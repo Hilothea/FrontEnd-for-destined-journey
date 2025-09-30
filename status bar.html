@@ -513,9 +513,9 @@ details.inventory-item-entry > summary {
     <hr class="thin-divider" />
   <!-- 状态网格布局 -->
   <div class="status-grid">
-  <!-- 左侧：战力层级、等级、种族、身份、职业、状态、称号等 -->
+  <!-- 左侧：生命层级、等级、种族、身份、职业、状态、称号等 -->
   <div class="status-grid-left">
-   <p><span class="property-name">⚜️ 战力层级:</span> <span id="char-power-level" class="value-main"></span></p>
+   <p><span class="property-name">⚜️ 生命层级:</span> <span id="char-power-level" class="value-main"></span></p>
    <p><span class="property-name">✨ 等级:</span> <span id="char-level" class="value-main"></span></p>
    <p><span class="property-name">🧬 种族:</span> <span id="char-race" class="value-main"></span></p>
    <p><span class="property-name">👑 身份:</span> <span id="char-identity" class="value-main">(暂无)</span></p>
@@ -947,7 +947,7 @@ details.inventory-item-entry > summary {
     setElementText('char-race', SafeGetValue(data, '角色.种族', '未知'));
     setElementText('char-identity', SafeGetValue(data, '角色.身份', '暂无'));
     setElementText('char-occupation', SafeGetValue(data, '角色.职业', '暂无'));
-    setElementText('char-power-level', SafeGetValue(data, '角色.状态.战力层级', '第一层级/普通层级'));
+    setElementText('char-power-level', SafeGetValue(data, '角色.状态.生命层级', '第一层级/普通层级'));
     setElementText('char-level', SafeGetValue(data, '角色.状态.等级', '1'));
     setElementText('char-adventurer-rank', SafeGetValue(data, '角色.状态.冒险者等级', '未评级'));
     setElementText('char-title', SafeGetValue(data, '角色.状态.称号', '无'));
@@ -1180,7 +1180,7 @@ details.inventory-item-entry > summary {
 
    function createDestinyTargetHTML(character, charKey, barId) {
     const name = SafeGetValue(character, '名称');
-    const powerLevel = SafeGetValue(character, '战力层级');
+    const powerLevel = SafeGetValue(character, '生命层级');
     const level = SafeGetValue(character, '等级');
     const race = SafeGetValue(character, '种族');
     const identity = SafeGetValue(character, '身份');
@@ -1197,7 +1197,7 @@ details.inventory-item-entry > summary {
     const backstory = SafeGetValue(character, '背景故事');
     const bondSkillText = SafeGetValue(character, '羁绊技能');
 
-    const powerLevelHTML = `<p><span class="property-name">⚜️ 战力层级:</span> <span class="value-main">${powerLevel || '未知'}</span></p>`;
+    const powerLevelHTML = `<p><span class="property-name">⚜️ 生命层级:</span> <span class="value-main">${powerLevel || '未知'}</span></p>`;
     const levelHTML = `<p><span class="property-name">✨ 等级:</span> <span class="value-main">${level || '未知'}</span></p>`;
     const raceHTML = `<p><span class="property-name">🧬 种族:</span> <span class="value-main">${race || '未知'}</span></p>`;
     const identityHTML = `<p><span class="property-name">👑 身份:</span> <span class="value-main">${identity || '未知'}</span></p>`;
@@ -1270,7 +1270,7 @@ details.inventory-item-entry > summary {
    }
 
   function updateAllSummaryDetails(data) {
-   const powerLevel = SafeGetValue(data, '角色.状态.战力层级', '第一层级/普通层级');
+   const powerLevel = SafeGetValue(data, '角色.状态.生命层级', '第一层级/普通层级');
    const level = SafeGetValue(data, '角色.状态.等级', '1');
     const hp = SafeGetValue(data, '角色.资源.生命值', '0');
     const hpMax = SafeGetValue(data, '角色.资源.生命值上限', '0');
