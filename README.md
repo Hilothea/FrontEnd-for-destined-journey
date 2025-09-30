@@ -1,4 +1,4 @@
-# FrontEnd-for-destined-journey
+# FrontEnd - 命定之诗与黄昏之歌
 
 ## 作者
 
@@ -18,7 +18,8 @@ Kitaikuyo，秋天的咸鱼，FL已躺平，yoyo514
 
 打包的文件在 `dist` 目录中，可通过 jsDelivr 获取
 
-[仓库打包目录 jsDelivr](https://testingcf.jsdelivr.net/gh/Hilothea/FrontEnd-for-destined-journey@dev/dist/)]
+[仓库打包目录 jsDelivr](https://testingcf.jsdelivr.net/gh/Hilothea/FrontEnd-for-destined-journey@dev/dist/)
+
 [状态栏 jsDelivr](https://testingcf.jsdelivr.net/gh/Hilothea/FrontEnd-for-destined-journey@dev/dist/status_bar/index.html)
 
 ## 环境
