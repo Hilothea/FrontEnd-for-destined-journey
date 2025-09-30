@@ -5,7 +5,7 @@ import CommonStatus from '../common/CommonStatus.vue';
 import EquipmentSlot from './EquipmentSlot.vue';
 
 // 使用状态数据
-const { statData } = useStatData()
+const { statData } = useStatData();
 
 // 装备槽位映射
 const equipmentSlots = [
@@ -16,8 +16,8 @@ const equipmentSlots = [
   { key: '手部防具', slotName: '手部防具', icon: '🧤' },
   { key: '脚部防具', slotName: '脚部防具', icon: '👢' },
   { key: '饰品1', slotName: '饰品1', icon: '💍' },
-  { key: '饰品2', slotName: '饰品2', icon: '📿' }
-]
+  { key: '饰品2', slotName: '饰品2', icon: '📿' },
+];
 
 // 获取装备数据
 const equipmentData = computed(() => {
@@ -26,30 +26,26 @@ const equipmentData = computed(() => {
       ...slot,
       name: '无装备',
       quality: '',
-      description: ''
-    }))
+      description: '',
+    }));
   }
 
-  const equipment = safeGet(statData.value, '财产.装备', {})
+  const equipment = safeGet(statData.value, '财产.装备', {});
 
   return equipmentSlots.map(slot => {
-    const equipData = safeGet(equipment, slot.key, {})
+    const equipData = safeGet(equipment, slot.key, {});
     return {
       ...slot,
       name: safeGet(equipData, '名称', '无装备'),
       quality: safeGet(equipData, '品质', ''),
-      description: safeGet(equipData, '描述', '')
-    }
-  })
-})
+      description: safeGet(equipData, '描述', ''),
+    };
+  });
+});
 </script>
 
 <template>
-  <CommonStatus
-    title="⚔️ 角色装备"
-    variant="section"
-    :default-open="false"
-  >
+  <CommonStatus title="⚔️ 角色装备" variant="section" :default-open="false">
     <div class="equipment-grid">
       <EquipmentSlot
         v-for="equipment in equipmentData"

@@ -1,19 +1,19 @@
 <script setup lang="ts">
 interface Props {
   /** 标题文本 */
-  title: string
+  title: string;
   /** 右侧摘要信息（可选） */
-  summaryDetails?: string
+  summaryDetails?: string;
   /** 是否默认展开 */
-  defaultOpen?: boolean
+  defaultOpen?: boolean;
   /** 是否锁定（未解锁状态） */
-  locked?: boolean
+  locked?: boolean;
   /** 变体类型：section(主要区块) | sub-section(子区块) | entry(条目) */
-  variant?: 'section' | 'sub-section' | 'entry'
+  variant?: 'section' | 'sub-section' | 'entry';
   /** 左侧图标（可选，默认使用星星） */
-  icon?: string
+  icon?: string;
   /** 额外的 CSS 类名 */
-  customClass?: string
+  customClass?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,57 +23,57 @@ const props = withDefaults(defineProps<Props>(), {
   variant: 'section',
   icon: '',
   customClass: '',
-})
+});
 
 // 控制展开/收起状态
-const isOpen = ref(props.defaultOpen)
+const isOpen = ref(props.defaultOpen);
 
 // 计算组件的 CSS 类名
 const containerClass = computed(() => {
-  const classes = ['details-status', `details-${props.variant}`]
-  if (props.locked) classes.push('locked')
-  if (isOpen.value) classes.push('is-open')
-  if (props.customClass) classes.push(props.customClass)
-  return classes.join(' ')
-})
+  const classes = ['details-status', `details-${props.variant}`];
+  if (props.locked) classes.push('locked');
+  if (isOpen.value) classes.push('is-open');
+  if (props.customClass) classes.push(props.customClass);
+  return classes.join(' ');
+});
 
 // 切换展开/收起
 const toggleOpen = () => {
-  if (props.locked) return // 锁定状态不允许展开
-  isOpen.value = !isOpen.value
-}
+  if (props.locked) return; // 锁定状态不允许展开
+  isOpen.value = !isOpen.value;
+};
 
 // 过渡钩子函数 - 实现高度动画
 const onEnter = (el: Element) => {
-  const element = el as HTMLElement
-  element.style.height = '0'
-  element.style.overflow = 'hidden'
+  const element = el as HTMLElement;
+  element.style.height = '0';
+  element.style.overflow = 'hidden';
   // 强制重排
-  void element.offsetHeight
+  void element.offsetHeight;
   // 设置目标高度
-  element.style.height = `${element.scrollHeight}px`
-}
+  element.style.height = `${element.scrollHeight}px`;
+};
 
 const onAfterEnter = (el: Element) => {
-  const element = el as HTMLElement
-  element.style.height = ''
-  element.style.overflow = ''
-}
+  const element = el as HTMLElement;
+  element.style.height = '';
+  element.style.overflow = '';
+};
 
 const onLeave = (el: Element) => {
-  const element = el as HTMLElement
-  element.style.height = `${element.scrollHeight}px`
-  element.style.overflow = 'hidden'
+  const element = el as HTMLElement;
+  element.style.height = `${element.scrollHeight}px`;
+  element.style.overflow = 'hidden';
   // 强制重排以触发过渡
-  void element.offsetHeight
-  element.style.height = '0'
-}
+  void element.offsetHeight;
+  element.style.height = '0';
+};
 
 const onAfterLeave = (el: Element) => {
-  const element = el as HTMLElement
-  element.style.height = ''
-  element.style.overflow = ''
-}
+  const element = el as HTMLElement;
+  element.style.height = '';
+  element.style.overflow = '';
+};
 </script>
 
 <template>
@@ -81,7 +81,7 @@ const onAfterLeave = (el: Element) => {
     <div class="summary" @click="toggleOpen">
       <!-- 左侧图标，如果提供了自定义图标则使用，否则使用默认星星 -->
       <span class="icon-star" :class="{ 'is-open': isOpen }">
-        {{ locked ? '🔒' : (icon || '✦') }}
+        {{ locked ? '🔒' : icon || '✦' }}
       </span>
 
       <!-- 标题内容 -->

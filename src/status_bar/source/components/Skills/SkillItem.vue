@@ -1,41 +1,41 @@
 <script lang="ts" setup>
-import { getQualityClass } from '../../utils/quality'
-import CommonStatus from '../common/CommonStatus.vue'
+import { getQualityClass } from '../../utils/quality';
+import CommonStatus from '../common/CommonStatus.vue';
 
 interface Props {
   /** 技能名称 */
-  name: string
+  name: string;
   /** 技能品质 */
-  quality?: string
+  quality?: string;
   /** 技能消耗（仅主动技能） */
-  cost?: string
+  cost?: string;
   /** 技能描述 */
-  description: string
+  description: string;
   /** 技能类型：主动或被动 */
-  type: 'active' | 'passive'
+  type: 'active' | 'passive';
 }
 
 const props = withDefaults(defineProps<Props>(), {
   quality: '',
-  cost: ''
-})
+  cost: '',
+});
 
 // 计算技能标题（只包含名称和品质）
 const skillTitle = computed(() => {
-  let title = props.name
+  let title = props.name;
   if (props.quality) {
-    title += `(${props.quality})`
+    title += `(${props.quality})`;
   }
-  return title
-})
+  return title;
+});
 
 // 计算摘要详情（显示消耗）
 const summaryDetails = computed(() => {
   if (props.type === 'active' && props.cost) {
-    return `消耗: ${props.cost}`
+    return `消耗: ${props.cost}`;
   }
-  return ''
-})
+  return '';
+});
 </script>
 
 <template>

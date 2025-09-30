@@ -1,35 +1,30 @@
 <script setup lang="ts">
-import { useStatData } from '../composables/use-stat-data'
-import { getExtensibleItems, safeGet } from '../utils/data-adapter'
-import CommonStatus from './common/CommonStatus.vue'
+import { useStatData } from '../composables/use-stat-data';
+import { getExtensibleItems, safeGet } from '../utils/data-adapter';
+import CommonStatus from './common/CommonStatus.vue';
 
-const { statData } = useStatData()
+const { statData } = useStatData();
 
 // 获取任务列表
 const tasks = computed(() => {
-  const taskData = safeGet(statData.value, '任务列表', {})
-  const items = getExtensibleItems(taskData)
+  const taskData = safeGet(statData.value, '任务列表', {});
+  const items = getExtensibleItems(taskData);
 
   return Object.entries(items).map(([key, task]: [string, any]) => ({
     key,
     title: key,
     intro: safeGet(task, '简介', ''),
     target: safeGet(task, '目标', ''),
-    reward: safeGet(task, '奖励', '')
-  }))
-})
+    reward: safeGet(task, '奖励', ''),
+  }));
+});
 
-const taskCount = computed(() => tasks.value.length)
-const summaryDetails = computed(() => `进行中: ${taskCount.value}个`)
+const taskCount = computed(() => tasks.value.length);
+const summaryDetails = computed(() => `进行中: ${taskCount.value}个`);
 </script>
 
 <template>
-  <CommonStatus
-    title="📜 当前任务"
-    variant="section"
-    :summary-details="summaryDetails"
-    :default-open="false"
-  >
+  <CommonStatus title="📜 当前任务" variant="section" :summary-details="summaryDetails" :default-open="false">
     <div v-if="taskCount > 0" class="tasks-container">
       <CommonStatus
         v-for="task in tasks"

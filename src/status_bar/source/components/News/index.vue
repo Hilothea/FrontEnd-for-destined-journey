@@ -1,45 +1,33 @@
 <script lang="ts" setup>
-import { useStatData } from '../../composables/use-stat-data'
-import { safeGet } from '../../utils/data-adapter'
-import CommonStatus from '../common/CommonStatus.vue'
-import NewsSection from './NewsSection.vue'
+import { useStatData } from '../../composables/use-stat-data';
+import { safeGet } from '../../utils/data-adapter';
+import CommonStatus from '../common/CommonStatus.vue';
+import NewsSection from './NewsSection.vue';
 
-const { statData } = useStatData()
+const { statData } = useStatData();
 
 // 获取新闻数据
-const goldLionNews = computed(() =>
-  safeGet(statData.value, '每日新闻.阿斯塔利亚快讯', '')
-)
+const goldLionNews = computed(() => safeGet(statData.value, '每日新闻.阿斯塔利亚快讯', ''));
 
-const tavernNews = computed(() =>
-  safeGet(statData.value, '每日新闻.酒馆留言板', '')
-)
+const tavernNews = computed(() => safeGet(statData.value, '每日新闻.酒馆留言板', ''));
 
-const teaPartyNews = computed(() =>
-  safeGet(statData.value, '每日新闻.红线助手的午后茶会', '')
-)
+const teaPartyNews = computed(() => safeGet(statData.value, '每日新闻.红线助手的午后茶会', ''));
 
 // 触发更新新闻
 const handleUpdateNews = () => {
   // 调用 SillyTavern 的斜杠命令
   if (typeof triggerSlash === 'function') {
-    triggerSlash('/send 更新"每日新闻"|/trigger')
+    triggerSlash('/send 更新"每日新闻"|/trigger');
   } else {
-    console.error('triggerSlash function is not available.')
+    console.error('triggerSlash function is not available.');
   }
-}
+};
 </script>
 
 <template>
-  <CommonStatus
-    title="🌍 每日新闻"
-    variant="section"
-    :default-open="false"
-  >
+  <CommonStatus title="🌍 每日新闻" variant="section" :default-open="false">
     <!-- 更新新闻按钮 -->
-    <button class="update-button" @click="handleUpdateNews">
-      更新每日新闻
-    </button>
+    <button class="update-button" @click="handleUpdateNews">更新每日新闻</button>
 
     <!-- 阿斯塔利亚快讯 -->
     <NewsSection

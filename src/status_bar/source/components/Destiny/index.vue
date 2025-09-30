@@ -1,24 +1,24 @@
 <script lang="ts" setup>
-import { useStatData } from '../../composables/use-stat-data'
-import { getExtensibleItems, safeGet } from '../../utils/data-adapter'
-import CommonStatus from '../common/CommonStatus.vue'
-import DestinyCharacter from './DestinyCharacter.vue'
+import { useStatData } from '../../composables/use-stat-data';
+import { getExtensibleItems, safeGet } from '../../utils/data-adapter';
+import CommonStatus from '../common/CommonStatus.vue';
+import DestinyCharacter from './DestinyCharacter.vue';
 
 // 使用状态数据
-const { statData } = useStatData()
+const { statData } = useStatData();
 
 // 获取命运点数
 const destinyPoints = computed(() => {
-  if (!statData.value) return 0
-  return safeGet(statData.value, '命运系统.命运点数', 0)
-})
+  if (!statData.value) return 0;
+  return safeGet(statData.value, '命运系统.命运点数', 0);
+});
 
 // 获取红线角色数据
 const charactersData = computed(() => {
-  if (!statData.value) return []
+  if (!statData.value) return [];
 
-  const redLineObj = safeGet(statData.value, '命运系统.红线对象', {})
-  const characters = getExtensibleItems(redLineObj)
+  const redLineObj = safeGet(statData.value, '命运系统.红线对象', {});
+  const characters = getExtensibleItems(redLineObj);
 
   return Object.entries(characters).map(([charName, charData]: [string, any]) => ({
     name: charName,
@@ -37,39 +37,32 @@ const charactersData = computed(() => {
     affection: safeGet(charData, '好感度', 0),
     evaluation: safeGet(charData, '评价', ''),
     backstory: safeGet(charData, '背景故事', ''),
-    bondSkill: safeGet(charData, '羁绊技能', {})
-  }))
-})
+    bondSkill: safeGet(charData, '羁绊技能', {}),
+  }));
+});
 
 // 计算摘要信息
 const summaryDetails = computed(() => {
-  const fp = destinyPoints.value
-  const count = charactersData.value.length
-  return `FP: ${fp} | 红线: ${count}人`
-})
+  const fp = destinyPoints.value;
+  const count = charactersData.value.length;
+  return `FP: ${fp} | 红线: ${count}人`;
+});
 
 // 触发命运抽卡
 const handleGacha = () => {
   // 调用 SillyTavern 的斜杠命令
   if (typeof triggerSlash === 'function') {
-    triggerSlash('/send 开始命运抽卡*5|/trigger')
+    triggerSlash('/send 开始命运抽卡*5|/trigger');
   } else {
-    console.error('triggerSlash function is not available.')
+    console.error('triggerSlash function is not available.');
   }
-}
+};
 </script>
 
 <template>
-  <CommonStatus
-    title="💞 命运红线"
-    variant="section"
-    :default-open="false"
-    :summary-details="summaryDetails"
-  >
+  <CommonStatus title="💞 命运红线" variant="section" :default-open="false" :summary-details="summaryDetails">
     <!-- 命运抽卡按钮 -->
-    <button class="gacha-button" @click="handleGacha">
-      命运抽卡(5连/500点)
-    </button>
+    <button class="gacha-button" @click="handleGacha">命运抽卡(5连/500点)</button>
 
     <!-- 命运点数显示 -->
     <div class="destiny-points">
@@ -103,9 +96,7 @@ const handleGacha = () => {
     </div>
 
     <!-- 空状态提示 -->
-    <p v-else class="empty-message value-main">
-      尚未与任何人缔结深刻的命运联系
-    </p>
+    <p v-else class="empty-message value-main">尚未与任何人缔结深刻的命运联系</p>
   </CommonStatus>
 </template>
 

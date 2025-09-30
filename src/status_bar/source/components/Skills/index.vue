@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { useStatData } from '../../composables/use-stat-data'
-import { getExtensibleItems, safeGet } from '../../utils/data-adapter'
-import CommonStatus from '../common/CommonStatus.vue'
-import SkillItem from './SkillItem.vue'
+import { useStatData } from '../../composables/use-stat-data';
+import { getExtensibleItems, safeGet } from '../../utils/data-adapter';
+import CommonStatus from '../common/CommonStatus.vue';
+import SkillItem from './SkillItem.vue';
 
-const { statData } = useStatData()
+const { statData } = useStatData();
 
 // 品质排序权重
 const rarityOrder: Record<string, number> = {
@@ -13,16 +13,16 @@ const rarityOrder: Record<string, number> = {
   史诗: 4,
   稀有: 3,
   优良: 2,
-  普通: 1
-}
+  普通: 1,
+};
 
 // 获取并分类技能
 const skills = computed(() => {
-  const skillData = safeGet(statData.value, '技能列表', {})
-  const items = getExtensibleItems(skillData)
+  const skillData = safeGet(statData.value, '技能列表', {});
+  const items = getExtensibleItems(skillData);
 
-  const active: any[] = []
-  const passive: any[] = []
+  const active: any[] = [];
+  const passive: any[] = [];
 
   Object.entries(items).forEach(([key, skill]: [string, any]) => {
     const skillInfo = {
@@ -31,33 +31,28 @@ const skills = computed(() => {
       quality: safeGet(skill, '品质', ''),
       cost: safeGet(skill, '消耗', ''),
       description: safeGet(skill, '描述', ''),
-      type: safeGet(skill, '类型', '')
-    }
+      type: safeGet(skill, '类型', ''),
+    };
 
     if (skillInfo.type === '主动') {
-      active.push(skillInfo)
+      active.push(skillInfo);
     } else if (skillInfo.type === '被动') {
-      passive.push(skillInfo)
+      passive.push(skillInfo);
     }
-  })
+  });
 
   // 按品质排序
-  const sortByRarity = (a: any, b: any) =>
-    (rarityOrder[b.quality] || 0) - (rarityOrder[a.quality] || 0)
+  const sortByRarity = (a: any, b: any) => (rarityOrder[b.quality] || 0) - (rarityOrder[a.quality] || 0);
 
-  active.sort(sortByRarity)
-  passive.sort(sortByRarity)
+  active.sort(sortByRarity);
+  passive.sort(sortByRarity);
 
-  return { active, passive }
-})
+  return { active, passive };
+});
 </script>
 
 <template>
-  <CommonStatus
-    title="💫 角色技能"
-    variant="section"
-    :default-open="false"
-  >
+  <CommonStatus title="💫 角色技能" variant="section" :default-open="false">
     <div class="skills-grid">
       <!-- 主动技能列 -->
       <div class="skills-column">

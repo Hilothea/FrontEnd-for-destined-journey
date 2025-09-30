@@ -10,7 +10,7 @@ export function getQualityClass(quality: string): string {
     史诗: 'quality-epic',
     稀有: 'quality-rare',
     优良: 'quality-uncommon',
-    普通: 'quality-common'
-  }
-  return qualityMap[quality] || ''
+    普通: 'quality-common',
+  };
+  return qualityMap[quality] || '';
 }

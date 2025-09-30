@@ -1,23 +1,23 @@
 <script lang="ts" setup>
 interface Props {
   /** 资源类型标签（如 HP、MP 等） */
-  label: string
+  label: string;
   /** 左侧 emoji 图标 */
-  icon: string
+  icon: string;
   /** 当前值 */
-  current: number
+  current: number;
   /** 最大值 */
-  max: number
+  max: number;
   /** 进度条颜色 */
-  color: string
+  color: string;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 
 // 计算进度条百分比
 const getPercentage = (current: number, max: number) => {
-  return Math.min(100, (current / max) * 100)
-}
+  return Math.min(100, (current / max) * 100);
+};
 </script>
 
 <template>
@@ -32,7 +32,7 @@ const getPercentage = (current: number, max: number) => {
         class="progress-bar-value"
         :style="{
           width: `${getPercentage(current, max)}%`,
-          backgroundColor: color
+          backgroundColor: color,
         }"
       ></div>
     </div>
@@ -71,11 +71,7 @@ const getPercentage = (current: number, max: number) => {
   height: 100%;
   transition: width 0.8s ease-out;
   border-radius: 9px;
-  background-image: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.15),
-    rgba(0, 0, 0, 0.1)
-  );
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.1));
   box-shadow: inset 0 -1px 3px rgba(0, 0, 0, 0.1);
 }
 </style>

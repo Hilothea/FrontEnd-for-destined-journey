@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { useStatData } from '../composables/use-stat-data'
-import { safeGet } from '../utils/data-adapter'
+import { useStatData } from '../composables/use-stat-data';
+import { safeGet } from '../utils/data-adapter';
 
-const { statData } = useStatData()
+const { statData } = useStatData();
 
-const worldTime = computed(() =>
-  safeGet(statData.value, '世界.时间', '未知时间')
-)
+const worldTime = computed(() => safeGet(statData.value, '世界.时间', '未知时间'));
 
-const worldLocation = computed(() =>
-  safeGet(statData.value, '世界.地点', '未知地点')
-)
+const worldLocation = computed(() => safeGet(statData.value, '世界.地点', '未知地点'));
 </script>
 
 <template>

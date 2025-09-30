@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 interface Props {
   /** 属性名称 */
-  label: string
+  label: string;
   /** 左侧 emoji 图标（可选） */
-  icon?: string
+  icon?: string;
   /** 属性值 */
-  value: string | number
+  value: string | number;
 }
 
-defineProps<Props>()
+defineProps<Props>();
 </script>
 
 <template>

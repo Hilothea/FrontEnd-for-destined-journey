@@ -1,38 +1,34 @@
 <script lang="ts" setup>
-import { getQualityClass } from '../../utils/quality'
+import { getQualityClass } from '../../utils/quality';
 
 interface Props {
   /** 槽位名称 */
-  slotName: string
+  slotName: string;
   /** 左侧 emoji 图标 */
-  icon: string
+  icon: string;
   /** 装备名称 */
-  equipmentName?: string
+  equipmentName?: string;
   /** 装备品质 */
-  quality?: string
+  quality?: string;
   /** 装备描述 */
-  description?: string
+  description?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   equipmentName: '无装备',
   quality: '',
-  description: ''
-})
+  description: '',
+});
 
 // 判断是否有装备
-const hasEquipment = computed(() => props.equipmentName !== '无装备')
+const hasEquipment = computed(() => props.equipmentName !== '无装备');
 </script>
 
 <template>
   <div class="equipment-slot">
     <p class="equipment-label">
       <span>{{ icon }} {{ slotName }}: </span>
-      <span
-        v-if="hasEquipment"
-        class="equipment-name value-main"
-        :class="getQualityClass(quality)"
-      >
+      <span v-if="hasEquipment" class="equipment-name value-main" :class="getQualityClass(quality)">
         {{ equipmentName }}<template v-if="quality">({{ quality }})</template>
       </span>
       <span v-else class="equipment-name value-main">无装备</span>

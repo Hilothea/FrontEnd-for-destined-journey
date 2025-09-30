@@ -1,39 +1,45 @@
 <script lang="ts" setup>
-import { useStatData } from '../../composables/use-stat-data'
-import { getExtensibleItems, normalizeStringOrArray, safeGet } from '../../utils/data-adapter'
-import CommonStatus from '../common/CommonStatus.vue'
-import PropertyItem from './PropertyItem.vue'
-import ResourceBar from './ResourceBar.vue'
+import { useStatData } from '../../composables/use-stat-data';
+import { getExtensibleItems, normalizeStringOrArray, safeGet } from '../../utils/data-adapter';
+import CommonStatus from '../common/CommonStatus.vue';
+import PropertyItem from './PropertyItem.vue';
+import ResourceBar from './ResourceBar.vue';
 
 // 使用状态数据
-const { statData } = useStatData()
+const { statData } = useStatData();
 
 // 获取资源数据
 const resourcesData = computed(() => {
-  if (!statData.value) return { hp: { current: 0, max: 0 }, mp: { current: 0, max: 0 }, sp: { current: 0, max: 0 }, exp: { current: 0, needed: 0 } }
+  if (!statData.value)
+    return {
+      hp: { current: 0, max: 0 },
+      mp: { current: 0, max: 0 },
+      sp: { current: 0, max: 0 },
+      exp: { current: 0, needed: 0 },
+    };
 
-  const resources = safeGet(statData.value, '角色.资源', {})
-  const status = safeGet(statData.value, '角色.状态', {})
+  const resources = safeGet(statData.value, '角色.资源', {});
+  const status = safeGet(statData.value, '角色.状态', {});
 
   return {
     hp: {
       current: safeGet(resources, '生命值', 0),
-      max: safeGet(resources, '生命值上限', 0)
+      max: safeGet(resources, '生命值上限', 0),
     },
     mp: {
       current: safeGet(resources, '法力值', 0),
-      max: safeGet(resources, '法力值上限', 0)
+      max: safeGet(resources, '法力值上限', 0),
     },
     sp: {
       current: safeGet(resources, '体力值', 0),
-      max: safeGet(resources, '体力值上限', 0)
+      max: safeGet(resources, '体力值上限', 0),
     },
     exp: {
       current: safeGet(status, '累计经验值', 0),
-      needed: safeGet(status, '升级所需经验', 0)
-    }
-  }
-})
+      needed: safeGet(status, '升级所需经验', 0),
+    },
+  };
+});
 
 // 获取状态数据
 const statusData = computed(() => {
@@ -46,32 +52,36 @@ const statusData = computed(() => {
       occupation: '暂无',
       adventurerRank: '未评级',
       title: '无称号',
-      titleEffect: ''
-    }
+      titleEffect: '',
+    };
   }
 
-  const character = safeGet(statData.value, '角色', {})
-  const status = safeGet(character, '状态', {})
-  const identity = normalizeStringOrArray(safeGet(character, '身份', []))
-  const occupation = normalizeStringOrArray(safeGet(character, '职业', []))
+  const character = safeGet(statData.value, '角色', {});
+  const status = safeGet(character, '状态', {});
+  const identity = normalizeStringOrArray(safeGet(character, '身份', []));
+  const occupation = normalizeStringOrArray(safeGet(character, '职业', []));
 
   return {
     lifeLevel: safeGet(status, '生命层级', '第一层级/普通层级'),
     level: safeGet(status, '等级', 1),
     race: safeGet(character, '种族', '未知'),
-    identity: Array.isArray(identity) ? (identity.length > 0 ? identity.join(', ') : '暂无') : (identity || '暂无'),
-    occupation: Array.isArray(occupation) ? (occupation.length > 0 ? occupation.join(', ') : '暂无') : (occupation || '暂无'),
+    identity: Array.isArray(identity) ? (identity.length > 0 ? identity.join(', ') : '暂无') : identity || '暂无',
+    occupation: Array.isArray(occupation)
+      ? occupation.length > 0
+        ? occupation.join(', ')
+        : '暂无'
+      : occupation || '暂无',
     adventurerRank: safeGet(status, '冒险者等级', '未评级'),
     title: safeGet(status, '称号', '无称号'),
-    titleEffect: safeGet(status, '称号效果', '')
-  }
-})
+    titleEffect: safeGet(status, '称号效果', ''),
+  };
+});
 
 // 获取属性数据
 const attributesData = computed(() => {
-  if (!statData.value) return { ap: 0, str: 0, agi: 0, con: 0, int: 0, spi: 0 }
+  if (!statData.value) return { ap: 0, str: 0, agi: 0, con: 0, int: 0, spi: 0 };
 
-  const attributes = safeGet(statData.value, '角色.属性', {})
+  const attributes = safeGet(statData.value, '角色.属性', {});
 
   return {
     ap: safeGet(attributes, '属性点', 0),
@@ -79,37 +89,32 @@ const attributesData = computed(() => {
     agi: safeGet(attributes, '敏捷', 0),
     con: safeGet(attributes, '体质', 0),
     int: safeGet(attributes, '智力', 0),
-    spi: safeGet(attributes, '精神', 0)
-  }
-})
+    spi: safeGet(attributes, '精神', 0),
+  };
+});
 
 // 获取即时状态数据
 const instantStatusData = computed(() => {
-  if (!statData.value) return []
+  if (!statData.value) return [];
 
-  const instantStatusObj = safeGet(statData.value, '角色.状态.即时状态', {})
-  const statusItems = getExtensibleItems(instantStatusObj)
+  const instantStatusObj = safeGet(statData.value, '角色.状态.即时状态', {});
+  const statusItems = getExtensibleItems(instantStatusObj);
 
   return Object.entries(statusItems).map(([statusName, statusData]: [string, any]) => ({
     name: statusName,
     effect: safeGet(statusData, '效果', ''),
-    duration: safeGet(statusData, '持续', '')
-  }))
-})
+    duration: safeGet(statusData, '持续', ''),
+  }));
+});
 
 // 计算摘要信息
 const summaryDetails = computed(() => {
-  return `等级: ${statusData.value.level}`
-})
+  return `等级: ${statusData.value.level}`;
+});
 </script>
 
 <template>
-  <CommonStatus
-    title="👤 角色信息与状态"
-    variant="section"
-    :summary-details="summaryDetails"
-    :default-open="false"
-  >
+  <CommonStatus title="👤 角色信息与状态" variant="section" :summary-details="summaryDetails" :default-open="false">
     <!-- 资源条区域 -->
     <div class="resources-section">
       <ResourceBar
@@ -175,11 +180,7 @@ const summaryDetails = computed(() => {
         <div class="instant-status-section">
           <p class="property-name">🔘 即时状态:</p>
           <div v-if="instantStatusData.length > 0" class="instant-status-list">
-            <p
-              v-for="(status, index) in instantStatusData"
-              :key="index"
-              class="instant-status-item"
-            >
+            <p v-for="(status, index) in instantStatusData" :key="index" class="instant-status-item">
               <span class="status-name">{{ status.name }}</span>
               <template v-if="status.effect">: {{ status.effect }}</template>
               <template v-if="status.duration"> ({{ status.duration }})</template>
