@@ -1,9 +1,30 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useStatData } from '../composables/use-stat-data'
+import { safeGet } from '../utils/data-adapter'
+
+const { statData } = useStatData()
+
+const worldTime = computed(() =>
+  safeGet(statData.value, '世界.时间', '未知时间')
+)
+
+const worldLocation = computed(() =>
+  safeGet(statData.value, '世界.地点', '未知地点')
+)
+</script>
 
 <template>
   <div class="world-status">
-    <div>⏳️ 时间: <span id="world-time" class="value-main">111</span></div>
-    <div>📍 地点: <span id="world-location" class="value-main">111</span></div>
+    <p class="world-info">
+      <span class="info-icon">⏳️</span>
+      <span class="info-label">时间:</span>
+      <span class="value-main">{{ worldTime }}</span>
+    </p>
+    <p class="world-info">
+      <span class="info-icon">📍</span>
+      <span class="info-label">地点:</span>
+      <span class="value-main">{{ worldLocation }}</span>
+    </p>
   </div>
 </template>
 
@@ -11,8 +32,7 @@
 .world-status {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
+  gap: 8px;
   background-color: #e8ddcb;
   padding: 10px 15px;
   margin-bottom: 15px;
@@ -27,5 +47,23 @@
     transform: translateY(-3px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
+}
+
+.world-info {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.6;
+}
+
+.info-icon {
+  flex-shrink: 0;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #4a3b31;
+  flex-shrink: 0;
 }
 </style>

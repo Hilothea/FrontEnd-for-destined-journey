@@ -1,12 +1,113 @@
 <script lang="ts" setup>
-import CommonStatus from './common/CommonStatus.vue';
+import { useStatData } from '../composables/use-stat-data'
+import { getExtensibleItems, safeGet } from '../utils/data-adapter'
+import CommonStatus from './common/CommonStatus.vue'
+
+// 定义类型
+interface AscensionItem {
+  name: string
+  description: string
+}
+
+interface DivinityInfo {
+  name: string
+  kingdom: string
+}
+
+// 使用状态数据
+const { statData } = useStatData()
+
+// 获取用户等级
+const userLevel = computed(() => {
+  if (!statData.value) return 1
+  return safeGet(statData.value, '角色.状态.等级', 1)
+})
+
+// 获取登神长阶数据
+const ascensionData = computed(() => {
+  if (!statData.value) return null
+  return safeGet(statData.value, '登神长阶', {})
+})
+
+// 获取要素数据 - 直接的键值对格式
+const elementsData = computed((): AscensionItem[] => {
+  if (!ascensionData.value) return []
+
+  const elementsObj = safeGet(ascensionData.value, '要素', {})
+  const items = getExtensibleItems(elementsObj)
+
+  return Object.entries(items).map(([name, description]: [string, any]) => ({
+    name,
+    description: String(description || '')
+  }))
+})
+
+// 获取权能数据 - 直接的键值对格式
+const authorityData = computed((): AscensionItem[] => {
+  if (!ascensionData.value) return []
+
+  const authorityObj = safeGet(ascensionData.value, '权能', {})
+  const items = getExtensibleItems(authorityObj)
+
+  return Object.entries(items).map(([name, description]: [string, any]) => ({
+    name,
+    description: String(description || '')
+  }))
+})
+
+// 获取法则数据 - 直接的键值对格式
+const lawsData = computed((): AscensionItem[] => {
+  if (!ascensionData.value) return []
+
+  const lawsObj = safeGet(ascensionData.value, '法则', {})
+  const items = getExtensibleItems(lawsObj)
+
+  return Object.entries(items).map(([name, description]: [string, any]) => ({
+    name,
+    description: String(description || '')
+  }))
+})
+
+// 获取神位/神国数据
+const divinityData = computed((): DivinityInfo => {
+  if (!ascensionData.value) return { name: '', kingdom: '' }
+
+  return {
+    name: safeGet(ascensionData.value, '神位', ''),
+    kingdom: safeGet(ascensionData.value, '神国.名称', '')
+  }
+})
+
+// 判断各阶段是否解锁
+const isElementsUnlocked = computed(() => userLevel.value >= 13)
+const isAuthorityUnlocked = computed(() => userLevel.value >= 17)
+const isLawsUnlocked = computed(() => userLevel.value >= 21)
+const isDivinityUnlocked = computed(() => userLevel.value >= 25)
+
+// 计算摘要信息
+const summaryDetails = computed(() => {
+  if (userLevel.value < 13) return '未开启'
+  if (userLevel.value >= 25 && divinityData.value.name) {
+    return `已登神: ${divinityData.value.name}`
+  }
+  if (userLevel.value >= 21 && lawsData.value.length > 0) {
+    return '当前阶段: 法则'
+  }
+  if (userLevel.value >= 17 && authorityData.value.length > 0) {
+    return '当前阶段: 权能'
+  }
+  if (userLevel.value >= 13 && elementsData.value.length > 0) {
+    return '当前阶段: 要素'
+  }
+  return '长阶已启'
+})
 </script>
 
 <template>
   <CommonStatus
     title="♾️ 登神长阶"
     variant="section"
-    summary-details="长阶未开启"
+    :summary-details="summaryDetails"
     :default-open="false"
   >
     <!-- 要素 -->
@@ -14,18 +115,20 @@ import CommonStatus from './common/CommonStatus.vue';
       title="要素"
       variant="sub-section"
       :default-open="false"
-      :locked="false"
+      :locked="!isElementsUnlocked"
     >
       <template #title>
-        要素 <span class="step-level-req">60级开启</span>
+        要素 <span class="step-level-req">13级开启</span>
       </template>
 
-      <div class="step-items-container">
-        <div class="step-item">
-          <span class="item-name">❖ 示例要素:</span>
-          <span class="item-desc">这是要素的描述信息</span>
+      <div v-if="isElementsUnlocked" class="step-items-container">
+        <div v-if="elementsData.length > 0">
+          <div v-for="(item, index) in elementsData" :key="index" class="step-item">
+            <span class="item-name">❖ {{ item.name }}:</span>
+            <span class="item-desc">{{ item.description }}</span>
+          </div>
         </div>
-        <p class="empty-slot">（尚无要素）</p>
+        <p v-else class="empty-slot">（尚无要素）</p>
       </div>
     </CommonStatus>
 
@@ -34,18 +137,20 @@ import CommonStatus from './common/CommonStatus.vue';
       title="权能"
       variant="sub-section"
       :default-open="false"
-      :locked="false"
+      :locked="!isAuthorityUnlocked"
     >
       <template #title>
-        权能 <span class="step-level-req">80级开启</span>
+        权能 <span class="step-level-req">17级开启</span>
       </template>
 
-      <div class="step-items-container">
-        <div class="step-item">
-          <span class="item-name">❖ 示例权能:</span>
-          <span class="item-desc">这是权能的描述信息</span>
+      <div v-if="isAuthorityUnlocked" class="step-items-container">
+        <div v-if="authorityData.length > 0">
+          <div v-for="(item, index) in authorityData" :key="index" class="step-item">
+            <span class="item-name">❖ {{ item.name }}:</span>
+            <span class="item-desc">{{ item.description }}</span>
+          </div>
         </div>
-        <p class="empty-slot">（尚无权能）</p>
+        <p v-else class="empty-slot">（尚无权能）</p>
       </div>
     </CommonStatus>
 
@@ -54,18 +159,20 @@ import CommonStatus from './common/CommonStatus.vue';
       title="法则"
       variant="sub-section"
       :default-open="false"
-      :locked="false"
+      :locked="!isLawsUnlocked"
     >
       <template #title>
-        法则 <span class="step-level-req">90级开启</span>
+        法则 <span class="step-level-req">21级开启</span>
       </template>
 
-      <div class="step-items-container">
-        <div class="step-item">
-          <span class="item-name">❖ 示例法则:</span>
-          <span class="item-desc">这是法则的描述信息</span>
+      <div v-if="isLawsUnlocked" class="step-items-container">
+        <div v-if="lawsData.length > 0">
+          <div v-for="(item, index) in lawsData" :key="index" class="step-item">
+            <span class="item-name">❖ {{ item.name }}:</span>
+            <span class="item-desc">{{ item.description }}</span>
+          </div>
         </div>
-        <p class="empty-slot">（尚无法则）</p>
+        <p v-else class="empty-slot">（尚无法则）</p>
       </div>
     </CommonStatus>
 
@@ -74,25 +181,25 @@ import CommonStatus from './common/CommonStatus.vue';
       title="神位 / 神国"
       variant="sub-section"
       :default-open="false"
-      :locked="false"
+      :locked="!isDivinityUnlocked"
     >
       <template #title>
-        神位 / 神国 <span class="step-level-req">100级开启</span>
+        神位 / 神国 <span class="step-level-req">25级开启</span>
       </template>
 
-      <div class="god-tier-grid">
+      <div v-if="isDivinityUnlocked" class="god-tier-grid">
         <div>
           <div class="step-item">
             <span class="item-name">神位: </span>
-            <span class="value-main">示例神位</span>
-            <span class="empty-slot">（尚未登临）</span>
+            <span v-if="divinityData.name" class="value-main">{{ divinityData.name }}</span>
+            <span v-else class="empty-slot">（尚未登临）</span>
           </div>
         </div>
         <div>
           <div class="step-item">
             <span class="item-name">神国: </span>
-            <span class="value-main">示例神国</span>
-            <span class="empty-slot">（尚未开辟）</span>
+            <span v-if="divinityData.kingdom" class="value-main">{{ divinityData.kingdom }}</span>
+            <span v-else class="empty-slot">（尚未开辟）</span>
           </div>
         </div>
       </div>
@@ -113,7 +220,7 @@ import CommonStatus from './common/CommonStatus.vue';
 .step-items-container {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 8px;
 }
 
 /* 步骤项 */
@@ -139,6 +246,7 @@ import CommonStatus from './common/CommonStatus.vue';
 .empty-slot {
   color: #9e9e9e;
   font-style: italic;
+  margin: 0;
 }
 
 /* 神位/神国网格布局 */
