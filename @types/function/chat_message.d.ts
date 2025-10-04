@@ -5,7 +5,7 @@ type ChatMessage = {
   is_hidden: boolean;
   message: string;
   data: Record<string, any>;
-  extra?: Record<string, any>;
+  extra: Record<string, any>;
 };
 
 type ChatMessageSwiped = {
@@ -154,6 +154,7 @@ type ChatMessageCreating = {
   is_hidden?: boolean;
   message: string;
   data?: Record<string, any>;
+  extra?: Record<string, any>;
 };
 
 type CreateChatMessagesOption = {
