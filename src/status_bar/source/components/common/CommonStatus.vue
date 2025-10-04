@@ -28,6 +28,14 @@ const props = withDefaults(defineProps<Props>(), {
 // 控制展开/收起状态
 const isOpen = ref(props.defaultOpen);
 
+// 摘要内容长度阈值（字符数），超过此值时另起一行
+const SUMMARY_LENGTH_THRESHOLD = 30;
+
+// 判断摘要内容是否过长，需要换行显示
+const shouldWrapSummary = computed(() => {
+  return props.summaryDetails.length > SUMMARY_LENGTH_THRESHOLD;
+});
+
 // 计算组件的 CSS 类名
 const containerClass = computed(() => {
   const classes = ['details-status', `details-${props.variant}`];
@@ -78,24 +86,31 @@ const onAfterLeave = (el: Element) => {
 
 <template>
   <div :class="containerClass">
-    <div class="summary" @click="toggleOpen">
-      <!-- 左侧图标，如果提供了自定义图标则使用，否则使用默认星星 -->
-      <span class="icon-star" :class="{ 'is-open': isOpen }">
-        {{ locked ? '🔒' : icon || '✦' }}
-      </span>
+    <div class="summary" :class="{ 'has-wrapped-summary': shouldWrapSummary }" @click="toggleOpen">
+      <div class="summary-main-line">
+        <!-- 左侧图标，如果提供了自定义图标则使用，否则使用默认星星 -->
+        <span class="icon-star" :class="{ 'is-open': isOpen }">
+          {{ locked ? '🔒' : icon || '✦' }}
+        </span>
 
-      <!-- 标题内容 -->
-      <span class="summary-title">
-        <slot name="title">{{ title }}</slot>
-      </span>
+        <!-- 标题内容 -->
+        <span class="summary-title">
+          <slot name="title">{{ title }}</slot>
+        </span>
 
-      <!-- 右侧摘要信息 -->
-      <span v-if="summaryDetails" class="summary-details">
+        <!-- 右侧摘要信息（内容较短时显示在同一行） -->
+        <span v-if="summaryDetails && !shouldWrapSummary" class="summary-details">
+          {{ summaryDetails }}
+        </span>
+
+        <!-- 右侧箭头 -->
+        <span class="arrow-toggle" :class="{ rotated: isOpen }">▼</span>
+      </div>
+
+      <!-- 摘要信息换行显示（内容较长时） -->
+      <div v-if="summaryDetails && shouldWrapSummary" class="summary-wrapped-details">
         {{ summaryDetails }}
-      </span>
-
-      <!-- 右侧箭头 -->
-      <span class="arrow-toggle" :class="{ rotated: isOpen }">▼</span>
+      </div>
     </div>
 
     <!-- 折叠内容区域 -->
@@ -153,8 +168,6 @@ const onAfterLeave = (el: Element) => {
   padding: 4px 15px;
   cursor: pointer;
   list-style: none;
-  display: flex;
-  align-items: center;
   border-bottom: 1px solid #c6b8a5;
   text-align: left;
   transition:
@@ -170,6 +183,18 @@ const onAfterLeave = (el: Element) => {
     background-color: #bfa996;
     border-bottom-color: #a39281;
   }
+
+  // 当摘要需要换行时，调整内边距
+  &.has-wrapped-summary {
+    padding-bottom: 8px;
+  }
+}
+
+/* 标题主行（包含图标、标题、箭头） */
+.summary-main-line {
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 /* 左侧星星图标 */
@@ -200,7 +225,7 @@ const onAfterLeave = (el: Element) => {
   flex: 1;
 }
 
-/* 右侧摘要信息 */
+/* 右侧摘要信息（同行显示） */
 .summary-details {
   margin-left: auto;
   padding-right: 15px;
@@ -211,6 +236,22 @@ const onAfterLeave = (el: Element) => {
   letter-spacing: 0.5px;
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
   align-self: center;
+  flex-shrink: 0;
+}
+
+/* 摘要信息换行显示 */
+.summary-wrapped-details {
+  margin-top: 6px;
+  padding-left: 22px;
+  padding-right: 10px;
+  font-family: 'Noto Sans SC', 'Courier New', monospace;
+  font-weight: 500;
+  font-size: 0.8em;
+  color: #6a514d;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
+  line-height: 1.4;
+  word-break: auto-phrase; /* 实验性功能，智能换行 */
 }
 
 /* 右侧箭头 */

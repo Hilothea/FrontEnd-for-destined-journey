@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useStatData } from '../../composables/use-stat-data';
-import { getExtensibleItems, normalizeStringOrArray, safeGet } from '../../utils/data-adapter';
+import { normalizeStringOrArray, safeGet } from '../../utils/data-adapter';
 import CommonStatus from '../common/CommonStatus.vue';
 import PropertyItem from './PropertyItem.vue';
 import ResourceBar from './ResourceBar.vue';
@@ -51,8 +51,6 @@ const statusData = computed(() => {
       identity: '暂无',
       occupation: '暂无',
       adventurerRank: '未评级',
-      title: '无称号',
-      titleEffect: '',
     };
   }
 
@@ -72,8 +70,6 @@ const statusData = computed(() => {
         : '暂无'
       : occupation || '暂无',
     adventurerRank: safeGet(status, '冒险者等级', '未评级'),
-    title: safeGet(status, '称号', '无称号'),
-    titleEffect: safeGet(status, '称号效果', ''),
   };
 });
 
@@ -93,23 +89,9 @@ const attributesData = computed(() => {
   };
 });
 
-// 获取即时状态数据
-const instantStatusData = computed(() => {
-  if (!statData.value) return [];
-
-  const instantStatusObj = safeGet(statData.value, '角色.状态.即时状态', {});
-  const statusItems = getExtensibleItems(instantStatusObj);
-
-  return Object.entries(statusItems).map(([statusName, statusData]: [string, any]) => ({
-    name: statusName,
-    effect: safeGet(statusData, '效果', ''),
-    duration: safeGet(statusData, '持续', ''),
-  }));
-});
-
 // 计算摘要信息
 const summaryDetails = computed(() => {
-  return `等级: ${statusData.value.level}`;
+  return `${statusData.value.lifeLevel} | 等级: ${statusData.value.level} | HP: ${resourcesData.value.hp.current}/${resourcesData.value.hp.max} | MP: ${resourcesData.value.mp.current}/${resourcesData.value.mp.max} | SP: ${resourcesData.value.sp.current}/${resourcesData.value.sp.max}`;
 });
 </script>
 
@@ -157,14 +139,6 @@ const summaryDetails = computed(() => {
         <PropertyItem label="👑 身份" :value="statusData.identity" />
         <PropertyItem label="⚖️ 职业" :value="statusData.occupation" />
         <PropertyItem label="🔥 冒险者等级" :value="statusData.adventurerRank" />
-
-        <!-- 称号及效果区域 -->
-        <div class="title-section">
-          <PropertyItem label="🏆 称号" :value="statusData.title" />
-          <div v-if="statusData.titleEffect" class="title-effect">
-            <span class="value-main">{{ statusData.titleEffect }}</span>
-          </div>
-        </div>
       </div>
 
       <!-- 右侧：属性点和五维属性 -->
@@ -175,19 +149,6 @@ const summaryDetails = computed(() => {
         <PropertyItem icon="🏋️" label="体质 CON" :value="attributesData.con" />
         <PropertyItem icon="🧠" label="智力 INT" :value="attributesData.int" />
         <PropertyItem icon="🧘" label="精神 SPI" :value="attributesData.spi" />
-
-        <!-- 即时状态 -->
-        <div class="instant-status-section">
-          <p class="property-name">🔘 即时状态:</p>
-          <div v-if="instantStatusData.length > 0" class="instant-status-list">
-            <p v-for="(status, index) in instantStatusData" :key="index" class="instant-status-item">
-              <span class="status-name">{{ status.name }}</span>
-              <template v-if="status.effect">: {{ status.effect }}</template>
-              <template v-if="status.duration"> ({{ status.duration }})</template>
-            </p>
-          </div>
-          <p v-else class="value-main">一切正常</p>
-        </div>
       </div>
     </div>
   </CommonStatus>
@@ -245,55 +206,6 @@ const summaryDetails = computed(() => {
   font-weight: bold;
   color: #6a514d;
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
-}
-
-/* 冒险者等级后的分隔线 */
-.status-grid-left > :nth-child(6) {
-  padding-bottom: 8px;
-  border-bottom: 1px solid #d3c5b3;
-}
-
-/* 称号区域 */
-.title-section {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-/* 称号效果样式 */
-.title-effect {
-  font-size: 0.85em;
-  font-style: italic;
-  color: #7a655d;
-  margin-left: 0;
-  padding-left: 0;
-}
-
-/* 即时状态区域 */
-.instant-status-section {
-  padding-top: 8px;
-  border-top: 1px solid #d3c5b3;
-}
-
-.instant-status-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 4px;
-}
-
-.instant-status-item {
-  margin: 0;
-  margin-left: 15px;
-  font-size: 0.9em;
-  color: #4a3b31;
-  line-height: 1.5;
-  white-space: pre-wrap;
-}
-
-.status-name {
-  font-weight: bold;
-  color: #6a514d;
 }
 
 /* 响应式布局 */

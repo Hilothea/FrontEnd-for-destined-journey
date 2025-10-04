@@ -97,7 +97,8 @@ const itemStats = computed(() => {
 
 // 计算摘要信息
 const summaryDetails = computed(() => {
-  return `物品: ${itemStats.value.total}种`;
+  const { platinum, gold, silver, copper } = currencyData.value
+  return `白金币: ${platinum} | 金币: ${gold} | 银币: ${silver} | 铜币: ${copper} | 物品: ${itemStats.value.total}`;
 });
 </script>
 

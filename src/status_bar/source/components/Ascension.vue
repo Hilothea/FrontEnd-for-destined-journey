@@ -88,7 +88,7 @@ const isDivinityUnlocked = computed(() => userLevel.value >= 25);
 const summaryDetails = computed(() => {
   if (userLevel.value < 13) return '未开启';
   if (userLevel.value >= 25 && divinityData.value.name) {
-    return `已登神: ${divinityData.value.name}`;
+    return divinityData.value.name.trim() !== '' ? `已登神: ${divinityData.value.name}` : `已登神`;
   }
   if (userLevel.value >= 21 && lawsData.value.length > 0) {
     return '当前阶段: 法则';
