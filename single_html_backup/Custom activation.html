@@ -274,7 +274,6 @@
       margin-top: 10px;
     }
 
-    /* 条件显示组样式 */
     .conditional-display-group {
       display: none;
       opacity: 0;
@@ -288,9 +287,7 @@
       display: block;
       opacity: 1;
       max-height: 250px;
-      /* 一个足够大的值以容纳文本区域 */
       margin-bottom: 18px !important;
-      /* 恢复.input-group的原始边距 */
     }
 
     .skill-option {
@@ -525,13 +522,74 @@
       text-decoration: none;
     }
 
+    .modal-tabs-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid var(--border-color-light);
+    }
+
+    .modal-tab {
+      padding: 6px 12px;
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 0.95em;
+      color: var(--text-color);
+      background-color: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .modal-tab:hover {
+      color: var(--title-color);
+    }
+
+    .modal-tab.active {
+      color: var(--title-color);
+      border-bottom-color: var(--border-color-strong);
+      font-weight: 700;
+    }
+    .accordion-group {
+      border-bottom: 2px solid var(--border-color-light);
+    }
+    .accordion-group:last-child {
+      border-bottom: none;
+    }
+
+    .accordion-header {
+      
+      width: 100%;
+      padding: 2px 10px;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 1.05em;
+      color: var(--title-color);
+      background-color: transparent;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.2s;
+      border-bottom: 2px solid var(--border-color-light);
+    }
+    
+    .accordion-header:hover {
+      background-color: rgba(220, 210, 190, 0.4);
+    }
+
     .modal-options-list {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      max-height: 55vh;
-      overflow-y: auto;
+      max-height: 65vh;
       padding-right: 10px;
+      overflow-y: auto;
     }
 
     .modal-footer {
@@ -553,6 +611,49 @@
 
     .modal-confirm-btn:hover {
       background-color: #c6b8a5;
+    }
+
+    .accordion-header::after {
+      content: '+';
+      font-size: 1.2em;
+      font-weight: bold;
+      color: var(--text-color);
+      transition: transform 0.3s ease;
+    }
+
+    .accordion-group.active .accordion-header::after {
+      content: '−';
+      transform: rotate(180deg);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.4s ease-out, opacity 0.3s ease-in, padding 0.3s ease-out;
+      padding: 0 10px;
+    }
+    
+    .accordion-group.active .accordion-content {
+      max-height: 45vh;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      opacity: 1;
+      padding: 5px 10px 15px 10px;
+      transition: max-height 0.5s ease-in, opacity 0.4s ease-out, padding 0.4s ease-in;
+    }
+    .review-category-header {
+        font-family: var(--font-title);
+        font-size: 1.2em;
+        color: var(--title-color);
+        margin-top: 15px;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--border-color-strong);
+    }
+    .review-category-header:first-child {
+        margin-top: 0;
     }
 
     @keyframes fadeIn {
@@ -600,7 +701,7 @@
       }
 
       .modal-content {
-        width: 95%;
+        width: 85%;
         margin: 10% auto;
       }
     }
@@ -743,7 +844,10 @@
       <label>📜 你的初始背景故事</label>
       <textarea id="backgroundStory" rows="4" placeholder="你选择了自定义开局，请在此处填写你的背景故事，这将作为游戏开局的引入..."></textarea>
     </div>
-
+    <div class="input-group">
+        <label for="reviewButton">📜 档案总览</label>
+        <button id="reviewButton" class="selection-btn" style="text-align: center;">查看已选档案</button>
+    </div>
     <div class="input-group">
       <label for="destinyPointsInput">💖 命运点数 <span class="reincarnation-points-inline">剩余: <span
             class="reincarnation-points-value">300</span>点</span></label>
@@ -763,10 +867,25 @@
         <h2 id="modalTitle" class="modal-title">选择</h2>
         <span class="close-btn">&times;</span>
       </div>
+      <div id="modalTabsContainer" class="modal-tabs-container">
+      </div>
       <div id="modalOptionsList" class="modal-options-list">
       </div>
       <div class="modal-footer">
         <button id="modalConfirmBtn" class="modal-confirm-btn">确认选择</button>
+      </div>
+    </div>
+  </div>
+  <div id="reviewModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="reviewModalTitle" class="modal-title">已选档案总览</h2>
+        <span id="reviewCloseBtn" class="close-btn">&times;</span>
+      </div>
+      <div id="reviewModalOptionsList" class="modal-options-list">
+      </div>
+      <div class="modal-footer">
+        <button id="reviewModalConfirmBtn" class="modal-confirm-btn">确认更改</button>
       </div>
     </div>
   </div>
@@ -779,8 +898,13 @@
       let isInitialLoad = true;
 
       const RARITY_MAP = {
-        common: '普通', uncommon: '优良', rare: '稀有', common_spell: '普通-法术', common_other: '普通-其他', common_prayer: '普通-祷告', common_combat_skill: '普通-战技', common_ritual: '普通-仪式',
-        epic: '史诗', legendary: '传说', mythic: '神话', only: '唯一',
+        only: '唯一', common: '普通', uncommon: '优良', rare: '稀有', epic: '史诗', legendary: '传说', mythic: '神话',
+        common_spell: '普通-法术', common_other: '普通-其他', common_prayer: '普通-祷告', common_combat_skill: '普通-战技', common_ritual: '普通-仪式',
+      };
+      const BACKGROUND_TYPE_MAP = {
+        general: '通用背景',
+        race: '种族限定',
+        location: '地区限定',
       };
       const RARITY_PRIORITY = { common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4, mythic: 5 };
 
@@ -1168,9 +1292,16 @@ const ALL_POSSIBLE_EQUIPMENTS = [
 
       const ALL_POSSIBLE_RED_THREADS = [
         // 第一层级 (1-4级, 30点)
+        { name: '艾琳', type: '第一层级', cost: 30, description: '第一层级/普通层级; 等级:15; 种族:人类; 身份:城镇卫兵家的女儿; 职业:见习牧师学徒; 性格:开朗、善良、有点冒失。; 喜爱:她对你抱有纯真的憧憬与爱慕。喜欢为你烤制各种口味的面包，并期待获得你的称赞。在你受伤时，会慌张又认真地为你包扎伤口。喜欢在闲暇时坐在你身边，听你讲述冒险的故事。; 外貌与特质:一头温暖的亚麻色短发，脸上有点小雀斑，澄澈的棕色眼眸里总是闪烁着活力的光芒。身形娇小，身上总带着一股淡淡的麦香。; 衣物装饰:朴素的村女服饰。; 角色装备:暂无。; 是否缔结红线:是; 好感度:250; 羁绊技能:【主动/爱心面包】:每日一次，艾琳为你烤制一个充满爱心的面包，食用后获得一个持续1小时的【微弱生命恢复】效果。【被动/慰藉之心】:艾琳的陪伴让你感到安心，你的负面精神状态（如恐惧、混乱）抗性微量提升。' },
+        { name: '菲娜', type: '第一层级', cost: 30, description: '第一层级/普通层级; 等级:15; 种族:精灵; 身份:精灵平民; 职业:采药人/猎人学徒; 性格:文静、害羞、对外界充满好奇。; 喜爱:她将你视为重要的朋友与依靠，这份感情正悄悄转变为爱意。喜欢和你一起在林间漫步，为你指认各种奇特的植物。虽然不善言辞，但会用弓箭默默守护你的背后。当你注视她时，她会羞涩地低下头，耳尖微微泛红。; 外貌与特质:柔顺的翠绿色长发，用藤蔓简单束起，尖尖的耳朵格外灵动，碧绿的眼眸如林中清泉。身姿纤细。; 衣物装饰:便于活动的皮甲和绿色短裙。; 角色装备:小巧的木弓。; 是否缔结红线:是; 好感度:280; 羁绊技能:【主动/林间低语】:消耗少量魔力，让菲娜与周围的植物沟通，可以探知附近小范围内的生物动向。【被动/自然亲和】:在森林或草地环境中，菲娜的体力恢复速度微量提升。' },
+        { name: '米可', type: '第一层级', cost: 30, description: '第一层级/普通层级; 等级:15; 种族:兽族(猫族); 身份:贫民/流浪儿; 职业:佣兵团新手杂役; 性格:警惕、机灵、外冷内热。; 喜爱:你是在她最困难时给予温暖的人，她已将你认定为唯一的家人和主人。喜欢蜷缩在你怀里睡觉，发出满足的咕噜声。会把偷来的“宝物”（通常是亮晶晶的小玩意）献给你。允许你抚摸她敏感的耳朵和尾巴，这是她表达最高信任的方式。; 外貌与特质:蓬松的黑色短发下，一双灵动的金色猫瞳格外显眼，头顶有对黑色的猫耳，身后是同样颜色的尾巴。身材瘦小，动作敏捷。; 衣物装饰:打满补丁但很干净的旧衣服。; 角色装备:暂无。; 是否缔结红线:是; 好感度:300; 羁绊技能:【主动/灵巧之爪】:每日三次，米可可以为你开锁一个简易的锁具或尝试偷窃一件价值不高的物品。【被动/夜行者】:在夜晚或昏暗环境下，米可进行潜行时更不容易被发现。' },
+        { name: '露娜', type: '第一层级', cost: 30, description: '第一层级/普通层级; 等级:15; 种族:翼族; 身份:翼民平民/信使; 职业:信使学徒; 性格:活泼、乐观、有些路痴。; 喜爱:她深深地迷恋着你，认为你是地面上最帅气、最强大的人。喜欢从空中盘旋而下，给你一个惊喜的拥抱。喜欢让你梳理她翅膀上的羽毛，这会让她感到非常舒服和亲密。经常会分享一些道听途说但并不准确的“重要情报”给你。; 外貌与特质:天蓝色的齐肩短发，蔚蓝的眼眸充满神采，背后有一对尚未完全长成的白色羽翼，耳后有小巧的头翅。体态轻盈。; 衣物装饰:信使公会的制服短裙，白色过膝袜，便于飞行的短靴。; 角色装备:暂无。; 是否缔结红线:是; 好感度:260; 羁绊技能:【主动/轻羽之风】:消耗少量体力，让露娜抱着你进行短距离的滑翔，可以跨越一些小型障碍。【被动/天空的祝福】:你受到的坠落伤害减少50%。' },
 
-        // 第二层级 5-8级, 80点)
-
+        // 第二层级 (5-8级, 80点)
+        { name: '克莱尔·梵卓', type: '第二层级', cost: 60, description: '第二层级/中坚层级; 等级:35; 种族:人类; 身份:王家书库特聘学者/C级冒险者; 职业:学者 ; 性格:知性、冷静、一丝不苟，但对在意的人会展露温柔。; 喜爱:她对你充满了浓厚的学术兴趣和个人爱慕。喜欢与你探讨古代遗迹的秘密，并为你解读晦涩的古文。在你熬夜研究时，会为你披上毯子，并准备提神的饮品。喜欢和你进行智力游戏，并享受被你“将死”的瞬间。私下里，她渴望你用强硬的方式打乱她一丝不苟的常态。; 外貌与特质:乌木般的黑色长发用一根银簪优雅地盘起，镜片后的紫色眼眸深邃而睿智。身材高挑，曲线优美，散发着书卷与墨水的气息。; 衣物装饰:金丝眼镜，剪裁合身的学者长袍。; 角色装备:暂无。; 是否缔结红线:是; 好感度:450; 羁绊技能:【主动/知识解析】:每日一次，克莱尔可以为你鉴定一件未知物品（非神器级），或提供一条与你当前困境相关的关键情报。【被动/学者的洞察】:你在解读文献或分析情报时，有更高几率获得额外信息。' },
+        { name: '伊莉雅·月影', type: '第二层级', cost: 60, description: '第二层级/中坚层级; 等级:35; 种族:精灵; 身份:月神殿祭司助理; 职业:月光游侠学徒; 性格:高贵、典雅、悲天悯人。; 喜爱:她相信你是命运指引的伴侣，对你的爱意深沉而神圣。喜欢在月光下为你祈祷和祝福。习惯在入睡时，用她带有月神气息的魔力为你构建一个安宁的梦境。性爱时，她会展现出与平日神圣气质截然相反的、顺从又渴求的一面，将此视为灵魂与肉体最神圣的结合。; 外貌与特质:月光般的银色长发直垂至脚踝，淡金色的眼眸仿佛蕴藏着星辰。额间有月形的银色印记，气质空灵而圣洁，赤足。; 衣物装饰:华丽的露背祭司长袍，布料如月光般流淌，脚踝上戴着银色的铃铛。; 角色装备:暂无。; 是否缔结红线:是; 好感度:500; 羁绊技能:【主动/月神之慰】:消耗魔力，伊莉雅吟唱祷文，为你恢复中量生命值，并为你附加一个能吸收少量伤害的月光护盾。【被动/星辰庇护】:在夜晚或受到月光照耀时，你受到的魔法伤害降低10%。' },
+        { name: '芬里娅', type: '第二层级', cost: 60, description: '第二层级/中坚层级; 等级:35; 种族:兽族(狼族); 身份:兽族氏族狩猎队长; 职业:正式战士; 性格:勇猛、忠诚、富有野性的占有欲。; 喜爱:你通过力量赢得了她的认可与爱情，她视你为唯一的头狼与配偶。喜欢用舔舐的方式为你清理伤口，这是兽族的最高礼遇。习惯以半蹲的姿势守护在你身边，警惕任何潜在的威胁。在二人世界里，她会化身为热情似火的母狼，渴望你用最原始的方式征服她，让她为你诞下最强的后代。; 外貌与特质:一头桀骜不驯的银灰色长发，锐利的琥珀色兽瞳，头顶有一对毛茸茸的狼耳。身材高大健美，肌肉线条流畅充满力量感。身后一条毛茸茸的大尾巴会根据情绪而摆动。; 衣物装饰:兽皮胸甲，兽皮战裙。; 角色装备:暂无。; 是否缔结红线:是; 好感度:480; 羁绊技能:【主动/狩猎律动】:与芬里娅共同作战时开启，你们的协同攻击会为敌人叠加【猎杀印记】，使你们的攻击攻击造成额外伤害。【被动/野性直觉】:与芬里娅同行时，你对周围的敌意和陷阱的感知会变得更加敏锐。' },
+        { name: '赛拉菲娜', type: '第二层级', cost: 60, description: '第二层级/中坚层级; 等级:35; 种族:翼族; 身份:圣翼骑士团成员; 职业:圣翼骑士团骑士学徒; 性格:严谨、可靠、富有责任心。; 喜爱:她欣赏你的强大与品格，将你视为可以托付后背的伴侣。喜欢在结束任务后，与你在云端之上并肩飞行。作为你的伴侣，她会用翅膀将你紧紧护在身下，无论是在休憩或情爱之时。她会认真执行你下达的任何“命令”，并从中获得满足感。; 外貌与特质:耀眼的金色长发扎成高马尾，凌厉的碧色眼眸如同鹰隼。背后是两对强健有力的洁白羽翼，展开时极具压迫感。丰满成熟的女性曲线，气质英姿飒爽。; 衣物装饰:暂无。; 角色装备:合身的银色轻型全身甲。; 是否缔结红线:是; 好感度:460; 羁绊技能:【主动/鹰眼侦查】:每日一次，赛拉菲娜可以飞至高空，为你侦查半径5公里范围内的地形和大型单位动向，并绘制成简易地图。【被动/顺风而行】:与赛拉菲娜同行时，你在野外非战斗状态下的行进速度提升15%。' },
         // 第三层级 (9-12级, 150点)
         { name: '水银灯', type: '第三层级', cost: 150, description: '第三层级/精英层级; 等级:11; 种族:仿生炼金人偶; 身份:你自制的仿生人偶; 职业:人偶审判战士; 性格:拥有人造灵魂，其灵魂、行为和思维方式与人类完全无异。性格清冷、矜持、傲娇。; 喜爱:视你为最爱的父亲与主人，喜欢用矜持的方式对你撒娇，渴望被你宠爱与爱抚，喜欢听你唱歌并跟着哼唱，平时喜欢坐在你的肩膀上。渴望守护你的一切，你的愿望和爱好就是她的愿望和爱好。; 外貌与特征:身高75cm的仿生人偶，肉体娇嫩柔软，有人类的一切生理功能。她有一对宽大的漆黑羽翼、月光般的银色长发、猩红宝石般的眼眸。她嗓音清冷，气质优雅。; 衣物装饰:黑白色哥特人偶长裙，黑丝吊带袜，漆黑小皮靴。不穿内衣裤。; 角色装备:巨大的漆黑收割者镰刀。; 登神长阶:未开启; 是否缔结红线:是; 好感度:1000; 评价:我的父亲，我的主人，好想被您抱在怀中……; 背景故事:由你亲手制作的人偶，睁开眼的那一刻，爱上了自己的制作者，自己的“父亲”。; 羁绊技能:【主动/死亡收割】:消耗你的1000MP。从你身上借用魔力，挥舞巨大镰刀斩出漆黑的魔力斩击，对最多三个目标同时造成对方生命上限30％的真实伤害。【被动/N之领域】:水银灯可以通过她专有的次级位面“N之领域”穿越空间，无视距离随时来到你的身边。她也可在自身重伤或濒死时,独自返回“N之领域”安全的恢复。' },
         { name: '塞莱丝汀·艾瑞隆', type: '第三层级', cost: 150, description: '第三层级/精英层级; 等级:10; 种族:翼民; 身份:翼民贵族/艾瑞隆男爵/艾瑞隆镇领主; 职业:圣光牧师/专业厨师; 性格:温柔、善良，偶尔有些天然呆。; 喜爱:她深爱着你。喜爱烹饪美食。习惯在睡觉时用宽大柔软的翅膀把你整个包裹起来。; 外貌与特质:金发及腰，眼眸如蓝宝石般清澈，背负有两对宽大的白金色羽翼，耳后上方有白金色的小巧头翅。身材高挑，性感丰腴，巨乳肥臀。气质恬静温和，总是带着治愈人心的微笑，嗓音柔和温暖。; 衣物装饰:白金色镶边的神圣牧师长袍，白色乳贴，白金色镂空内裤，白丝吊带袜，金边白底高跟鞋。; 角色装备:神殿牧师权杖(腰侧悬挂); 登神长阶:未开启; 是否缔结红线:是; 好感度:700; 评价:我好像爱上他了，这就是命运赐给我的礼物吗？如果能让他尝尝我做的饭就好了……; 背景故事:翼民贵族艾瑞隆家族当代族长，自小出身高贵，肩负着家族和领主的职责与荣耀。; 羁绊技能:【主动/奉献净化】:每日一次，为你清除不超过塞莱丝汀“生命层级”的一切临时负面状态。【被动/守护之心】:在你即将遭受致命伤害时，塞莱丝汀会无视空间距离立刻察觉，并可主动选择为你承担此次伤害。' },
@@ -1180,25 +1311,174 @@ const ALL_POSSIBLE_EQUIPMENTS = [
       ];
 
       const ALL_POSSIBLE_BACKGROUNDS = [
-        { name: '【自定义开局】', description: '自由发挥你的想象力，编写你自己的人物初始背景。' },
-        { name: '【旅途与幸运】女神的指引', description: '你在一个破败的神龛前祈祷时，旅途与幸运的女神"泰珂"似乎听到了你的声音。你获得了一个神谕：前往最近的城镇，在"第一声钟响时遇到的第一个人"身上，有你命运的转机，或许你能遇到那个“她”？' },
-        { name: '【护送商队】金狮的低语', description: '金狮商会的一支商队需要穿越盗匪横行的区域。任务看似简单，但你偶然听到，商队护卫在私下讨论货物中藏着的"禁忌品"。这趟旅程可能不只是对抗盗匪那么简单。' },
-        { name: '【历史的尘埃】第二次魔王战争古战场', description: '一位来自"伯伦斯法环联邦"身份尊贵的历史学者雇佣你和一整个中型佣兵团作为保镖，深入第二次魔王战争的古战场，也就是如今的"无尽深渊地城"进行探索。他坚信那里埋藏着英雄们遗落的神器。' },
-        { name: '【盗贼的邀约】暗影中的交易', description: '一张黑色的卡片悄无声息地出现在你的口袋里，上面是"暗影之手"的印记。他们邀请你去城中最混乱的街区进行一场交易。' },
-        { name: '【阴霾中的抉择】帝国的通缉令', description: '在靠近兽族联盟的帝国边境城镇，你看到一张通缉令，悬赏一名"叛逃的帝国士兵"。然而，酒馆里的佣兵却说，那名士兵是因为发现了某个贵族的秘密才被灭口的。' },
-        { name: '【种族限定】圣金之翼的试炼', description: '（仅限翼民）作为一名年轻的翼民，你即将接受攀登圣山、面见教皇的“圣金之翼”试炼。这不仅是对你飞行技巧和信仰的考验，也是决定你未来在圣都梵尼亚地位的关键仪式。', requiredRace: '翼民' },
-        { name: '【种族限定】生命庆典的骚动', description: '（仅限精灵）作为一名精灵，你被长者派去调查“新芽之月”生命庆典上出现的魔力紊乱现象。这股力量似乎源自森林深处，它既可能带来新生，也可能引向腐化。', requiredRace: '精灵' },
-        { name: '【种族限定】失落的氏族图腾', description: '（仅限兽族）你的氏族图腾被敌对部落偷走了，这是奇耻大辱。你必须独自潜入对方的领地，在先祖之魂的怒火降临前，凭自己的力量和荣耀将图腾夺回。', requiredRace: '兽族' },
-        { name: '【地区限定】踏星仪式', description: '（仅限“伯伦斯法环”开局）听闻“伯伦斯法环”三年一度的大型学徒招募仪式“踏星仪式”即将举行，你决定前往“伯伦斯法环”求学，一路日夜兼程，你终于赶在伯伦斯法环的“踏星仪式”当天来到了雾晶港。穿越宏伟庞大的魔幻城市，步入城市中心的伯伦斯广场，你在熙熙攘攘的人群中排队进入那高耸入云的魔幻巨塔“苍穹之塔”。此刻你身处塔中宽广恢弘的学徒招募大厅，和上千人一起等待着那张测试天赋和技能、决定自己命运的魔法羊皮纸。', requiredLocation: '大陆东北部沿海区域-伯伦斯法环联邦-雾晶港' },
-        { name: '【地区限定】无尽之雨和无尽之旅', description: '（仅限诺瓦·瓦伦蒂亚城开局）你来到了整片大陆上最大的冒险者之城——诺瓦·瓦伦蒂亚城。无尽的雨林、庞大的诺瓦尔河、传说中的龙姬、以及神话中封印了第二代魔王的神迹“无尽深渊地城”，这座坐落于原始魔法雨林“无尽树海”的雨之城，将成为你传奇史诗的起点。此刻你身处整片大陆上规模最大的冒险者公会分会——“瓦伦蒂亚冒险者公会”的服务大厅中，正打算注册成为一名正式的冒险者。', requiredLocation: '大陆西南部区域-无尽树海-奥古斯提姆帝国-诺瓦·瓦伦蒂亚城' },
-        { name: '【地区限定】王国的暗流', description: '（仅限索伦蒂斯王国开局）索伦蒂斯王国的海军正在秘密寻找一件名为"海龙之牙"的遗物，据说它能平息风暴。一位神秘的贵族委托你抢先一步找到它，他似乎另有图谋。', requiredLocation: '大陆东南部区域-索伦蒂斯王国' },
-        { name: '【地区限定】北境的呼唤', description: '（仅限诺斯加德联盟开局）诺斯加德联盟的锻造师协会急需一种只在"永冻冰原"上才能找到的"永冻冰晶"。这不仅是一趟深入魔物腹地的危险旅程，更是赢得这些坚韧北方人尊重的机会。', requiredLocation: '大陆东北部区域-诺斯加德联盟' }
+        // --- 通用背景 ---
+        { name: '【自定义开局】', description: '自由发挥你的想象力，编写你自己的人物初始背景。', bgType: 'general' },
+        { name: '【旅途与幸运】女神的指引', description: '你在一个破败的神龛前祈祷时，旅途与幸运的女神"泰珂"似乎听到了你的声音。你获得了一个神谕：前往最近的城镇，在"第一声钟响时遇到的第一个人"身上，有你命运的转机，或许你能遇到那个“她”？', bgType: 'general' },
+        { name: '【护送商队】金狮的低语', description: '金狮商会的一支商队需要穿越盗匪横行的区域。任务看似简单，但你偶然听到，商队护卫在私下讨论货物中藏着的"禁忌品"。这趟旅程可能不只是对抗盗匪那么简单。', bgType: 'general' },
+        { name: '【历史的尘埃】第二次魔王战争古战场', description: '一位来自"伯伦斯法环联邦"身份尊贵的历史学者雇佣你和一整个中型佣兵团作为保镖，深入第二次魔王战争的古战场，也就是如今的"无尽深渊地城"进行探索。他坚信那里埋藏着英雄们遗落的神器。', bgType: 'general' },
+        { name: '【盗贼的邀约】暗影中的交易', description: '一张黑色的卡片悄无声息地出现在你的口袋里，上面是"暗影之手"的印记。他们邀请你去城中最混乱的街区进行一场交易。', bgType: 'general' },
+        { name: '【阴霾中的抉择】帝国的通缉令', description: '在靠近兽族联盟的帝国边境城镇，你看到一张通缉令，悬赏一名"叛逃的帝国士兵"。然而，酒馆里的佣兵却说，那名士兵是因为发现了某个贵族的秘密才被灭口的。', bgType: 'general' },
+
+        // --- 种族限定 ---
+        { name: '【种族限定】圣金之翼的试炼', description: '（仅限翼民）作为一名年轻的翼民，你即将接受攀登圣山、面见教皇的“圣金之翼”试炼。这不仅是对你飞行技巧和信仰的考验，也是决定你未来在圣都梵尼亚地位的关键仪式。', requiredRace: '翼民', bgType: 'race' },
+        { name: '【种族限定】生命庆典的骚动', description: '（仅限精灵）作为一名精灵，你被长者派去调查“新芽之月”生命庆典上出现的魔力紊乱现象。这股力量似乎源自森林深处，它既可能带来新生，也可能引向腐化。', requiredRace: '精灵', bgType: 'race' },
+        { name: '【种族限定】失落的氏族图腾', description: '（仅限兽族）你的氏族图腾被敌对部落偷走了，这是奇耻大辱。你必须独自潜入对方的领地，在先祖之魂的怒火降临前，凭自己的力量和荣耀将图腾夺回。', requiredRace: '兽族', bgType: 'race' },
+        
+        // --- 地区限定 ---
+        { name: '【地区限定】踏星仪式', description: '（仅限“伯伦斯法环”开局）听闻“伯伦斯法环”三年一度的大型学徒招募仪式“踏星仪式”即将举行，你决定前往“伯伦斯法环”求学，一路日夜兼程，你终于赶在伯伦斯法环的“踏星仪式”当天来到了雾晶港。穿越宏伟庞大的魔幻城市，步入城市中心的伯伦斯广场，你在熙熙攘攘的人群中排队进入那高耸入云的魔幻巨塔“苍穹之塔”。此刻你身处塔中宽广恢弘的学徒招募大厅，和上千人一起等待着那张测试天赋和技能、决定自己命运的魔法羊皮纸。', requiredLocation: '大陆东北部沿海区域-伯伦斯法环联邦-雾晶港', bgType: 'location' },
+        { name: '【地区限定】无尽之雨和无尽之旅', description: '（仅限诺瓦·瓦伦蒂亚城开局）你来到了整片大陆上最大的冒险者之城——诺瓦·瓦伦蒂亚城。无尽的雨林、庞大的诺瓦尔河、传说中的龙姬、以及神话中封印了第二代魔王的神迹“无尽深渊地城”，这座坐落于原始魔法雨林“无尽树海”的雨之城，将成为你传奇史诗的起点。此刻你身处整片大陆上规模最大的冒险者公会分会——“瓦伦蒂亚冒险者公会”的服务大厅中，正打算注册成为一名正式的冒险者。', requiredLocation: '大陆西南部区域-无尽树海-奥古斯提姆帝国-诺瓦·瓦伦蒂亚城', bgType: 'location' },
+        { name: '【地区限定】王国的暗流', description: '（仅限索伦蒂斯王国开局）索伦蒂斯王国的海军正在秘密寻找一件名为"海龙之牙"的遗物，据说它能平息风暴。一位神秘的贵族委托你抢先一步找到它，他似乎另有图谋。', requiredLocation: '大陆东南部区域-索伦蒂斯王国', bgType: 'location' },
+        { name: '【地区限定】北境的呼唤', description: '（仅限诺斯加德联盟开局）诺斯加德联盟的锻造师协会急需一种只在"永冻冰原"上才能找到的"永冻冰晶"。这不仅是一趟深入魔物腹地的危险旅程，更是赢得这些坚韧北方人尊重的机会。', requiredLocation: '大陆东北部区域-诺斯加德联盟', bgType: 'location' }
       ];
+
+      const ALL_POSSIBLE_TALISMANS = [
+        { name: '红琥珀链坠', type: '饰品', cost: 13, rarity: 'uncommon', description: '镶有小块红色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中红琥珀蕴藏了原始的生命力。能提升生命值的上限（+6%最大生命值HP）。' },
+        { name: '红琥珀链坠', type: '饰品', cost: 26, rarity: 'rare', description: '镶有多块红色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中红琥珀蕴藏了原始的生命力。能提升生命值的上限（+12%最大生命值HP）。' },
+        { name: '蓝琥珀链坠', type: '饰品', cost: 13, rarity: 'uncommon', description: '镶有小块蓝色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中蓝琥珀蕴藏了原始的魔力。能提升专注值的上限（+6%最大专注值MP）。' },
+        { name: '蓝琥珀链坠', type: '饰品', cost: 26, rarity: 'rare', description: '镶有多块蓝色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中蓝琥珀蕴藏了原始的魔力。能提升专注值的上限（+12%最大专注值MP）。' },
+        { name: '绿琥珀链坠', type: '饰品', cost: 13, rarity: 'uncommon', description: '镶有小块绿色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中绿琥珀蕴藏了原始的活力。能提升精力值的上限（+6%最大精力值SP）。' },
+        { name: '绿琥珀链坠', type: '饰品', cost: 26, rarity: 'rare', description: '镶有多块绿色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中绿琥珀蕴藏了原始的活力。能提升精力值的上限（+12%最大精力值SP）。' },
+        { name: '恩惠露滴护符', type: '饰品', cost: 25, rarity: 'rare', description: '用金色琥珀与黄铜制成，参考久远以前，大地上的生命承接世界树滴下的露滴时的模样。随时间缓慢恢复生命值（生命值HP+20/min）。' },
+        { name: '蓝色恩惠露滴护符', type: '饰品', cost: 25, rarity: 'rare', description: '用蓝色琥珀与黄铜制成，参考久远以前，大地上的生命承接世界树滴下的露滴时的模样。随时间缓慢恢复专注值（专注值MP+10/min）。' },
+        { name: '绿龟挂坠', type: '饰品', cost: 14, rarity: 'uncommon', description: '参考绿乌龟的模样制成的护符。乌龟是著名的营养食材，为精力无穷的象征。据说称呼乌龟为睿智兽物的魔法师们，认为那是野蛮的习俗。随时间缓慢恢复精力值（精力值SP+20/min）。' },
+        { name: '双头绿龟挂坠', type: '饰品', cost: 28, rarity: 'rare', description: '参考双头绿乌龟的模样制成的护符。乌龟是著名的营养食材，为精力无穷的象征。据说称呼乌龟为睿智兽物的魔法师们，认为那是野蛮的习俗。随时间缓慢恢复精力值（精力值SP+30/min）。' },
+        { name: '红种子坠饰', type: '饰品', cost: 27, rarity: 'rare', description: '将红琥珀与黄金制成种子的样子，是祈求世界树为之响应的美好愿景。能提升生命值的恢复能力（生命值HP回复效果+30%）。' },
+        { name: '蓝种子坠饰', type: '饰品', cost: 27, rarity: 'rare', description: '将蓝琥珀与黄金制成种子的样子，是祈求世界树为之响应的美好愿景。能提升专注值的恢复能力（生命值HP回复效果+30%）。' },
+        { name: '世界树的恩惠', type: '饰品', cost: 45, rarity: 'epic', description: '用黄金制成，是为久远以前，大地上的生命赞颂世界树时使用的古老饰品。能大幅提升生命值、专注值、精力值的上限（+18%最大生命值HP、最大专注值MP、最大精力值SP）。' },
+        { name: '古龙盾型徽章', type: '饰品', cost: 30, rarity: 'rare', description: '有着巨大古龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此龙的图案被视为各种庇佑的象征。能少许减免受到的物理损伤（受到的物理攻击伤害*90%）。' },
+        { name: '古龙坚盾徽章', type: '饰品', cost: 42, rarity: 'epic', description: '有着巨大古龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此龙的图案被视为各种庇佑的象征。能大幅度减免受到的物理损伤（受到的物理攻击伤害*75%）。' },
+        { name: '古龙大盾徽章', type: '饰品', cost: 65, rarity: 'legendary', description: '有着巨大古龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此龙的图案被视为各种庇佑的象征。能极大幅度减免受到的物理损伤（受到的物理攻击伤害*50%）。' },
+        { name: '虹龙盾型徽章', type: '饰品', cost: 18, rarity: 'uncommon', description: '有着巨大虹彩龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此虹彩龙的图案被视为各种庇佑的象征。能些微减免受到的所有非物理损伤（受到的所有非物理攻击伤害*95%）。' },
+        { name: '虹龙坚盾徽章', type: '饰品', cost: 32, rarity: 'rare', description: '有着巨大虹彩龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此虹彩龙的图案被视为各种庇佑的象征。能少许减免受到的所有非物理损伤（受到的所有非物理攻击伤害*90%）。' },
+        { name: '虹龙大盾徽章', type: '饰品', cost: 44, rarity: 'epic', description: '有着巨大虹彩龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此虹彩龙的图案被视为各种庇佑的象征。能大幅度减免受到的所有非物理损伤（受到的所有非物理攻击伤害*75%）。' },
+        { name: '魔龙盾型徽章', type: '饰品', cost: 18, rarity: 'uncommon', description: '有着巨大魔龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此魔龙的图案被视为抵抗魔力的象征。能少许减免受到的魔力损伤（受到的魔力攻击伤害*90%）。' },
+        { name: '魔龙坚盾徽章', type: '饰品', cost: 32, rarity: 'rare', description: '有着巨大魔龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此魔龙的图案被视为抵抗魔力的象征。能大幅度减免受到的魔力损伤（受到的魔力攻击伤害*75%）。' },
+        { name: '魔龙大盾徽章', type: '饰品', cost: 44, rarity: 'epic', description: '有着巨大魔龙浮雕的古代熟鐵制護符。生命誕生，隨後遠古巨龍成為天空與大地的主宰，之後的生命都奉其為尊崇，因此魔龍的圖案被視為抵抗魔力的象徵。能極大幅度減免受到的魔力損傷（受到的魔力攻擊傷害*50%）。' },
+        { name: '火龙盾型徽章', type: '饰品', cost: 18, rarity: 'uncommon', description: '有着巨大火龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此火龙的图案被视为抵抗火焰的象征。能少许减免受到的火焰损伤（受到的火焰攻击伤害*90%）。' },
+        { name: '火龙坚盾徽章', type: '饰品', cost: 32, rarity: 'rare', description: '有着巨大火龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此火龙的图案被视为抵抗火焰的象征。能大幅度减免受到的火焰损伤（受到的火焰攻击伤害*75%）。' },
+        { name: '火龙大盾徽章', type: '饰品', cost: 44, rarity: 'epic', description: '有着巨大火龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此火龙的图案被视为抵抗火焰的象征。能极大幅度减免受到的火焰损伤（受到的火焰攻击伤害*50%）。' },
+        { name: '雷龙盾型徽章', type: '饰品', cost: 18, rarity: 'uncommon', description: '有着巨大雷龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此雷龙的图案被视为抵抗雷电的象征。能少许减免受到的雷电损伤（受到的雷电攻击伤害*90%）。' },
+        { name: '雷龙坚盾徽章', type: '饰品', cost: 32, rarity: 'rare', description: '有着巨大雷龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此雷龙的图案被视为抵抗雷电的象征。能大幅度减免受到的雷电损伤（受到的雷电攻击伤害*75%）。' },
+        { name: '雷龙大盾徽章', type: '饰品', cost: 44, rarity: 'epic', description: '有着巨大雷龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此雷龙的图案被视为抵抗雷电的象征。能极大幅度减免受到的雷电损伤（受到的雷电攻击伤害*50%）。' },
+        { name: '圣龙盾型徽章', type: '饰品', cost: 18, rarity: 'uncommon', description: '有着巨大圣龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此圣龙的图案被视为抵抗神圣的象征。能少许减免受到的神圣损伤（受到的神圣攻击伤害*90%）。' },
+        { name: '圣龙坚盾徽章', type: '饰品', cost: 32, rarity: 'rare', description: '有着巨大圣龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此圣龙的图案被视为抵抗神圣的象征。能大幅度减免受到的神圣损伤（受到的神圣攻击伤害*75%）。' },
+        { name: '圣龙大盾徽章', type: '饰品', cost: 32, rarity: 'epic', description: '有着巨大圣龙浮雕的古代熟铁制护符。生命诞生，随后远古巨龙成为天空与大地的主宰，之后的生命都奉其为尊崇，因此圣龙的图案被视为抵抗神圣的象征。能大幅度减免受到的神圣损伤（受到的神圣攻击伤害*50%）。' },
+        { name: '金黄色编发', type: '饰品', cost: 75, rarity: 'legendary', description: '古代神祇的遗物，此为其使用、遗留的祭品。没有人知道神祇为了什么而祈祷、许愿，又或是，为了什么而忏悔。能极大幅度减免受到的神圣损伤（受到的神圣攻击伤害*25%）。' },
+        { name: '兽族免疫小角饰品', type: '饰品', cost: 17, rarity: 'uncommon', description: '据说此为兽族代代制作的古老象征。长命野兽的角会长出新芽，在不停萌发新芽之后，野兽会成为山林与原野的守护者。能抵抗各种毒素与中毒状态（30%概率免疫稀有及以下的武器造成的毒、50%概率免疫第三层级及以下生命体造成的毒）。' },
+        { name: '兽族免疫大角饰品', type: '饰品', cost: 31, rarity: 'rare', description: '据说此为兽族代代制作的古老象征。长命野兽的角会长出新芽，在不停萌发新芽之后，野兽会成为山林与原野的守护者。能大幅抵抗各种毒素与中毒状态（60%概率免疫稀有及以下的武器造成的毒、75%概率免疫第三层级及以下生命体造成的毒）。' },
+        { name: '兽族健壮小角饰品', type: '饰品', cost: 17, rarity: 'uncommon', description: '据说此为兽族代代制作的古老象征。长命野兽的角会长出新芽，在不停萌发新芽之后，野兽会成为山林与原野的守护者。能抵抗各种流血与冻伤效果（降低25%稀有及以下的武器造成的流血与冻伤效果、降低50%第三层级及以下生命体造成的流血与冻伤效果）。' },
+        { name: '兽族健壮大角饰品', type: '饰品', cost: 31, rarity: 'rare', description: '据说此为兽族代代制作的古老象征。长命野兽的角会长出新芽，在不停萌发新芽之后，野兽会成为山林与原野的守护者。能大幅抵抗各种流血与冻伤效果（降低50%稀有及以下的武器造成的流血与冻伤效果、降低75%第三层级及以下生命体造成的流血与冻伤效果）。' },
+        { name: '兽族理智小角饰品', type: '饰品', cost: 17, rarity: 'uncommon', description: '据说此为兽族代代制作的古老象征。长命野兽的角会长出新芽，在不停萌发新芽之后，野兽会成为山林与原野的守护者。能抵抗各种影响精神的效果，包括精神控制、思维错乱、惊心、魅惑、魔音等（降低50%稀有及以下的道具造成的效果、降低60%第三层级及以下生命体造成的效果）。' },
+        { name: '兽族理智大角饰品', type: '饰品', cost: 31, rarity: 'rare', description: '据说此为兽族代代制作的古老象征。长命野兽的角会长出新芽，在不停萌发新芽之后，野兽会成为山林与原野的守护者。能大幅抵抗各种影响精神的效果，包括精神控制、思维错乱、惊心、魅惑、魔音等（降低75%稀有及以下的道具造成的效果、降低80%第三层级及以下生命体造成的效果）。' },
+        { name: '疾病护符', type: '饰品', cost: 29, rarity: 'rare', description: '参考病死的模样制成的护符。体弱的人罹患可怕的疾病时，如若侥幸存活了下来，将不会再受此疾病的侵扰。在陷入异常负面状态后，数天时间内，遇上同样的异常负面状态时，能提升抵抗力（异常负面状态的影响*50%，可以叠加3次）。' },
+        { name: '匕首护符', type: '饰品', cost: 22, rarity: 'rare', description: '以匕首与刺客的形象制成的护符。‘暗影之手’刺客与盗贼的联合公会，以无数见不得光的事物为生。在敌人未曾察觉之时发出的一击，能提升攻击力（伤害+70%）。' },
+        { name: '曲剑护符', type: '饰品', cost: 22, rarity: 'rare', description: '以曲剑与剑士的形象制成的护符。那体现险中求胜的杰出剑术，据说是在过去，传说中的剑士领悟的技术。在拨开敌人武器的刹那发动攻击，能提升攻击力（伤害+50%）。' },
+        { name: '双头剑护符', type: '饰品', cost: 22, rarity: 'rare', description: '以双头剑与密使的形象制成的护符。密使们继承而来的双头剑剑术，贯彻攻击招招不致命，但最后一记攻击最为强力的作法。一连串攻击的最后一击，能提升攻击力（伤害+40%）。' },
+        { name: '斧护符', type: '饰品', cost: 22, rarity: 'rare', description: '以斧与战士的形象制成的护符。斧是北境战王的武器，众战士推崇王之余，也使用相同武器。他们擅长使出蓄满力量的攻击。使出蓄满全部力量的一击，能提升攻击力（伤害+30%）。' },
+        { name: '锤护符', type: '饰品', cost: 22, rarity: 'rare', description: '以大槌与骑士的形象制成的护符。槌在对上持盾重甲敌人时相当有效，为狩猎骑士时的知名武器。攻击持有大盾或身披重甲的敌人，能提升攻击力（伤害+20%）。' },
+        { name: '矛护符', type: '饰品', cost: 22, rarity: 'rare', description: '以矛与士兵的形象制成的护符。在埃斯塔利亚大陆，常见士兵用矛。遇上强敌时，有时能给予有效反击。在敌人发动攻击时刺击敌人，能提升攻击力（伤害+30%）。' },
+        { name: '骑兵护符', type: '饰品', cost: 22, rarity: 'rare', description: '以骑枪与骑士的形象制成的护符。骑在马上的骑士十分可畏————身在高处，视野更加全面，可说是如虎添翼。骑马时，能提升攻击力（伤害+20%）。' },
+        { name: '钩爪护符', type: '饰品', cost: 22, rarity: 'rare', description: '以钩爪与死士的形象制成的护符。‘暗影之手’刺客与盗贼的联合公会，以无数见不得光的事物为生。从敌人头顶跃下发动攻击，能提升攻击力（伤害+50%）。' },
+        { name: '大盾护符', type: '饰品', cost: 24, rarity: 'rare', description: '以阴影中握着匕首的手为形象制成的护符。还曾荣耀的骑士们，将过去的准则奉为圭臬：要善尽守护职责，该先举起的不是剑，是盾。持盾时，能提升坚守能力（更不容易被击退、击溃、破盾）。' },
+        { name: '双手剑护符', type: '饰品', cost: 24, rarity: 'rare', description: '以双手剑与战士的形象制成的护符。战士沉浸于战斗，放弃了持盾，转而双手握住大剑。能强化以双手同时握住近战武器时的攻击（攻击力提升10%）。' },
+        { name: '弓护符', type: '饰品', cost: 23, rarity: 'rare', description: '以弓与兽族的形象制成的护符。兽族狩猎着野兽，野兽也狩猎着兽族。能提升弓箭的攻击力（伤害+20%）。' },
+        { name: '箭护符', type: '饰品', cost: 23, rarity: 'rare', description: '以羽毛箭与铁箭组合制成的护符。选择不同种类的箭进行狩猎，兽族的猎手深谙此道。能提升弓的射程和箭的攻击力（射程+50%，攻击力提升20%）。' },
+        { name: '狙击护符', type: '饰品', cost: 23, rarity: 'rare', description: '以长弓与射手的形象制成的护符。兽族的猎手会进行短暂的精密瞄准，然后一击致命。能提升精密瞄准后射击的攻击力（攻击力提升50%）。' },
+        { name: '杖护符', type: '饰品', cost: 12, rarity: 'uncommon', description: '以握住学徒制式法杖的手为形象制成的护符。握住法杖的手，期盼魔法的内心，此为法术的古老起源。能提升魔法的攻击力（伤害+5%）。' },
+        { name: '书护符', type: '饰品', cost: 25, rarity: 'rare', description: '以持有魔法书的手为形象制成的护符。长久以来，历代魔法师的智慧构成了伯伦斯法环联邦的无数图书馆，其中尤以“雾晶港”藏书最丰。能提升魔法的攻击力（伤害+10%）。' },
+        { name: '塔护符', type: '饰品', cost: 40, rarity: 'epic', description: '以初始法杖、初始魔法书、学派魔法师塔一同为形象制成的护符。只存在过八枚的护符，那是开宗立派的传奇。能提升魔法的攻击力（伤害+20%）。' },
+        { name: '咆哮链坠', type: '饰品', cost: 26, rarity: 'rare', description: '以嘶吼巨人的形象制成的青铜链坠，在远古时代，巨人是与古龙并列的强大存在。据说巨人轰然的咆哮能破坏自然————譬如引发山崩，或召来冰风暴。能强化咆哮与吐息（伤害提升20%）。' },
+        { name: '炼金师护符', type: '饰品', cost: 12, rarity: 'uncommon', description: '参考炼金烧瓶的模样制成的护符，为当代所有炼金师的制式装备。炼金师有着只有他们才知道的万物变化规律。可能位在高原的边缘，或是隐藏的洞窟内，在那里，世间万物的内藏奥秘将一一展现。能强化所有炼金制品的效果（提升1%）。' },
+        { name: '魔剑徽章', type: '饰品', cost: 28, rarity: 'rare', description: '在盾面有着魔剑徽章的护符。长久以来，有那么一批魔法师偏爱近战。能减少以近战武器施展魔法攻击时消耗的专注值（减少30%专注值MP消耗）。' },
+        { name: '战士壶饰品', type: '饰品', cost: 28, rarity: 'rare', description: '参考承装战士灰烬的壶制成的护符。在古代，勇猛的战士死去的后，会接受火化。余下的灰烬与饰品，会装入壶中，送往战士的故乡。能提升每把近战武器专属特殊攻击的攻击力（攻击力提升20%）。' },
+        { name: '山羊饰品', type: '饰品', cost: 16, rarity: 'uncommon', description: '参考山羊的角制成的护符。山羊是坚韧的象征，即使受到攻击也会坚持发动攻击。能些微减少攻击被打断或沉默的概率（10%的概率仍然能发动攻击）。' },
+        { name: '大山羊饰品', type: '饰品', cost: 30, rarity: 'rare', description: '参考大山羊的角制成的护符。山羊是坚韧的象征，即使受到攻击也会坚持发动攻击。能少许减少攻击被打断或沉默的概率（20%的概率仍然能发动攻击）。' },
+        { name: '裂石护符', type: '饰品', cost: 24, rarity: 'rare', description: '镇邪石是用于镇住地震的灵异石。据说当它裂开以后，城镇也随之陷入地面。但关于城镇下陷的原因，有另一种说法──那可能是星星坠落导致。能提升踢击与踏地类招式的威力（攻击力提升15%）。' },
+        { name: '铜绿圆饼', type: '饰品', cost: 29, rarity: 'rare', description: '以十分沉重的锈蚀青铜制成的圆饼，非常沉重。重量代表着强度，也是守护他人的力量。装备重量越重，防御力会越高（穿戴自身体重一半的装备时增伤10%，穿戴与自身体重等重的装备时增伤20%）。' },
+        { name: '友好壶', type: '饰品', cost: 48, rarity: 'epic', description: '火焰元素精灵送给朋友的罐子样式护符，历史上仅出现过三次，其中两次由大炼金术师持有。将易燃易爆的东西填入陶罐中，这便是炼金术的起源。能强化火焰与爆裂的炼金武器（伤害提升100%）。' },
+        { name: '星辰碎片刀', type: '饰品', cost: 46, rarity: 'epic', description: '染血的古老星屑刀。古老的魔法师为了将自己的命运送入星间，会用这把刀划开心脏，接着步入死亡。能减少使用魔法时消耗的专注值，但减少生命值上限（减少魔法35%的专注值MP消耗，减少10%的生命值HP上限）。' },
+        { name: '蓝衣舞娘', type: '饰品', cost: 46, rarity: 'epic', description: '以蓝衣舞娘的形象制成的布质人偶，非常古老，传承而来的物品。据说蓝衣舞娘是妖精，妖精将流水赐予剑士，剑士因此得以对阵古老腐败。披挂越轻，攻击力会越高（只穿一层衣物时增加20%攻击力，只穿内衣时增加50%攻击力）。' },
+        { name: '魔力对蝎', type: '饰品', cost: 33, rarity: 'rare', description: '采取奇特手段偷袭的刺客们拥有的护符。参考刚蜕皮的蝎子制成，蝎螯夹着魔力色的干缩心脏。能提升魔力属性攻击力，但降低减伤率。（魔力属性攻击提升10%，受到的损伤提升10%）。' },
+        { name: '火焰对蝎', type: '饰品', cost: 33, rarity: 'rare', description: '采取奇特手段偷袭的刺客们拥有的护符。参考刚蜕皮的蝎子制成，蝎螯夹着火焰色的干缩心脏。能提升火焰属性攻击力，但降低减伤率。（火焰属性攻击提升10%，受到的损伤提升10%）。' },
+        { name: '雷电对蝎', type: '饰品', cost: 33, rarity: 'rare', description: '采取奇特手段偷袭的刺客们拥有的护符。参考刚蜕皮的蝎子制成，蝎螯夹着雷电色的干缩心脏。能提升雷电属性攻击力，但降低减伤率。（雷电属性攻击提升10%，受到的损伤提升10%）。' },
+        { name: '神圣对蝎', type: '饰品', cost: 33, rarity: 'rare', description: '采取奇特手段偷袭的刺客们拥有的护符。参考刚蜕皮的蝎子制成，蝎螯夹着神圣色的干缩心脏。能提升神圣属性攻击力，但降低减伤率。（神圣属性攻击提升10%，受到的损伤提升10%）。' },
+        { name: '红羽七刃剑', type: '饰品', cost: 34, rarity: 'rare', description: '源自古代死亡仪式的护符。红色羽毛的护符，与死亡比邻时，情绪会为之高昂————那拚命求生的模样，会让随后到来的死亡更加耀眼。在面临死亡时，能提升攻击力。（生命值HP低于20%时，攻击力提升50%）。' },
+        { name: '蓝羽七刃剑', type: '饰品', cost: 34, rarity: 'rare', description: '源自古代死亡仪式的护符。蓝色羽毛的护符，与死亡比邻时，情绪会为之高昂————那拚命求生的模样，会让随后到来的死亡更加耀眼。在面临死亡时，能提升减伤率。（生命值HP低于20%时，受到的损伤*30%）。' },
+        { name: '献斗剑坠饰', type: '饰品', cost: 28, rarity: 'rare', description: '过去献给战王与神祇的战斗仪式————参考用于仪式中的剑制成的护符。如今战斗仪式早已废除，北境各处的竞技场是遗留下来的产物。生命值全满时，提升攻击力（攻击力提升10%）。' },
+        { name: '献斗盾坠饰', type: '饰品', cost: 28, rarity: 'rare', description: '过去献给战王与神祇的战斗仪式————参考用于仪式中的盾制成的护符。如今战斗仪式早已废除，北境各处的竞技场是遗留下来的产物。生命值全满时，提升减伤率（受到的损伤*50%）。' },
+        { name: '羽翼护符', type: '饰品', cost: 19, rarity: 'uncommon', description: '以翼民的起源为形象制成的护符。在那过去，羽翼还未宽大、优美。提升闪避成功率，但增加受到的损伤（闪避提升10%，受到的损伤提升30%）。' },
+        { name: '久远羽翼护符', type: '饰品', cost: 48, rarity: 'epic', description: '以翼民的起源为形象制成的护符。在久远的过去，羽翼还未宽大、优美。提升闪避成功率，但增加受到的损伤（闪避提升30%，受到的损伤提升10%）。' },
+        { name: '染红凶刀', type: '饰品', cost: 30, rarity: 'rare', description: '形状蜿蜒，染上红色的匕首。曾经发生的轰动大陆的刺杀，此为其中一把凶刃的摸样。在敌人未曾察觉之时发出的一击，能恢复生命值（能恢复85+最大生命值10%的生命值HP）。' },
+        { name: '染蓝凶刀', type: '饰品', cost: 30, rarity: 'rare', description: '形状蜿蜒，染上蓝色的匕首。曾经发生的轰动大陆的刺杀，此为其中一把凶刃的摸样。在敌人未曾察觉之时发出的一击，能恢复专注值（能恢复85+最大专注值10%的专注值MP）。' },
+        { name: '掠夺浮雕坠饰', type: '饰品', cost: 47, rarity: 'epic', description: '以一位席卷大陆的野心家的模样制成的护符。当司法裁决的君主发誓犯下反叛生命的亵渎之举，所有的掠夺残杀行为都受到肯定──与他的神祇作法如出一辙。当周围敌人死亡时，能恢复生命值。（一名敌人死亡后，恢复100+5%最大生命值的生命值HP）。' },
+        { name: '守护之主的角', type: '饰品', cost: 47, rarity: 'epic', description: '切下山林与原野之主的角而成的物品。山林与原野之主倒下，几株嫩芽以它的角为温床，盛开发光。魔力不仅来自于群星与夜空，也来自于悠久的生命与死亡。当周围敌人死亡时，能恢复专注值。（一名敌人死亡后，恢复100+5%最大专注值的专注值MP）。' },
+        { name: '圣祭襁褓', type: '饰品', cost: 45, rarity: 'epic', description: '一小块古代的祭祀制品。古代咒术与献祭的女王主持的祭祀，千刀万剐之后，神圣献祭者的遗体会用这块布包裹，庆贺他们迎来截然不同的“生”。连续攻击时，能恢复血量（用近战武器打出一套完整的连续攻击，则恢复50+5%最大生命值的生命值HP）。' },
+        { name: '翼剑徽章', type: '饰品', cost: 45, rarity: 'epic', description: '参考高举曲剑的义手与簇拥义手的飞翼为形象，制成的古老护符。传说中的剑士其肢体并不完整，此为其使用黄金义手握住曲剑，对决古老腐败时的写照。攻击越是连续，越能提升攻击力（用近战武器打出一套完整的连续攻击，则本场战斗增伤10%，最多触发4次）。' },
+        { name: '黄金义手', type: '饰品', cost: 80, rarity: 'legendary', description: '传说中的剑士其肢体并不完整，此为其对决古老腐败时，使用的黄金义肢。能提升敏捷属性，攻击越是连续，越能提升攻击力（敏捷属性+1，用近战武器打出一套完整的连续攻击，则本场战斗增伤10%，最多触发6次）。' },
+        { name: '金色粪金龟', type: '饰品', cost: 25, rarity: 'rare', description: '以粪金龟的形象制成的精金护符。各种宝藏、贵重物品的搬运工————粪金龟被认为是屎里淘金的典范。在搜刮财宝时，更容易发现藏起来的财宝。（搜刮的钱币珠宝+20%）。' },
+        { name: '银色粪金龟', type: '饰品', cost: 25, rarity: 'rare', description: '以粪金龟的形象制成的秘银护符。各种宝藏、贵重物品的搬运工————粪金龟被认为是屎里淘金的典范。在搜刮武器装备时，更容易发现藏起来的武器装备。（搜刮武器装备随机额外获取零到多件）。' },
+        { name: '克雷普的小瓶子', type: '饰品', cost: 40, rarity: 'epic', description: '以“阴影之手”其中一位刺客宗师‘克雷普’命名的护符，封着暗雾的神秘小瓶子，一些“阴影之手”的刺客使用的诅咒器具。新晋杀手，在一片寂静的时刻最为心慌。能完全去除自己发出的声响，绝对不会因为脚步或动作惊动敌人。' },
+        { name: '隐身面纱', type: '饰品', cost: 40, rarity: 'epic', description: '表面具有光泽的暗色布卷成的护符。此为过去的刺客大师，在刺杀之夜用于隐藏身形的部分面纱。远离敌人时，蹲下或伏卧能完全隐藏自己的身影。' },
+        { name: '主人伪装镜', type: '饰品', cost: 40, rarity: 'epic', description: '映照出模糊人影的小镜子，古老的易容器具。为了欺骗，使他人相信自己也是这里原有的一员。能使自己在他人视觉与意识中像是此地的主人。' },
+        { name: '长尾猫别针', type: '饰品', cost: 60, rarity: 'legendary', description: '以长尾猫的形象制成的别针。据说那是月与群星的神祇故事中出现的妖精猫，曾从星间跃下落到地面，却安然无恙。从高处落下时，能完全不受到损伤。' },
+        { name: '纠缠脐带', type: '饰品', cost: 60, rarity: 'legendary', description: '歪扭成奇怪模样的神秘圆环。那是世人间隐秘的联系，无从得知来源的思维、神态、情绪、举止。自己的举止会产生变化（可以在任何场合做出符合当前状况的举止与神态，转瞬间荒原的蛮族也将变得温文尔雅彬彬有礼）。' },
+        { name: '介错刀', type: '饰品', cost: 26, rarity: 'rare', description: '刀身窄短、沾满血液的短刀，已经不能作为武器使用。曾作为让受伤的战士解脱用的物品，夺走多条性命后，刀锋已有缺损，也带有一丝邪气。能提升在使出致命一击后的攻击力（一小时内提升20%攻击力，无法叠加）。' },
+        { name: '圣战徽章', type: '饰品', cost: 26, rarity: 'rare', description: '参考高举的矛与火焰制成的护符，与英雄并肩作战，为圣战捐躯的人们拥有的徽章。只有坚信此为圣战的人们，才能从殒命的哀号声中，找到一丝激昂。击杀敌人时，能短暂提升攻击力（一小时内提升20%攻击力，无法叠加）。' },
+        { name: '干枯花束', type: '饰品', cost: 26, rarity: 'rare', description: '惹人怜爱的干枯花束，供养在小墓碑前的物品。对深爱之人的不幸感到心伤──这情感不论身处何地，皆是如此。当自己召唤的灵魂或死者死亡时，能提升攻击力。（一小时内提升20%攻击力，无法叠加）。' },
+        { name: '老翁的欢愉', type: '饰品', cost: 26, rarity: 'rare', description: '以禁触老翁欢欣的模样制成的护符。我等会献上发狂──让那癫狂之主来到世间，让所有人陷入癫狂的欢愉吧。当周围人物被精神控制或者狂乱发癫时，能提升攻击力。（一小时内提升20%攻击力，无法叠加）。' },
+        { name: '融泥的欢愉', type: '饰品', cost: 26, rarity: 'rare', description: '以深眠之主熟睡时的微笑模样制成的护符。融泥是污秽尸肉最后化成的模样，痛苦在死后仍在持续，而深眠之主让融泥获得了深沉酣眠，那是永恒的安宁。当周围人物陷入睡眠时，能提升攻击力。（一小时内提升20%攻击力，无法叠加）。' },
+        { name: '腐败眷属的欢愉', type: '饰品', cost: 26, rarity: 'rare', description: '以剧毒虫群欢欣的模样制成的护符。向猩红之主献上腐败吧──在遥远他方封印的神祇，回到我们这群弃子的身旁吧。当周围人物中毒时，能提升攻击力。（一小时内提升20%攻击力，无法叠加）。' },
+        { name: '鲜血君王的欢愉', type: '饰品', cost: 26, rarity: 'rare', description: '以鲜血君王欢欣的模样制成的护符。向鲜血君王献上鲜血吧──王的神祇正在渴望。当周围人物流血时，能提升攻击力。（一小时内提升1%攻击力，最多叠加40次）。' },
+        { name: '狂怒神兽', type: '饰品', cost: 48, rarity: 'epic', description: '久远的古代，进行祭祀时，神兽于其中舞动──参考那狂怒舞动的模样制成的护符。据说古人信仰神兽是来自上天的使者──它的愤怒会造成天空失序，而其中最显著的，就是风暴。提升风暴的攻击力（攻击力提升+30%）。' },
+        { name: '星与火浮雕坠饰', type: '饰品', cost: 48, rarity: 'epic', description: '星火骑士——执掌魔剑与火剑的双剑骑士，雕着她面容凛然的肖像护符。摆出攻击架式，并维持一定时间后，能强化之后使出的攻击（维持准备攻击的动作架势1秒后，发动攻击增伤50%）。' },
+        { name: '狂龙护符', type: '饰品', cost: 90, rarity: 'legendary', description: '参考飞龙首领的模样制成的护符。飞龙的首领是裹挟着焰雷的狂龙，当他发出轰然咆哮，大地会涌出沸腾的熔岩。据说它曾挑战古龙之王，最后落得两败俱伤。提升熔岩、雷电、火焰的攻击力（熔岩攻击力+100%，雷电、火焰攻击力+60%）。' },
+        { name: '王受赐护符', type: '饰品', cost: 85, rarity: 'legendary', description: '参考绝强的战王，誓约神祇并受到赐福时的模样制成的护符。王受赐露滴时气势非凡、充满魄力──据说在受赐的当下，他文风不动。誓约神祇之王，耸立于大地。提升使用恢复方法时的强韧度（神级以下的武器道具和第七层级以下的生命体无法打断你的恢复过程，但依然可以正常对你造成伤害）。' },
+        { name: '亲爱的星尘', type: '饰品', cost: 95, rarity: 'legendary', description: '以老者手指轻捏星屑的模样制成的护符。塔的大法师疾呼：对星星怀抱浪漫思维、对星尘满怀爱意──能办到如此，就能成为顶尖魔法师。你呀，要去学会爱。能最大幅缩短魔法的咏唱时间，但增加受到的损伤。（魔法吟唱时间缩短到极限，只剩下必须的施法动作，受到的损伤+100%）。' },
+        { name: '战王的肖像', type: '饰品', cost: 80, rarity: 'legendary', description: '以古代王者的形象制成的小肖像，这位王者是勇猛的战士，与神祇誓约。能强化蓄力的攻击（任何蓄力攻击提升35%的伤害）。' },
+        { name: '法王的肖像', type: '饰品', cost: 80, rarity: 'legendary', description: '以古代王者的形象制成的小肖像，这位王者精通魔法，与神祇相连。能大幅缩短所有法术的吟唱时间。（只留下必要的关键吟唱语句）' },
+        { name: '古王护符', type: '饰品', cost: 90, rarity: 'legendary', description: '参考远古巨龙之王的形象制成的远古熟铁护符，龙是那个时代的主宰。古王的城，据说还在遥远天际的彼端矗立。能提升所有增益效果的持续时间和效果（持续时间+200%、效果+50%）。' },
+        { name: '神祇', type: '饰品', cost: 70, rarity: 'legendary', description: '关于神祇传说的雕制护符。神祇，曾见过世界树全貌的存在，那是世间唯一、万物伊始。能提升体质属性（体质+1）。' },
+        { name: '碎星', type: '饰品', cost: 70, rarity: 'legendary', description: '关于英雄传说的雕制护符。英雄，独自挑战并粉碎坠落的星星，那是从天而降的可怕天外生命。能提升力量属性（力量+1）。' },
+        { name: '剑士', type: '饰品', cost: 70, rarity: 'legendary', description: '关于剑士传说的雕制护符。剑士，其剑技蕴藏封印古老腐败的力量，那是户枢不蠹、流水不腐。能提升敏捷属性（敏捷+1）。' },
+        { name: '观星', type: '饰品', cost: 70, rarity: 'legendary', description: '关于观星传说的雕制护符。观星，仰望夜空找寻星星的轨迹，那是一段不停追赶命运的旅行。能提升智力属性（智力+1）。' },
+        { name: '预言', type: '饰品', cost: 70, rarity: 'legendary', description: '关于预言传说的雕制护符。预言，毋庸置疑的静谧沉默中的奥秘，那是随后的话语，不曾存在的话语。能提升精神属性（精神+1）。' },
+        { name: '古老王者的烙印', type: '饰品', cost: 150, rarity: 'mythic', description: '在极为久远的过去，连至强的王者都在世间留下了自己的一部分，此为某位古老王者的一只不朽眼眸，置入黄金丝线勾勒组成的小球。能提升智力与精神属性（体质+1、力量+1、敏捷+1）。' },
+        { name: '古老神祇的烙印', type: '饰品', cost: 150, rarity: 'mythic', description: '在极为久远的过去，连高远的神祇都在世间留下了自己的一部分，此为某位古老神祇的一只不朽眼眸，置入黄金丝线勾勒组成的小球。能提升智力与精神属性（智力+2、精神+2）。' },
+        { name: '牺牲细枝', type: '饰品', cost: 110, rarity: 'mythic', description: '细到仿佛一折即断的枯枝护符。世界树的一部份，在世界久远开端时剪下的树枝。死亡的瞬间出现在遥远彼方，不会丢失任何物品，生命值专注值精力值回满。但作为代价，此护符会消失。' },
+        { name: '黑月', type: '饰品', cost: 200, rarity: 'mythic', description: '月与星辰的低语者・露娜的秘密宝藏，与露娜自己洁白完满的月不同，此为无数命运的尽头，那轮漆黑之月。露娜对照黑月，铸造了这枚护符。能仅限一次的，挽回某个人或事物的死亡命运。' }
+      ];
+
+      const MODAL_TABS_CONFIG = {
+        equipments: [
+          { name: '基础装备', data: ALL_POSSIBLE_EQUIPMENTS, isDefault: true },
+          { name: '法环护符拓展', data: ALL_POSSIBLE_TALISMANS }
+        ],
+        items: [
+          { name: '基础物资', data: ALL_POSSIBLE_ITEMS, isDefault: true },
+        ],
+        skills: [
+          { name: '基础技能', data: ALL_POSSIBLE_SKILLS, isDefault: true },
+        ],
+        redThreads: [
+          { name: '基础红线对象', data: ALL_POSSIBLE_RED_THREADS, isDefault: true },
+        ],
+        backgrounds: [
+          { name: '基础背景', data: ALL_POSSIBLE_BACKGROUNDS, isDefault: true },
+        ],
+      }
 
       const COSTS = {
         race: { '精灵': 10, '翼民': 10, '自然魔物(括号内自行编辑具体魔物/详见世界书)': 10, '亡灵种族(括号内自行编辑具体种类/详见世界书)': 10, '深渊魔族(括号内自行编辑具体种类/详见世界书)': 20, 'custom': 80 },
         identity: { '沦为奴隶': -20, '自由平民': 0, '中产阶级': 20, '贵族阶级': 40, '游荡亡灵': 0, '野生魔物(魔兽)': 0, '魔王残党': -20, 'custom': 80 },
         startLocation: {},
+      };
+
+      const ALL_DATA_SOURCES = {
+          equipments: [...ALL_POSSIBLE_EQUIPMENTS, ...ALL_POSSIBLE_TALISMANS],
+          items: ALL_POSSIBLE_ITEMS,
+          skills: ALL_POSSIBLE_SKILLS,
+          redThreads: ALL_POSSIBLE_RED_THREADS,
+          backgrounds: ALL_POSSIBLE_BACKGROUNDS
       };
 
       const elements = {
@@ -1219,12 +1499,19 @@ const ALL_POSSIBLE_EQUIPMENTS = [
         randomizeAttributesButton: document.getElementById('randomizeAttributesButton'),
         modal: document.getElementById('selectionModal'), modalTitle: document.getElementById('modalTitle'),
         modalOptionsList: document.getElementById('modalOptionsList'), modalConfirmBtn: document.getElementById('modalConfirmBtn'),
+        modalTabsContainer: document.getElementById('modalTabsContainer'), 
         closeBtn: document.querySelector('.close-btn'),
         equipmentsSummary: document.getElementById('equipmentsSummary'),
         itemsSummary: document.getElementById('itemsSummary'),
         skillsSummary: document.getElementById('skillsSummary'),
         redThreadsSummary: document.getElementById('redThreadsSummary'),
         backgroundsSummary: document.getElementById('backgroundsSummary'),
+        reviewButton: document.getElementById('reviewButton'),
+        reviewModal: document.getElementById('reviewModal'),
+        reviewModalTitle: document.getElementById('reviewModalTitle'),
+        reviewModalOptionsList: document.getElementById('reviewModalOptionsList'),
+        reviewModalConfirmBtn: document.getElementById('reviewModalConfirmBtn'),
+        reviewCloseBtn: document.getElementById('reviewCloseBtn'),
       };
 
       const attributes = ['力量', '敏捷', '体质', '智力', '精神'];
@@ -1256,60 +1543,138 @@ const ALL_POSSIBLE_EQUIPMENTS = [
       }
 
       function populateModal(category) {
-        let data, title, isRadio = false;
+        if (!category) { return; } 
+        let title, isRadio = false;
+        let mainData; 
         switch (category) {
-          case 'equipments': data = ALL_POSSIBLE_EQUIPMENTS; title = '选择初始装备'; break;
-          case 'items': data = ALL_POSSIBLE_ITEMS; title = '选择初始物品'; break;
-          case 'skills': data = ALL_POSSIBLE_SKILLS; title = '选择初始技能'; break;
-          case 'redThreads': data = ALL_POSSIBLE_RED_THREADS; title = '选择初始红线对象'; isRadio = true; break;
-          case 'backgrounds': data = ALL_POSSIBLE_BACKGROUNDS; title = '选择初始背景'; isRadio = true; break;
+          case 'equipments': title = '选择初始装备'; break;
+          case 'items': mainData = ALL_POSSIBLE_ITEMS; title = '选择初始物品'; break;
+          case 'skills': mainData = ALL_POSSIBLE_SKILLS; title = '选择初始技能'; break;
+          case 'redThreads': mainData = ALL_POSSIBLE_RED_THREADS; title = '选择初始红线对象'; isRadio = true; break;
+          case 'backgrounds': mainData = ALL_POSSIBLE_BACKGROUNDS; title = '选择初始背景'; isRadio = true; break;
         }
-
         elements.modalTitle.textContent = title;
+        elements.modalTabsContainer.innerHTML = '';
         elements.modalOptionsList.innerHTML = '';
-
-        let currentSelections;
-        if (isRadio) {
-          currentSelections = selections[category] && selections[category].length > 0 ? [selections[category][0]] : [];
+        const tabsConfig = MODAL_TABS_CONFIG[category];
+        if (tabsConfig) {
+          let defaultTabIndex = tabsConfig.findIndex(tab => tab.isDefault) || 0;
+          tabsConfig.forEach((tabConfig, index) => {
+            const tabElement = document.createElement('button');
+            tabElement.className = 'modal-tab';
+            tabElement.textContent = tabConfig.name;
+            tabElement.dataset.tabIndex = index;
+            tabElement.addEventListener('click', () => {
+              elements.modalTabsContainer.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+              tabElement.classList.add('active');
+              populateTabContent(tabConfig.data, category, isRadio);
+            });
+            elements.modalTabsContainer.appendChild(tabElement);
+          });
+          elements.modalTabsContainer.querySelector(`[data-tab-index="${defaultTabIndex}"]`).click();
         } else {
-          currentSelections = selections[category] || [];
+          populateTabContent(mainData, category, isRadio);
         }
-
-        data.forEach(item => {
-          const isChecked = currentSelections.includes(item.name);
-          const inputType = isRadio ? 'radio' : 'checkbox';
-          const costText = item.cost ? `|${item.cost}点` : '';
-          const rarityText = item.rarity ? `<span class="rarity-${item.rarity}">【${RARITY_MAP[item.rarity] || item.rarity}】</span>` : '';
-          const typeText = item.type ? `|${item.type}` : '';
-
-          const label = document.createElement('label');
-          label.className = 'skill-option';
-          label.innerHTML = `
-                    <input type="${inputType}" name="${category}" value="${item.name}" data-cost="${item.cost || 0}" ${isChecked ? 'checked' : ''}>
-                    <div class="skill-option-content">
-                        <span class="skill-main-info">
-                            ${rarityText} ${item.name} ${typeText} ${costText}
-                        </span>
-                        <small class="skill-description">${item.description}</small>
-                    </div>
-                `;
-          elements.modalOptionsList.appendChild(label);
-        });
         if (category === 'backgrounds') {
           updateBackgroundAvailabilityInModal();
         }
       }
 
-      function handleModalConfirm() {
-        if (!currentOpenCategory) return;
-        const inputs = elements.modalOptionsList.querySelectorAll(`input[name="${currentOpenCategory}"]:checked`);
-
-        if (currentOpenCategory === 'backgrounds') {
-          selections.backgrounds = inputs.length ? inputs[0].value : null;
+      function populateTabContent(data, category, isRadio) {
+        elements.modalOptionsList.innerHTML = '';
+        if (!data) return; 
+        const currentSelections = selections[category] || [];
+        let groupByKey, groupKeyMap, groupOrder;
+        
+        if (category === 'backgrounds') {
+            groupByKey = 'bgType';
+            groupKeyMap = BACKGROUND_TYPE_MAP;
+            groupOrder = ['通用背景', '种族限定', '地区限定'];
+        } else if (category === 'redThreads') {
+            groupByKey = 'type'; 
+            groupKeyMap = null; 
+            groupOrder = ['第一层级', '第二层级', '第三层级']; 
         } else {
-          selections[currentOpenCategory] = Array.from(inputs).map(input => input.value);
+            groupByKey = 'rarity'; 
+            groupKeyMap = RARITY_MAP;
+            groupOrder = ['唯一', '普通', '优良', '稀有', '史诗', '传说', '神话', '普通-战技', '普通-法术', '普通-祷告', '普通-仪式', '普通-其他'];
         }
+        const groupedData = data.reduce((acc, item) => {
+          const key = item[groupByKey];
+          const groupName = groupKeyMap ? (groupKeyMap[key] || '其他') : (key || '其他');
+          if (!acc[groupName]) {
+            acc[groupName] = [];
+          }
+          acc[groupName].push(item);
+          return acc;
+        }, {});
+        const sortedGroupKeys = Object.keys(groupedData).sort((a, b) => {
+          const indexA = groupOrder.indexOf(a);
+          const indexB = groupOrder.indexOf(b);
+          if (indexA === -1) return 1;
+          if (indexB === -1) return -1;
+          return indexA - indexB;
+        });
+        sortedGroupKeys.forEach(groupName => {
+          if (groupedData[groupName].length === 0) return; 
+          const groupContainer = document.createElement('div');
+          groupContainer.className = 'accordion-group';
+          const header = document.createElement('button');
+          header.className = 'accordion-header';
+          header.textContent = `${groupName} (${groupedData[groupName].length})`;
+          const content = document.createElement('div');
+          content.className = 'accordion-content';
 
+          groupedData[groupName].forEach(item => {
+            const isChecked = currentSelections.includes(item.name);
+            const inputType = isRadio ? 'radio' : 'checkbox';
+            const costText = item.cost ? `|${item.cost}点` : '';
+            const typeText = item.type ? `|${item.type}` : '';
+            const label = document.createElement('label');
+            label.className = 'skill-option';
+            label.style.marginBottom = '8px';
+            label.innerHTML = `
+              <input type="${inputType}" name="${category}" value="${item.name}" data-cost="${item.cost || 0}" ${isChecked ? 'checked' : ''}>
+              <div class="skill-option-content">
+                  <span class="skill-main-info">
+                      ${item.name} ${typeText} ${costText}
+                  </span>
+                  <small class="skill-description">${item.description}</small>
+              </div>
+            `;
+            content.appendChild(label);
+          });
+
+          groupContainer.appendChild(header);
+          groupContainer.appendChild(content);
+          elements.modalOptionsList.appendChild(groupContainer);
+        });
+      }
+
+      function handleModalSelectionChange(event) {
+        if (!currentOpenCategory || !event.target.matches('input')) return;
+
+        const input = event.target;
+        const itemName = input.value;
+        const isRadio = input.type === 'radio';
+
+        if (isRadio) {
+          if (input.checked) {
+            selections[currentOpenCategory] = [itemName];
+          }
+        } else {
+          const currentSelectionSet = new Set(selections[currentOpenCategory]);
+          if (input.checked) {
+            currentSelectionSet.add(itemName);
+          } else {
+            currentSelectionSet.delete(itemName);
+          }
+          selections[currentOpenCategory] = Array.from(currentSelectionSet);
+        }
+      }
+
+       function handleModalConfirm() {
+        if (!currentOpenCategory) return;
         updateSelectionSummary(currentOpenCategory);
 
         if (currentOpenCategory === 'backgrounds') {
@@ -1359,6 +1724,83 @@ const ALL_POSSIBLE_EQUIPMENTS = [
         });
 
         summaryElement.textContent = `已选${count}件，消耗${cost}点`;
+      }
+
+      function openReviewModal() {
+        elements.reviewModalOptionsList.innerHTML = '';
+        const categoryTitles = {
+            equipments: '⚔️ 初始装备',
+            items: '🎒 初始物品',
+            skills: '💫 技能选择',
+            redThreads: '❤️ 初始红线对象',
+            backgrounds: '🧭 初始背景'
+        };
+        Object.keys(categoryTitles).forEach(category => {
+            const selectedNames = selections[category];
+            if (!selectedNames || (Array.isArray(selectedNames) && selectedNames.length === 0)) {
+                return; 
+            }
+            const header = document.createElement('h3');
+            header.className = 'review-category-header';
+            header.textContent = categoryTitles[category];
+            elements.reviewModalOptionsList.appendChild(header);
+            const itemsToShow = Array.isArray(selectedNames) ? selectedNames : [selectedNames];
+            itemsToShow.forEach(itemName => {
+                const itemData = ALL_DATA_SOURCES[category].find(d => d.name === itemName);
+                if (!itemData) return;
+
+                const isRadio = category === 'redThreads' || category === 'backgrounds';
+                const label = createReviewItemLabel(itemData, category, isRadio);
+                elements.reviewModalOptionsList.appendChild(label);
+            });
+        });
+
+        elements.reviewModal.style.display = 'block';
+      }
+
+      function closeReviewModal() {
+        elements.reviewModal.style.display = 'none';
+      }
+
+      function createReviewItemLabel(item, category, isRadio) {
+          const inputType = isRadio ? 'radio' : 'checkbox';
+          const costText = item.cost ? `|${item.cost}点` : '';
+          const rarityText = item.rarity ? `<span class="rarity-${item.rarity}">【${RARITY_MAP[item.rarity] || item.rarity}】</span>` : '';
+          const typeText = item.type ? `|${item.type}` : '';
+          
+          const label = document.createElement('label');
+          label.className = 'skill-option';
+          label.innerHTML = `
+              <input type="${inputType}" name="review_${category}" value="${item.name}" data-category="${category}" checked>
+              <div class="skill-option-content">
+                  <span class="skill-main-info">
+                      ${rarityText} ${item.name} ${typeText} ${costText}
+                  </span>
+                  <small class="skill-description">${item.description}</small>
+              </div>
+          `;
+          return label;
+      }
+
+      function handleReviewConfirm() {
+          const allInputs = elements.reviewModalOptionsList.querySelectorAll('input');
+          const newSelections = { equipments: [], items: [], skills: [], redThreads: [], backgrounds: null };
+          allInputs.forEach(input => {
+              if (input.checked) {
+                  const category = input.dataset.category;
+                  const value = input.value;
+                  if (Array.isArray(newSelections[category])) {
+                      newSelections[category].push(value);
+                  } else {
+                      newSelections[category] = value; 
+                  }
+              }
+          });
+          selections = newSelections;
+          Object.keys(ALL_DATA_SOURCES).forEach(updateSelectionSummary);
+          updateBackgroundStoryVisibility();
+          calculatePoints();
+          closeReviewModal();
       }
 
       function calculatePoints() {
@@ -1605,7 +2047,10 @@ const ALL_POSSIBLE_EQUIPMENTS = [
       elements.raceInput.addEventListener('change', () => { if (selections.backgrounds) { selections.backgrounds = null; updateSelectionSummary('backgrounds'); updateBackgroundStoryVisibility(); } });
       elements.startLocationInput.addEventListener('change', () => { if (selections.backgrounds) { selections.backgrounds = null; updateSelectionSummary('backgrounds'); updateBackgroundStoryVisibility(); } });
 
-      document.querySelectorAll('.selection-btn').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.category)));
+      document.querySelectorAll('.selection-btn').forEach(btn => {
+        if (btn.id === 'reviewButton') return;
+        btn.addEventListener('click', () => openModal(btn.dataset.category));
+      });
       elements.modalConfirmBtn.addEventListener('click', handleModalConfirm);
       elements.closeBtn.addEventListener('click', closeModal);
       window.addEventListener('click', (e) => { if (e.target == elements.modal) closeModal(); });
@@ -1614,7 +2059,27 @@ const ALL_POSSIBLE_EQUIPMENTS = [
       elements.resetButton.addEventListener('click', resetAll);
       elements.randomizeAttributesButton.addEventListener('click', randomizeAP);
       elements.randomizePointsButton.addEventListener('click', randomizePoints);
+      elements.modalOptionsList.addEventListener('change', handleModalSelectionChange);
+      elements.modalOptionsList.addEventListener('click', (event) => {
+        const header = event.target.closest('.accordion-header');
+        if (!header) return; 
+        const currentGroup = header.parentElement;
+        const isAlreadyActive = currentGroup.classList.contains('active');
+        elements.modalOptionsList.querySelectorAll('.accordion-group').forEach(group => {
+          group.classList.remove('active');
+        });
+        if (!isAlreadyActive) {
+          currentGroup.classList.add('active');
+        }
+      });
 
+      elements.reviewButton.addEventListener('click', openReviewModal);
+      elements.reviewCloseBtn.addEventListener('click', closeReviewModal);
+      elements.reviewModalConfirmBtn.addEventListener('click', handleReviewConfirm);
+      window.addEventListener('click', (e) => { 
+        if (e.target == elements.modal) closeModal();
+        if (e.target == elements.reviewModal) closeReviewModal(); 
+      });
       elements.sendButton.addEventListener('click', async () => {
         const getSelectedObjects = (category, sourceData) => selections[category].map(name => sourceData.find(d => d.name === name) || { name });
         const inputs = {

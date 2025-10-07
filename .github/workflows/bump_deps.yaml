@@ -14,8 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: dev
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -42,4 +40,3 @@ jobs:
         with:
           default_author: github_actions
           message: '[bot] bump deps'
-          branch: dev

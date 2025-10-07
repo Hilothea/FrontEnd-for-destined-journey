@@ -1,0 +1,40 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 通用数值样式 */
+.value-main {
+  font-weight: 500;
+  font-family: 'Noto Sans SC', 'Courier New', monospace;
+  text-shadow:
+    0 0 2px rgba(0, 0, 0, 0.15),
+    0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+/* 品质颜色 */
+.quality-mythic {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.quality-legendary {
+  color: #9e7121;
+  font-weight: bold;
+}
+
+.quality-epic {
+  color: #9c27b0;
+  font-weight: bold;
+}
+
+.quality-rare {
+  color: #193c96;
+  font-weight: bold;
+}
+
+.quality-uncommon {
+  color: #388e3c;
+  font-weight: bold;
+}
