@@ -7,69 +7,141 @@ import EquipmentSlot from './EquipmentSlot.vue';
 // 使用状态数据
 const { statData } = useStatData();
 
-// 装备槽位映射
-const equipmentSlots = [
-  { key: '主武器', slotName: '主武器', icon: '🗡️' },
-  { key: '副武器', slotName: '副武器', icon: '🛡️' },
-  { key: '身体防具', slotName: '身体', icon: '🧥' },
-  { key: '头部防具', slotName: '头部防具', icon: '🎓' },
-  { key: '手部防具', slotName: '手部防具', icon: '🧤' },
-  { key: '脚部防具', slotName: '脚部防具', icon: '👢' },
-  { key: '饰品1', slotName: '饰品1', icon: '💍' },
-  { key: '饰品2', slotName: '饰品2', icon: '📿' },
+// 装备类别配置
+const equipmentCategories = [
+  { key: '武器', title: '🗡️ 武器' },
+  { key: '防具', title: '🛡️ 防具' },
+  { key: '饰品', title: '💍 饰品' },
 ];
 
-// 获取装备数据
+// 获取装备数据（按类别分组）
 const equipmentData = computed(() => {
   if (!statData.value) {
-    return equipmentSlots.map(slot => ({
-      ...slot,
-      name: '无装备',
-      quality: '',
-      description: '',
+    return equipmentCategories.map(category => ({
+      ...category,
+      items: [],
     }));
   }
 
   const equipment = safeGet(statData.value, '财产.装备', {});
 
-  return equipmentSlots.map(slot => {
-    const equipData = safeGet(equipment, slot.key, {});
+  return equipmentCategories.map(category => {
+    const categoryData = safeGet(equipment, category.key, {});
+    const items: Array<{
+      name: string;
+      quality: string;
+      description: string;
+      position: string;
+    }> = [];
+
+    // 遍历类别中的所有装备（排除 $meta）
+    Object.entries(categoryData).forEach(([key, value]) => {
+      if (key === '$meta') return;
+
+      const equipData = value as Record<string, unknown>;
+      items.push({
+        name: key,
+        quality: safeGet(equipData, '品质', '') as string,
+        description: safeGet(equipData, '描述', '') as string,
+        position: safeGet(equipData, '位置', '') as string,
+      });
+    });
+
     return {
-      ...slot,
-      name: safeGet(equipData, '名称', '无装备'),
-      quality: safeGet(equipData, '品质', ''),
-      description: safeGet(equipData, '描述', ''),
+      ...category,
+      items,
     };
   });
+});
+
+// 计算装备总数
+const totalEquipmentCount = computed(() => {
+  return equipmentData.value.reduce((sum, category) => sum + category.items.length, 0);
 });
 </script>
 
 <template>
-  <CommonStatus title="⚔️ 角色装备" variant="section" :default-open="false">
-    <div class="equipment-grid">
-      <EquipmentSlot
-        v-for="equipment in equipmentData"
-        :key="equipment.key"
-        :slot-name="equipment.slotName"
-        :icon="equipment.icon"
-        :equipment-name="equipment.name"
-        :quality="equipment.quality"
-        :description="equipment.description"
-      />
+  <CommonStatus
+    title="⚔️ 角色装备"
+    variant="section"
+    :default-open="false"
+    :summary-details="`共 ${totalEquipmentCount} 件装备`"
+  >
+    <div class="equipment-section">
+      <div v-if="totalEquipmentCount > 0" class="equipment-grid">
+        <!-- 按类别分栏显示 -->
+        <div v-for="category in equipmentData" :key="category.key" class="equipment-column">
+          <h3 class="equipment-category-title">{{ category.title }}</h3>
+          <div v-if="category.items.length === 0" class="empty-category">暂无{{ category.key }}</div>
+          <div v-else class="equipment-list">
+            <EquipmentSlot
+              v-for="item in category.items"
+              :key="item.name"
+              :equipment-name="item.name"
+              :quality="item.quality"
+              :description="item.description"
+              :position="item.position"
+            />
+          </div>
+        </div>
+      </div>
+
+      <p v-else class="empty-message value-main">暂无装备</p>
     </div>
   </CommonStatus>
 </template>
 
 <style lang="scss" scoped>
+/* 装备部分样式 */
+.equipment-section {
+  .property-name {
+    font-weight: bold;
+    color: #6a514d;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
+    margin-bottom: 12px;
+  }
+}
+
+/* 装备网格布局 - 垂直排列 */
 .equipment-grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
+}
 
-  /* 为每个装备槽位添加底部分隔线，除了最后一个 */
-  > *:not(:last-child) {
-    padding-bottom: 10px;
-    border-bottom: 1px solid #d3c5b3;
-  }
+.equipment-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.equipment-category-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1em;
+  font-weight: 700;
+  color: #5d4037;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #d3c5b3;
+  margin-bottom: 6px;
+}
+
+.equipment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empty-category {
+  color: #7a655d;
+  font-style: italic;
+  font-size: 0.9em;
+  padding: 5px 10px;
+}
+
+.empty-message {
+  color: #7a655d;
+  font-style: italic;
+  margin: 0;
+  padding-left: 15px;
 }
 </style>

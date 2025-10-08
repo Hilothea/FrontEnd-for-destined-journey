@@ -1,68 +1,68 @@
 <script lang="ts" setup>
 import { getQualityClass } from '../../utils/quality';
+import CommonStatus from '../common/CommonStatus.vue';
 
 interface Props {
-  /** 槽位名称 */
-  slotName: string;
-  /** 左侧 emoji 图标 */
-  icon: string;
   /** 装备名称 */
-  equipmentName?: string;
+  equipmentName: string;
   /** 装备品质 */
   quality?: string;
   /** 装备描述 */
   description?: string;
+  /** 装备位置 */
+  position?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  equipmentName: '无装备',
   quality: '',
   description: '',
+  position: '',
 });
 
-// 判断是否有装备
-const hasEquipment = computed(() => props.equipmentName !== '无装备');
+// 计算装备标题（只包含名称和品质）
+const equipmentTitle = computed(() => {
+  let title = props.equipmentName;
+  if (props.quality) {
+    title += `(${props.quality})`;
+  }
+  return title;
+});
+
+// 计算摘要详情（显示位置）
+const summaryDetails = computed(() => {
+  return props.position ? `位置: ${props.position}` : '';
+});
 </script>
 
 <template>
-  <div class="equipment-slot">
-    <p class="equipment-label">
-      <span>{{ icon }} {{ slotName }}: </span>
-      <span v-if="hasEquipment" class="equipment-name value-main" :class="getQualityClass(quality)">
+  <CommonStatus
+    :title="equipmentTitle"
+    variant="entry"
+    :default-open="false"
+    custom-class="equipment-entry"
+    :summary-details="summaryDetails"
+  >
+    <template #title>
+      <span class="value-main" :class="getQualityClass(quality)">
         {{ equipmentName }}<template v-if="quality">({{ quality }})</template>
       </span>
-      <span v-else class="equipment-name value-main">无装备</span>
-    </p>
-    <p v-if="hasEquipment && description" class="equipment-description value-main">
-      {{ description }}
-    </p>
-  </div>
+    </template>
+
+    <div class="equipment-details value-main">{{ description }}</div>
+  </CommonStatus>
 </template>
 
 <style lang="scss" scoped>
-.equipment-slot {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.equipment-label {
-  margin: 0;
-  line-height: 1.6;
-
-  > span:first-child {
-    font-weight: bold;
-    color: #6a514d;
-    text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
+.equipment-entry {
+  :deep(.summary-title) {
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 }
 
-.equipment-description {
-  margin: 0;
-  font-size: 0.85em;
-  font-style: italic;
-  color: #7a655d;
-  padding-left: 10px;
-  margin-top: 2px;
+.equipment-details {
+  color: #4a3b31;
+  line-height: 1.6;
 }
 </style>

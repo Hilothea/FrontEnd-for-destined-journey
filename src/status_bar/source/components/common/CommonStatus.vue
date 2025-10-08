@@ -28,12 +28,41 @@ const props = withDefaults(defineProps<Props>(), {
 // 控制展开/收起状态
 const isOpen = ref(props.defaultOpen);
 
-// 摘要内容长度阈值（字符数），超过此值时另起一行
-const SUMMARY_LENGTH_THRESHOLD = 30;
+// 响应式的窗口宽度
+const windowWidth = ref(window.innerWidth);
+
+// 监听窗口大小变化
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateWindowWidth);
+});
 
 // 判断摘要内容是否过长，需要换行显示
+// 基于字符长度和窗口宽度的简单判断
 const shouldWrapSummary = computed(() => {
-  return props.summaryDetails.length > SUMMARY_LENGTH_THRESHOLD;
+  if (!props.summaryDetails) return false;
+
+  const textLength = props.summaryDetails.length;
+
+  // 移动端（<= 600px）：超过10个字符就换行
+  if (windowWidth.value <= 600) {
+    return textLength > 10;
+  }
+
+  // 平板端（600px < width <= 1000px）：超过30个字符就换行
+  if (windowWidth.value <= 1000) {
+    return textLength > 30;
+  }
+
+  // 桌面端（> 1000px）：超过50个字符才换行
+  return textLength > 50;
 });
 
 // 计算组件的 CSS 类名
