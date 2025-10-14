@@ -1,7 +1,11 @@
-<script setup lang="ts"></script>
-
 <template>
-  <div></div>
+  <div class="creator-app">
+    <RouterView />
+  </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.creator-app {
+  background-color: #f5efe6;
+}
+</style>
