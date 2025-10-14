@@ -30,7 +30,7 @@ const routes: RouteRecordRaw[] = [
         path: 'selections',
         name: 'Selections',
         component: Selections,
-        meta: { title: '装备技能', step: 2 },
+        meta: { title: '装备与技能', step: 2 },
       },
       {
         path: 'background',
