@@ -250,6 +250,17 @@ const bondSkills = computed(() => {
     color: #4a3b31;
     word-break: break-word;
   }
+
+  /* 移动端优化：value 另起一行显示并缩进对齐 */
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
+
+    .value-main {
+      padding-left: 1.5em;
+    }
+  }
 }
 
 .divider {
