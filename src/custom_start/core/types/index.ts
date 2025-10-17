@@ -9,6 +9,7 @@ export type Item = {
   cost: number;
   rarity: Rarity;
   description: string;
+  [key: string]: any;
 };
 
 export type Equipment = Item;
@@ -22,6 +23,7 @@ export interface RedThread {
   type: string;
   cost: number;
   description: string;
+  [key: string]: any;
 }
 
 // 背景类型
@@ -30,6 +32,7 @@ export interface Background {
   description: string;
   requiredRace?: string;
   requiredLocation?: string;
+  [key: string]: any;
 }
 
 // 属性类型

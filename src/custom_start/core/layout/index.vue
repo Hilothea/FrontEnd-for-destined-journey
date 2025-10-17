@@ -1,11 +1,49 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { useRoute, useRouter } from 'vue-router';
+import { useCharacterStore } from '../store';
 import Steps from './component/Steps.vue';
 
 const router = useRouter();
 const route = useRoute();
+const characterStore = useCharacterStore();
+const { character, consumedPoints } = storeToRefs(characterStore);
+
+// 在组件中计算可用点数
+const availablePoints = computed(() => {
+  return character.value.reincarnationPoints - consumedPoints.value;
+});
+
+// 判断是否可以 Roll 点数（只有在没有消耗点数时才允许）
+const canRollPoints = computed(() => {
+  return consumedPoints.value === 0;
+});
 
 const stepRef = ref<InstanceType<typeof Steps> | null>(null);
+
+// 创建事件触发器
+const randomGenerateTrigger = ref(0);
+const resetPageTrigger = ref(0);
+
+// 通过 provide 提供给子组件
+provide('randomGenerateTrigger', randomGenerateTrigger);
+provide('resetPageTrigger', resetPageTrigger);
+
+// Roll 转生点数
+const handleRollPoints = () => {
+  const newPoints = characterStore.rollInitialPoints();
+  console.log(`Roll 到新的转生点数: ${newPoints}`);
+};
+
+// 随机生成当前页面内容
+const handleRandomGenerate = () => {
+  randomGenerateTrigger.value++;
+};
+
+// 重置当前页面内容
+const handleReset = () => {
+  resetPageTrigger.value++;
+};
 
 const stepTitles = ref([
   { title: '信息/属性' },
@@ -84,11 +122,43 @@ watch(() => route.name, (newRoute, oldRoute) => {
 <template>
   <div class="layout">
     <h1 class="main-title">命定之诗与黄昏之歌</h1>
+
+    <!-- 转生点数显示和 Roll 点按钮 -->
+    <div class="points-panel">
+      <div class="points-display">
+        <span class="points-label">可用转生点：</span>
+        <span class="points-value" :class="{ 'negative': availablePoints < 0 }">
+          {{ availablePoints }}
+        </span>
+        <span class="points-total">/ {{ character.reincarnationPoints }}</span>
+      </div>
+      <button
+        class="roll-button"
+        :disabled="!canRollPoints"
+        :title="canRollPoints ? '随机生成新的转生点数' : '已消耗点数，无法重新 Roll（请先重置）'"
+        @click="handleRollPoints"
+      >
+        <span class="button-text">🎲 Roll 点数</span>
+      </button>
+    </div>
+
     <Steps
       ref="stepRef"
       :steps="stepTitles"
       :step="currentStep"
     />
+
+    <!-- 随机生成和重置按钮 -->
+    <div class="action-buttons">
+      <button class="action-button random-button" title="随机生成当前页面内容" @click="handleRandomGenerate">
+        <span class="icon">✨</span>
+        <span class="text">随机当前页</span>
+      </button>
+      <button class="action-button reset-button" title="重置当前页面" @click="handleReset">
+        <span class="icon">🔄</span>
+        <span class="text">重置当前页</span>
+      </button>
+    </div>
 
     <div class="content-area">
       <router-view v-slot="{ Component, route: slotRoute }">
@@ -121,18 +191,106 @@ watch(() => route.name, (newRoute, oldRoute) => {
 .layout {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 500px;
   padding: var(--spacing-xl);
 }
 
 .main-title {
   text-align: center;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
   color: var(--title-color);
 }
 
+// 转生点数面板
+.points-panel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.points-display {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  font-size: 1.1rem;
+  font-weight: 600;
+
+  .points-label {
+    color: var(--text-color);
+  }
+
+  .points-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    transition: var(--transition-normal);
+
+    &.negative {
+      color: var(--error-color);
+      animation: shake 0.3s ease-in-out;
+    }
+  }
+
+  .points-total {
+    color: var(--text-light);
+    font-size: 1rem;
+  }
+}
+
+.roll-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: linear-gradient(135deg, var(--accent-color) 0%, #b8941f 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, #e0c04a 0%, #d4af37 100%);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--border-color-light);
+    color: var(--text-light);
+
+    &:hover {
+      transform: none;
+      box-shadow: var(--shadow-sm);
+    }
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
 .content-area {
-  flex: 1;
   margin: var(--spacing-md) 0;
   padding: var(--spacing-md);
   background: var(--card-bg);
@@ -141,6 +299,7 @@ watch(() => route.name, (newRoute, oldRoute) => {
   box-shadow: var(--shadow-md);
   position: relative;
   overflow: hidden;
+  min-height: 400px;
 }
 
 // 向左滑动过渡（前进）
@@ -180,6 +339,60 @@ watch(() => route.name, (newRoute, oldRoute) => {
   justify-content: space-between;
   align-items: center;
   gap: var(--spacing-lg);
+}
+
+// 操作按钮组
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--spacing-md);
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+
+  .icon {
+    font-size: 1.1rem;
+  }
+
+  &.random-button {
+    background: linear-gradient(135deg, #e8d5c4 0%, #d4c4b0 100%);
+    color: var(--title-color);
+
+    &:hover {
+      background: linear-gradient(135deg, #f0ddd0 0%, #e0d5c7 100%);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+
+  &.reset-button {
+    background: linear-gradient(135deg, #c6b8a5 0%, #b0a295 100%);
+    color: var(--title-color);
+
+    &:hover {
+      background: linear-gradient(135deg, #d4c4b0 0%, #c6b8a5 100%);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
 }
 
 .nav-button {
@@ -222,6 +435,18 @@ watch(() => route.name, (newRoute, oldRoute) => {
     padding: var(--spacing-md);
   }
 
+  .points-display {
+    font-size: 1rem;
+
+    .points-value {
+      font-size: 1.3rem;
+    }
+  }
+
+  .action-buttons {
+    flex-wrap: wrap;
+  }
+
   .navigation {
     flex-wrap: wrap;
     justify-content: center;
@@ -231,6 +456,10 @@ watch(() => route.name, (newRoute, oldRoute) => {
     flex: 1;
     min-width: 120px;
     justify-content: center;
+  }
+
+  .action-button {
+    flex: 1;
   }
 }
 </style>

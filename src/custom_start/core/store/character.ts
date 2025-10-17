@@ -36,12 +36,6 @@ export const useCharacterStore = defineStore('character', () => {
     destinyPoints: 0, // 命运点数
   });
 
-  const selectedEquipments = ref<string[]>([]);
-  const selectedSkills = ref<string[]>([]);
-  const selectedItems = ref<string[]>([]);
-  const selectedRedThread = ref<string>('');
-  const selectedBackground = ref<string>('');
-
   // ============ Computed ============
 
   /**
@@ -66,19 +60,6 @@ export const useCharacterStore = defineStore('character', () => {
     return total;
   });
 
-  /**
-   * 计算可用的转生点数
-   */
-  const availablePoints = computed(() => {
-    return character.value.reincarnationPoints - consumedPoints.value;
-  });
-
-  /**
-   * 检查是否超过点数限制
-   */
-  const isOverBudget = computed(() => {
-    return availablePoints.value < 0;
-  });
 
   // ============ Actions ============
 
@@ -91,7 +72,9 @@ export const useCharacterStore = defineStore('character', () => {
   };
 
   const addAttributePoint = (attr: keyof Attributes) => {
-    if (availablePoints.value > 0) {
+    // 计算当前可用点数
+    const available = character.value.reincarnationPoints - consumedPoints.value;
+    if (available > 0) {
       character.value.attributePoints[attr]++;
     }
   };
@@ -99,24 +82,6 @@ export const useCharacterStore = defineStore('character', () => {
   const removeAttributePoint = (attr: keyof Attributes) => {
     if (character.value.attributePoints[attr] > 0) {
       character.value.attributePoints[attr]--;
-    }
-  };
-
-  const toggleEquipment = (equipment_id: string) => {
-    const idx = selectedEquipments.value.indexOf(equipment_id);
-    if (idx === -1) {
-      selectedEquipments.value.push(equipment_id);
-    } else {
-      selectedEquipments.value.splice(idx, 1);
-    }
-  };
-
-  const toggleSkill = (skill_id: string) => {
-    const idx = selectedSkills.value.indexOf(skill_id);
-    if (idx === -1) {
-      selectedSkills.value.push(skill_id);
-    } else {
-      selectedSkills.value.splice(idx, 1);
     }
   };
 
@@ -157,29 +122,15 @@ export const useCharacterStore = defineStore('character', () => {
       reincarnationPoints: INITIAL_REINCARNATION_POINTS,
       destinyPoints: 0,
     };
-    selectedEquipments.value = [];
-    selectedSkills.value = [];
-    selectedItems.value = [];
-    selectedRedThread.value = '';
-    selectedBackground.value = '';
   };
 
   return {
     character,
-    selectedEquipments,
-    selectedSkills,
-    selectedItems,
-    selectedRedThread,
-    selectedBackground,
     consumedPoints,
-    availablePoints,
-    isOverBudget,
     updateCharacterField,
     updateAttribute,
     addAttributePoint,
     removeAttributePoint,
-    toggleEquipment,
-    toggleSkill,
     rollInitialPoints,
     resetCharacter,
   };
