@@ -27,11 +27,10 @@ const rarityOrder: Record<string, number> = {
 
 // 获取货币数据
 const currencyData = computed(() => {
-  if (!statData.value) return { platinum: 0, gold: 0, silver: 0, copper: 0 };
+  if (!statData.value) return { gold: 0, silver: 0, copper: 0 };
 
   const currency = safeGet(statData.value, '财产.货币', {});
   return {
-    platinum: safeGet(currency, '白金币', 0),
     gold: safeGet(currency, '金币', 0),
     silver: safeGet(currency, '银币', 0),
     copper: safeGet(currency, '铜币', 0),
@@ -97,8 +96,8 @@ const itemStats = computed(() => {
 
 // 计算摘要信息
 const summaryDetails = computed(() => {
-  const { platinum, gold, silver, copper } = currencyData.value;
-  return `白金币: ${platinum} | 金币: ${gold} | 银币: ${silver} | 铜币: ${copper} | 物品: ${itemStats.value.total}`;
+  const { gold, silver, copper } = currencyData.value;
+  return `金币: ${gold} | 银币: ${silver} | 铜币: ${copper} | 物品: ${itemStats.value.total}`;
 });
 </script>
 
@@ -108,9 +107,6 @@ const summaryDetails = computed(() => {
     <div class="currency-section">
       <p class="property-name">💰 货币:</p>
       <div class="currency-display">
-        <span class="currency-item">
-          💠<span class="value-main">{{ currencyData.platinum }}</span>
-        </span>
         <span class="currency-item">
           🟡<span class="value-main">{{ currencyData.gold }}</span>
         </span>
