@@ -34,6 +34,11 @@ const itemTitle = computed(() => {
 const summaryDetails = computed(() => {
   return `数量: ${props.quantity}`;
 });
+
+// 检查是否是"其它物品"类型
+const isOtherItem = computed(() => {
+  return props.type && props.type !== '武器防具' && props.type !== '消耗品' && props.type !== '材料';
+});
 </script>
 
 <template>
@@ -50,7 +55,12 @@ const summaryDetails = computed(() => {
       </span>
     </template>
 
-    <div class="item-details value-main">{{ description }}</div>
+    <div class="item-details value-main">
+      <div v-if="isOtherItem" class="item-type">
+        <strong>类型：</strong>{{ type }}
+      </div>
+      <div>{{ description }}</div>
+    </div>
   </CommonStatus>
 </template>
 
@@ -66,5 +76,17 @@ const summaryDetails = computed(() => {
 .item-details {
   color: var(--theme-text-primary);
   line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item-type {
+  color: var(--theme-text-secondary);
+  font-size: 0.95em;
+
+  strong {
+    color: var(--theme-text-tertiary);
+  }
 }
 </style>
