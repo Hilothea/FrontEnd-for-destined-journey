@@ -23,21 +23,26 @@ const skills = computed(() => {
 
   const active: any[] = [];
   const passive: any[] = [];
+  const other: any[] = [];
 
   Object.entries(items).forEach(([key, skill]: [string, any]) => {
+    const skillType = safeGet(skill, '类型', '') as string;
     const skillInfo = {
       key,
       name: key,
       quality: safeGet(skill, '品质', ''),
       cost: safeGet(skill, '消耗', ''),
       description: safeGet(skill, '描述', ''),
-      type: safeGet(skill, '类型', ''),
+      type: skillType,
     };
 
-    if (skillInfo.type === '主动') {
+    if (skillType === '主动') {
       active.push(skillInfo);
-    } else if (skillInfo.type === '被动') {
+    } else if (skillType === '被动') {
       passive.push(skillInfo);
+    } else if (skillType) {
+      // 其他类型的技能
+      other.push(skillInfo);
     }
   });
 
@@ -46,14 +51,15 @@ const skills = computed(() => {
 
   active.sort(sortByRarity);
   passive.sort(sortByRarity);
+  other.sort(sortByRarity);
 
-  return { active, passive };
+  return { active, passive, other };
 });
 </script>
 
 <template>
   <CommonStatus title="💫 角色技能" variant="section" :default-open="false">
-    <div class="skills-grid">
+    <div class="skills-grid" :class="{ 'has-other': skills.other.length > 0 }">
       <!-- 主动技能列 -->
       <div class="skills-column">
         <h3 class="skills-category-title">🌀 主动技能</h3>
@@ -86,6 +92,23 @@ const skills = computed(() => {
         </div>
         <p v-else class="empty-message value-main">尚未拥有任何被动技能</p>
       </div>
+
+      <!-- 其他技能列 -->
+      <div v-if="skills.other.length > 0" class="skills-column">
+        <h3 class="skills-category-title">✨ 其他技能</h3>
+        <div class="skills-list">
+          <SkillItem
+            v-for="skill in skills.other"
+            :key="skill.key"
+            :name="skill.name"
+            :quality="skill.quality"
+            :cost="skill.cost"
+            :description="skill.description"
+            :other-type-name="skill.type"
+            type="other"
+          />
+        </div>
+      </div>
     </div>
   </CommonStatus>
 </template>
@@ -107,6 +130,25 @@ const skills = computed(() => {
     height: 100%;
     background-color: var(--theme-border-light);
     justify-self: center;
+  }
+
+  /* 有其他技能时改为垂直布局 */
+  &.has-other {
+    grid-template-columns: 1fr;
+    gap: 20px;
+
+    &::before {
+      display: none;
+    }
+
+    .skills-column {
+      grid-column: 1;
+
+      &:not(:first-child) {
+        padding-top: 15px;
+        border-top: 1px solid var(--theme-border-light);
+      }
+    }
   }
 }
 
@@ -150,7 +192,8 @@ const skills = computed(() => {
     grid-template-columns: 1fr;
     gap: 20px;
 
-    &::before {
+    &::before,
+    &::after {
       display: none;
     }
   }
@@ -158,7 +201,7 @@ const skills = computed(() => {
   .skills-column {
     grid-column: 1 !important;
 
-    &:last-child {
+    &:not(:first-child) {
       padding-top: 10px;
       border-top: 1px solid var(--theme-border-light);
     }

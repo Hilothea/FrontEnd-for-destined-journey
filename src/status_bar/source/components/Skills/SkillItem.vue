@@ -7,17 +7,20 @@ interface Props {
   name: string;
   /** 技能品质 */
   quality?: string;
-  /** 技能消耗（仅主动技能） */
+  /** 技能消耗 */
   cost?: string;
   /** 技能描述 */
   description: string;
-  /** 技能类型：主动或被动 */
-  type: 'active' | 'passive';
+  /** 技能类型：主动、被动或其他 */
+  type: 'active' | 'passive' | 'other';
+  /** 其他技能的具体类型名称 */
+  otherTypeName?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   quality: '',
   cost: '',
+  otherTypeName: '其它',
 });
 
 // 计算技能标题（只包含名称和品质）
@@ -31,7 +34,7 @@ const skillTitle = computed(() => {
 
 // 计算摘要详情（显示消耗）
 const summaryDetails = computed(() => {
-  if (props.type === 'active' && props.cost) {
+  if ((props.type === 'active' || props.type === 'other') && props.cost) {
     return `消耗: ${props.cost}`;
   }
   return '';
@@ -53,7 +56,10 @@ const summaryDetails = computed(() => {
     </template>
 
     <div class="skill-description value-main">
-      {{ description }}
+      <div v-if="type === 'other' && otherTypeName" class="skill-type">
+        <strong>类型：</strong>{{ otherTypeName }}
+      </div>
+      <div>{{ description }}</div>
     </div>
   </CommonStatus>
 </template>
@@ -70,5 +76,17 @@ const summaryDetails = computed(() => {
 .skill-description {
   color: var(--theme-text-primary);
   line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skill-type {
+  color: var(--theme-text-secondary);
+  font-size: 0.95em;
+
+  strong {
+    color: var(--theme-text-tertiary);
+  }
 }
 </style>
