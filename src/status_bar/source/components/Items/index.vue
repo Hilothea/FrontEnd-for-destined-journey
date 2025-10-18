@@ -159,7 +159,7 @@ const summaryDetails = computed(() => {
 
   .property-name {
     font-weight: bold;
-    color: #6a514d;
+    color: var(--theme-text-secondary);
     text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
     margin-bottom: 8px;
   }
@@ -188,7 +188,7 @@ const summaryDetails = computed(() => {
 /* 分隔线 */
 .thin-divider {
   border: 0;
-  border-top: 2px solid #c6b8a5;
+  border-top: 2px solid var(--theme-border-dark);
   margin: 10px 0;
   width: 100%;
 }
@@ -197,7 +197,7 @@ const summaryDetails = computed(() => {
 .items-section {
   .property-name {
     font-weight: bold;
-    color: #6a514d;
+    color: var(--theme-text-secondary);
     text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
     margin-bottom: 12px;
   }
@@ -221,9 +221,9 @@ const summaryDetails = computed(() => {
   font-family: 'Cinzel', serif;
   font-size: 1em;
   font-weight: 700;
-  color: #5d4037;
+  color: var(--theme-text-tertiary);
   padding-bottom: 8px;
-  border-bottom: 1px solid #d3c5b3;
+  border-bottom: 1px solid var(--theme-border-light);
   margin-bottom: 6px;
 }
 
@@ -234,7 +234,7 @@ const summaryDetails = computed(() => {
 }
 
 .empty-message {
-  color: #7a655d;
+  color: var(--theme-text-muted);
   font-style: italic;
   margin: 0;
   padding-left: 15px;

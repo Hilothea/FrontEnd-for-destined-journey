@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useStatData } from '../../composables/use-stat-data';
+import { useThemeStore } from '../../store/theme';
 import { normalizeStringOrArray, safeGet } from '../../utils/data-adapter';
 import CommonStatus from '../common/CommonStatus.vue';
 import PropertyItem from './PropertyItem.vue';
@@ -7,6 +8,7 @@ import ResourceBar from './ResourceBar.vue';
 
 // 使用状态数据
 const { statData } = useStatData();
+const themeStore = useThemeStore();
 
 // 获取资源数据
 const resourcesData = computed(() => {
@@ -104,28 +106,28 @@ const summaryDetails = computed(() => {
         icon="❤️"
         :current="resourcesData.hp.current"
         :max="resourcesData.hp.max"
-        color="#D32F2F"
+        :color="themeStore.effectiveColors.resourceHp"
       />
       <ResourceBar
         label="MP"
         icon="🔮"
         :current="resourcesData.mp.current"
         :max="resourcesData.mp.max"
-        color="#1976D2"
+        :color="themeStore.effectiveColors.resourceMp"
       />
       <ResourceBar
         label="SP"
         icon="⚡"
         :current="resourcesData.sp.current"
         :max="resourcesData.sp.max"
-        color="#388E3C"
+        :color="themeStore.effectiveColors.resourceSp"
       />
       <ResourceBar
         label="累计经验"
         icon="⭐"
         :current="resourcesData.exp.current"
         :max="resourcesData.exp.needed"
-        color="#FFA000"
+        :color="themeStore.effectiveColors.resourceExp"
       />
     </div>
 
@@ -162,7 +164,7 @@ const summaryDetails = computed(() => {
   gap: 12px;
   margin-bottom: 10px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #d3c5b3;
+  border-bottom: 1px solid var(--theme-border-light);
 }
 
 /* 状态网格布局 */
@@ -179,7 +181,7 @@ const summaryDetails = computed(() => {
     grid-row: 1;
     width: 1px;
     height: 100%;
-    background-color: #d3c5b3;
+    background-color: var(--theme-border-light);
     justify-self: center;
   }
 }
@@ -204,7 +206,7 @@ const summaryDetails = computed(() => {
 /* 属性名称样式 */
 .property-name {
   font-weight: bold;
-  color: #6a514d;
+  color: var(--theme-text-secondary);
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
@@ -226,7 +228,7 @@ const summaryDetails = computed(() => {
 
   .status-grid-right {
     padding-top: 10px;
-    border-top: 1px solid #d3c5b3;
+    border-top: 1px solid var(--theme-border-light);
   }
 }
 </style>

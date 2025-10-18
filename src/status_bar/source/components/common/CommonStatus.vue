@@ -163,7 +163,7 @@ const onAfterLeave = (el: Element) => {
 /* 折叠面板基础样式 */
 .details-status {
   margin-bottom: 6px;
-  border: 1px solid #d3c5b3;
+  border: 1px solid var(--theme-border-light);
   border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -177,12 +177,12 @@ const onAfterLeave = (el: Element) => {
   // 锁定状态
   &.locked {
     .summary {
-      background-color: #e8e4e0;
-      color: #b5aaa2;
+      background-color: var(--theme-disabled-bg);
+      color: var(--theme-disabled-text);
       cursor: not-allowed;
 
       .icon-star {
-        color: #b5aaa2;
+        color: var(--theme-disabled-text);
       }
     }
   }
@@ -192,25 +192,25 @@ const onAfterLeave = (el: Element) => {
 .summary {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  color: #5d4037;
-  background-color: #d7c8b6;
+  color: var(--theme-text-tertiary);
+  background-color: var(--theme-title-bg);
   padding: 4px 15px;
   cursor: pointer;
   list-style: none;
-  border-bottom: 1px solid #c6b8a5;
+  border-bottom: 1px solid var(--theme-border-dark);
   text-align: left;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
 
   &:hover {
-    background-color: #cbb8a5;
-    color: #4a3b31;
+    background-color: var(--theme-title-bg-hover);
+    color: var(--theme-text-primary);
   }
 
   .is-open & {
-    background-color: #bfa996;
-    border-bottom-color: #a39281;
+    background-color: var(--theme-open-bg);
+    border-bottom-color: var(--theme-open-border-color);
   }
 
   // 当摘要需要换行时，调整内边距
@@ -229,7 +229,7 @@ const onAfterLeave = (el: Element) => {
 /* 左侧星星图标 */
 .icon-star {
   font-size: 1.1em;
-  color: #a39281;
+  color: var(--theme-star-inactive);
   text-shadow: none;
   margin-right: 12px;
   flex-shrink: 0;
@@ -241,10 +241,10 @@ const onAfterLeave = (el: Element) => {
 
   &.is-open {
     transform: rotate(360deg);
-    color: #f7d75a;
+    color: var(--theme-star-active);
     text-shadow:
       0 0 3px rgba(255, 255, 255, 0.8),
-      0 0 6px #f7d75a,
+      0 0 6px var(--theme-star-active),
       0 0 10px #e5a50a;
   }
 }
@@ -261,7 +261,7 @@ const onAfterLeave = (el: Element) => {
   font-family: 'Noto Sans SC', 'Courier New', monospace;
   font-weight: 500;
   font-size: 0.8em;
-  color: #6a514d;
+  color: var(--theme-text-secondary);
   letter-spacing: 0.5px;
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
   align-self: center;
@@ -276,7 +276,7 @@ const onAfterLeave = (el: Element) => {
   font-family: 'Noto Sans SC', 'Courier New', monospace;
   font-weight: 500;
   font-size: 0.8em;
-  color: #6a514d;
+  color: var(--theme-text-secondary);
   letter-spacing: 0.5px;
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
   line-height: 1.4;
@@ -298,7 +298,8 @@ const onAfterLeave = (el: Element) => {
 
 /* 折叠内容区域 */
 .details-content {
-  background-color: rgba(253, 250, 245, 0.9);
+  background-color: var(--theme-background-tertiary);
+  opacity: var(--theme-background-tertiary-opacity);
   transition: height 0.2s ease-in-out;
   overflow: hidden;
 }

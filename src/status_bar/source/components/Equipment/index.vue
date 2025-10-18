@@ -96,7 +96,7 @@ const totalEquipmentCount = computed(() => {
 .equipment-section {
   .property-name {
     font-weight: bold;
-    color: #6a514d;
+    color: var(--theme-text-secondary);
     text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
     margin-bottom: 12px;
   }
@@ -119,9 +119,9 @@ const totalEquipmentCount = computed(() => {
   font-family: 'Cinzel', serif;
   font-size: 1em;
   font-weight: 700;
-  color: #5d4037;
+  color: var(--theme-text-tertiary);
   padding-bottom: 8px;
-  border-bottom: 1px solid #d3c5b3;
+  border-bottom: 1px solid var(--theme-border-light);
   margin-bottom: 6px;
 }
 
@@ -132,14 +132,14 @@ const totalEquipmentCount = computed(() => {
 }
 
 .empty-category {
-  color: #7a655d;
+  color: var(--theme-text-muted);
   font-style: italic;
   font-size: 0.9em;
   padding: 5px 10px;
 }
 
 .empty-message {
-  color: #7a655d;
+  color: var(--theme-text-muted);
   font-style: italic;
   margin: 0;
   padding-left: 15px;

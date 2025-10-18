@@ -6,6 +6,7 @@
 
 /* 通用数值样式 */
 .value-main {
+  color: var(--theme-text-primary);
   font-weight: 500;
   font-family: 'Noto Sans SC', 'Courier New', monospace;
   text-shadow:
@@ -13,28 +14,28 @@
     0 0 5px rgba(255, 255, 255, 0.3);
 }
 
-/* 品质颜色 */
+/* 品质颜色 - 使用主题变量 */
 .quality-mythic {
-  color: #d32f2f;
+  color: var(--theme-quality-mythic);
   font-weight: bold;
 }
 
 .quality-legendary {
-  color: #9e7121;
+  color: var(--theme-quality-legendary);
   font-weight: bold;
 }
 
 .quality-epic {
-  color: #9c27b0;
+  color: var(--theme-quality-epic);
   font-weight: bold;
 }
 
 .quality-rare {
-  color: #193c96;
+  color: var(--theme-quality-rare);
   font-weight: bold;
 }
 
 .quality-uncommon {
-  color: #388e3c;
+  color: var(--theme-quality-uncommon);
   font-weight: bold;
 }

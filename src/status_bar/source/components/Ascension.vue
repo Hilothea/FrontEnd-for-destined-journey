@@ -178,7 +178,7 @@ const summaryDetails = computed(() => {
 /* 等级要求标签 */
 .step-level-req {
   font-size: 0.8em;
-  color: #7a655d;
+  color: var(--theme-text-muted);
   font-style: italic;
   margin-left: 15px;
 }
@@ -198,20 +198,20 @@ const summaryDetails = computed(() => {
 
 .item-name {
   font-weight: bold;
-  color: #6d4c41;
+  color: var(--theme-text-tertiary);
 }
 
 .item-desc {
   font-size: 0.9em;
   font-style: italic;
-  color: #7a655d;
+  color: var(--theme-text-muted);
   margin-left: 20px;
   display: block; /* 确保换行 */
 }
 
 /* 空状态提示 */
 .empty-slot {
-  color: #9e9e9e;
+  color: var(--theme-text-muted);
   font-style: italic;
   margin: 0;
 }

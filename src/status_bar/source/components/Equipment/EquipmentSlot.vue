@@ -62,7 +62,7 @@ const summaryDetails = computed(() => {
 }
 
 .equipment-details {
-  color: #4a3b31;
+  color: var(--theme-text-primary);
   line-height: 1.6;
 }
 </style>

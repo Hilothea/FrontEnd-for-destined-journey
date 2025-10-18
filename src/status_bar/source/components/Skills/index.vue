@@ -105,7 +105,7 @@ const skills = computed(() => {
     grid-row: 1;
     width: 1px;
     height: 100%;
-    background-color: #d3c5b3;
+    background-color: var(--theme-border-light);
     justify-self: center;
   }
 }
@@ -128,7 +128,7 @@ const skills = computed(() => {
   font-family: 'Cinzel', serif;
   font-size: 1em;
   font-weight: 700;
-  color: #5d4037;
+  color: var(--theme-text-tertiary);
   padding-bottom: 8px;
 }
 
@@ -139,7 +139,7 @@ const skills = computed(() => {
 }
 
 .empty-message {
-  color: #7a655d;
+  color: var(--theme-text-muted);
   font-style: italic;
   margin: 0;
 }
@@ -160,7 +160,7 @@ const skills = computed(() => {
 
     &:last-child {
       padding-top: 10px;
-      border-top: 1px solid #d3c5b3;
+      border-top: 1px solid var(--theme-border-light);
     }
   }
 }

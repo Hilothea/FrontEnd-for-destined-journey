@@ -241,13 +241,13 @@ const bondSkills = computed(() => {
 
   .property-name {
     font-weight: bold;
-    color: #6a514d;
+    color: var(--theme-text-secondary);
     text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
     flex-shrink: 0;
   }
 
   .value-main {
-    color: #4a3b31;
+    color: var(--theme-text-primary);
     word-break: break-word;
   }
 
@@ -265,13 +265,13 @@ const bondSkills = computed(() => {
 
 .divider {
   border: 0;
-  border-top: 1px solid #c6b8a5;
+  border-top: 1px solid var(--theme-border-dark);
   width: 100%;
 }
 
 /* 好感度进度条 */
 .affection-bar-container {
-  background-color: #c8bbaf;
+  background-color: var(--theme-progress-bar-bg);
   border-radius: 9px;
   height: 18px;
   margin-top: 4px;
@@ -285,7 +285,7 @@ const bondSkills = computed(() => {
   height: 100%;
   transition: width 0.8s ease-out;
   border-radius: 9px;
-  background-color: #ec407a;
+  background-color: var(--theme-affection-bar);
   background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.1));
   box-shadow: inset 0 -1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -307,12 +307,12 @@ const bondSkills = computed(() => {
 
 .skill-name {
   font-weight: bold;
-  color: #6d4c41;
+  color: var(--theme-text-tertiary);
 }
 
 .skill-description {
   font-size: 0.9em;
-  color: #7a655d;
+  color: var(--theme-text-muted);
   padding-left: 1em;
 }
 </style>

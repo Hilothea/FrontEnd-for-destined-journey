@@ -28,7 +28,7 @@ defineProps<Props>();
 
 .property-name {
   font-weight: bold;
-  color: #6a514d;
+  color: var(--theme-text-secondary);
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
 }
 </style>

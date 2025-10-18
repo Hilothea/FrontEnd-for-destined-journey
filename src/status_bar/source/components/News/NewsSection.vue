@@ -44,6 +44,6 @@ const formattedContent = computed(() => {
 .news-content {
   white-space: pre-wrap;
   line-height: 1.6;
-  color: #4a3b31;
+  color: var(--theme-text-primary);
 }
 </style>

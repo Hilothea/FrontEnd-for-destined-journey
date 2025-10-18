@@ -103,8 +103,8 @@ const handleGacha = () => {
 <style lang="scss" scoped>
 /* 命运抽卡按钮 */
 .gacha-button {
-  background-color: #8d6e63;
-  color: white;
+  background-color: var(--theme-button-bg);
+  color: var(--theme-button-text);
   border: none;
   padding: 8px 12px;
   border-radius: 4px;
@@ -116,7 +116,7 @@ const handleGacha = () => {
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: #6d4c41;
+    background-color: var(--theme-button-bg-hover);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     transform: translateY(-2px);
   }
@@ -134,12 +134,12 @@ const handleGacha = () => {
 
   .property-name {
     font-weight: bold;
-    color: #6a514d;
+    color: var(--theme-text-secondary);
     text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
   }
 
   .value-main {
-    color: #4a3b31;
+    color: var(--theme-text-primary);
   }
 }
 
@@ -152,7 +152,7 @@ const handleGacha = () => {
 
 /* 空状态提示 */
 .empty-message {
-  color: #7a655d;
+  color: var(--theme-text-muted);
   font-style: italic;
   margin: 0;
 }

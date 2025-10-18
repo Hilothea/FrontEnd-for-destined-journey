@@ -73,12 +73,12 @@ const summaryDetails = computed(() => `进行中: ${taskCount.value}个`);
 
 .field-label {
   font-weight: bold;
-  color: #6a514d;
+  color: var(--theme-text-secondary);
   margin-right: 4px;
 }
 
 .empty-message {
-  color: #7a655d;
+  color: var(--theme-text-muted);
   font-style: italic;
   margin: 0;
 }

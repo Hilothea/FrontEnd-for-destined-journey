@@ -29,10 +29,10 @@ const worldLocation = computed(() => safeGet(statData.value, '世界.地点', '�
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background-color: #e8ddcb;
+  background-color: var(--theme-background-secondary);
   padding: 10px 15px;
   margin-bottom: 15px;
-  border: 1px solid #c6b8a5;
+  border: 1px solid var(--theme-border-dark);
   border-radius: 4px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition:
@@ -55,11 +55,13 @@ const worldLocation = computed(() => safeGet(statData.value, '世界.地点', '�
 
 .info-icon {
   flex-shrink: 0;
+  line-height: 1;
 }
 
 .info-label {
   font-weight: 500;
-  color: #4a3b31;
+  color: var(--theme-text-primary);
   flex-shrink: 0;
+  line-height: 1;
 }
 </style>

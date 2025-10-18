@@ -52,14 +52,14 @@ const getPercentage = (current: number, max: number) => {
 
 .property-name {
   font-weight: bold;
-  color: #6a514d;
+  color: var(--theme-text-secondary);
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
   margin-right: 4px;
 }
 
 /* 进度条样式 */
 .progress-bar-container {
-  background-color: #c8bbaf;
+  background-color: var(--theme-progress-bar-bg);
   border-radius: 9px;
   height: 18px;
   overflow: hidden;
