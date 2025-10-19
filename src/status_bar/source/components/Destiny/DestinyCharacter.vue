@@ -58,6 +58,43 @@ const props = withDefaults(defineProps<Props>(), {
   bondSkill: () => ({}),
 });
 
+// 响应式的窗口宽度
+const windowWidth = ref(window.innerWidth);
+
+// 监听窗口大小变化
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateWindowWidth);
+});
+
+// 判断文本是否需要换行显示
+// 基于字符长度和窗口宽度的判断
+const shouldWrapText = (text: string) => {
+  if (!text) return false;
+
+  const textLength = text.length;
+
+  // 移动端（<= 600px）：超过20个字符就换行
+  if (windowWidth.value <= 600) {
+    return textLength > 20;
+  }
+
+  // 平板端（600px < width <= 1000px）：超过30个字符就换行
+  if (windowWidth.value <= 1000) {
+    return textLength > 30;
+  }
+
+  // 桌面端（> 1000px）：超过50个字符才换行
+  return textLength > 50;
+};
+
 // 格式化身份（兼容字符串和数组）
 const identityText = computed(() => {
   if (!props.identity) return '未知';
@@ -108,6 +145,29 @@ const bondSkills = computed(() => {
     description: String(skillDescription),
   }));
 });
+
+// 基本信息数据结构
+const basicInfoFields = computed(() => [
+  { icon: '⚜️', label: '生命层级', value: props.lifeLevel },
+  { icon: '✨', label: '等级', value: String(props.level) },
+  { icon: '🧬', label: '种族', value: props.race },
+  { icon: '👑', label: '身份', value: identityText.value },
+  { icon: '⚖️', label: '职业', value: occupationText.value },
+  { icon: '🎭', label: '性格', value: props.personality },
+  { icon: '💖', label: '喜爱', value: props.favorites },
+  { icon: '🌸', label: '外貌特质', value: props.appearance },
+  { icon: '👗', label: '衣物装饰', value: props.adornments },
+  { icon: '⚔️', label: '角色装备', value: props.equipment },
+  { icon: '♾️', label: '登神长阶', value: props.ascension },
+]);
+
+// 命运关系数据结构
+const destinyFields = computed(() => [
+  { icon: '', label: '是否缔结红线', value: props.isTied },
+  { icon: '❤️', label: '好感度', value: affectionData.value.text, showBar: true },
+  { icon: '💭', label: '评价', value: props.evaluation || '暂无评价' },
+  { icon: '📜', label: '背景故事', value: props.backstory },
+]);
 </script>
 
 <template>
@@ -121,49 +181,14 @@ const bondSkills = computed(() => {
     <div class="character-info">
       <!-- 基本信息区 -->
       <div class="info-section">
-        <div class="info-row">
-          <span class="property-name">⚜️ 生命层级:</span>
-          <span class="value-main">{{ lifeLevel }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">✨ 等级:</span>
-          <span class="value-main">{{ level }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">🧬 种族:</span>
-          <span class="value-main">{{ race }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">👑 身份:</span>
-          <span class="value-main">{{ identityText }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">⚖️ 职业:</span>
-          <span class="value-main">{{ occupationText }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">🎭 性格:</span>
-          <span class="value-main">{{ personality }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">💖 喜爱:</span>
-          <span class="value-main">{{ favorites }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">🌸 外貌特质:</span>
-          <span class="value-main">{{ appearance }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">👗 衣物装饰:</span>
-          <span class="value-main">{{ adornments }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">⚔️ 角色装备:</span>
-          <span class="value-main">{{ equipment }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">♾️ 登神长阶:</span>
-          <span class="value-main">{{ ascension }}</span>
+        <div
+          v-for="field in basicInfoFields"
+          :key="field.label"
+          class="info-row"
+          :class="{ 'wrap-value': shouldWrapText(field.value) }"
+        >
+          <span class="property-name">{{ field.icon }} {{ field.label }}:</span>
+          <span class="value-main">{{ field.value }}</span>
         </div>
       </div>
 
@@ -171,25 +196,15 @@ const bondSkills = computed(() => {
 
       <!-- 命运关系区 -->
       <div class="destiny-section">
-        <div class="info-row">
-          <span class="property-name">是否缔结红线:</span>
-          <span class="value-main">{{ isTied }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">❤️ 好感度:</span>
-          <span class="value-main">{{ affectionData.text }}</span>
-        </div>
-        <div class="affection-bar-container">
-          <div class="affection-bar-value" :style="{ width: `${affectionData.percentage}%` }"></div>
-        </div>
-        <div class="info-row">
-          <span class="property-name">💭 评价:</span>
-          <span class="value-main">{{ evaluation || '暂无评价' }}</span>
-        </div>
-        <div class="info-row">
-          <span class="property-name">📜 背景故事:</span>
-          <span class="value-main">{{ backstory }}</span>
-        </div>
+        <template v-for="field in destinyFields" :key="field.label">
+          <div class="info-row" :class="{ 'wrap-value': shouldWrapText(field.value) }">
+            <span class="property-name">{{ field.icon }}{{ field.icon ? ' ' : '' }}{{ field.label }}:</span>
+            <span class="value-main">{{ field.value }}</span>
+          </div>
+          <div v-if="field.showBar" class="affection-bar-container">
+            <div class="affection-bar-value" :style="{ width: `${affectionData.percentage}%` }"></div>
+          </div>
+        </template>
       </div>
 
       <hr class="divider" />
@@ -251,8 +266,8 @@ const bondSkills = computed(() => {
     word-break: break-word;
   }
 
-  /* 移动端优化：value 另起一行显示并缩进对齐 */
-  @media (max-width: 768px) {
+  /* 根据字符数判断是否需要换行 */
+  &.wrap-value {
     flex-direction: column;
     gap: 2px;
     align-items: flex-start;
