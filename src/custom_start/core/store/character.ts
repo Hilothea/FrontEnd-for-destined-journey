@@ -36,7 +36,7 @@ export const useCharacterStore = defineStore('character', () => {
     destinyPoints: 0, // 命运点数
   });
 
-  // ============ Computed ============
+  // Computed
 
   /**
    * 计算当前消耗的转生点数
@@ -61,7 +61,7 @@ export const useCharacterStore = defineStore('character', () => {
   });
 
 
-  // ============ Actions ============
+  // Actions
 
   const updateCharacterField = (field: keyof CharacterConfig, value: unknown) => {
     character.value[field] = value as never;

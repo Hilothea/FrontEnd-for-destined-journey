@@ -25,6 +25,14 @@ interface Props {
   adornments?: string;
   /** 角色装备 */
   equipment?: string;
+  /** 角色属性（五维） */
+  attributes?: {
+    力量?: number;
+    敏捷?: number;
+    体质?: number;
+    智力?: number;
+    精神?: number;
+  };
   /** 登神长阶 */
   ascension?: string;
   /** 是否缔结红线 */
@@ -50,6 +58,7 @@ const props = withDefaults(defineProps<Props>(), {
   appearance: '未知',
   adornments: '未知',
   equipment: '未知',
+  attributes: () => ({}),
   ascension: '未开启',
   isTied: '否',
   affection: 0,
@@ -149,7 +158,7 @@ const bondSkills = computed(() => {
 // 基本信息数据结构
 const basicInfoFields = computed(() => [
   { icon: '⚜️', label: '生命层级', value: props.lifeLevel },
-  { icon: '✨', label: '等级', value: String(props.level) },
+  { icon: '🎯', label: '等级', value: String(props.level) },
   { icon: '🧬', label: '种族', value: props.race },
   { icon: '👑', label: '身份', value: identityText.value },
   { icon: '⚖️', label: '职业', value: occupationText.value },
@@ -160,6 +169,18 @@ const basicInfoFields = computed(() => [
   { icon: '⚔️', label: '角色装备', value: props.equipment },
   { icon: '♾️', label: '登神长阶', value: props.ascension },
 ]);
+
+// 五维属性数据结构
+const attributesFields = computed(() => {
+  const attrs = props.attributes || {};
+  return [
+    { icon: '💪', label: '力量', value: String(attrs.力量 ?? 0) },
+    { icon: '⚡', label: '敏捷', value: String(attrs.敏捷 ?? 0) },
+    { icon: '🛡️', label: '体质', value: String(attrs.体质 ?? 0) },
+    { icon: '🧠', label: '智力', value: String(attrs.智力 ?? 0) },
+    { icon: '✨', label: '精神', value: String(attrs.精神 ?? 0) },
+  ];
+});
 
 // 命运关系数据结构
 const destinyFields = computed(() => [
@@ -187,6 +208,16 @@ const destinyFields = computed(() => [
           class="info-row"
           :class="{ 'wrap-value': shouldWrapText(field.value) }"
         >
+          <span class="property-name">{{ field.icon }} {{ field.label }}:</span>
+          <span class="value-main">{{ field.value }}</span>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- 五维属性区 -->
+      <div class="info-section">
+        <div v-for="field in attributesFields" :key="field.label" class="info-row">
           <span class="property-name">{{ field.icon }} {{ field.label }}:</span>
           <span class="value-main">{{ field.value }}</span>
         </div>

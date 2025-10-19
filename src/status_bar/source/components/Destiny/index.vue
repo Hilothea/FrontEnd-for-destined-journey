@@ -32,6 +32,7 @@ const charactersData = computed(() => {
     appearance: safeGet(charData, '外貌特质', ''),
     adornments: safeGet(charData, '衣物装饰', ''),
     equipment: safeGet(charData, '角色装备', ''),
+    attributes: safeGet(charData, '角色属性', {}),
     ascension: safeGet(charData, '登神长阶', ''),
     isTied: safeGet(charData, '是否缔结红线', '否'),
     affection: safeGet(charData, '好感度', 0),
@@ -86,6 +87,7 @@ const handleGacha = () => {
         :appearance="char.appearance"
         :adornments="char.adornments"
         :equipment="char.equipment"
+        :attributes="char.attributes"
         :ascension="char.ascension"
         :is-tied="char.isTied"
         :affection="char.affection"

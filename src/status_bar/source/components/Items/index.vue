@@ -49,6 +49,8 @@ const itemsData = computed(() => {
     quality: safeGet(itemData, '品质', '普通'),
     quantity: safeGet(itemData, '数量', 1),
     type: safeGet(itemData, '类型', '其它物品'),
+    tags: safeGet(itemData, '标签', ''),
+    effect: safeGet(itemData, '效果', ''),
     description: safeGet(itemData, '描述', '无描述'),
   }));
 });
@@ -137,6 +139,8 @@ const summaryDetails = computed(() => {
               :quality="item.quality"
               :quantity="item.quantity"
               :type="item.type"
+              :tags="item.tags"
+              :effect="item.effect"
               :description="item.description"
             />
           </div>

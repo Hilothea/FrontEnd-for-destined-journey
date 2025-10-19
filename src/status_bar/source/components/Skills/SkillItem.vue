@@ -9,6 +9,10 @@ interface Props {
   quality?: string;
   /** 技能消耗 */
   cost?: string;
+  /** 技能标签 */
+  tags?: string;
+  /** 技能效果 */
+  effect?: string;
   /** 技能描述 */
   description: string;
   /** 技能类型：主动、被动或其他 */
@@ -20,6 +24,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   quality: '',
   cost: '',
+  tags: '',
+  effect: '',
   otherTypeName: '其它',
 });
 
@@ -59,7 +65,15 @@ const summaryDetails = computed(() => {
       <div v-if="type === 'other' && otherTypeName" class="skill-type">
         <strong>类型：</strong>{{ otherTypeName }}
       </div>
-      <div>{{ description }}</div>
+      <div class="skill-meta">
+        <strong>标签：</strong>{{ tags }}
+      </div>
+      <div class="skill-meta">
+        <strong>效果：</strong>{{ effect }}
+      </div>
+      <div class="skill-meta">
+        <strong>描述：</strong>{{ description }}
+      </div>
     </div>
   </CommonStatus>
 </template>
@@ -81,7 +95,8 @@ const summaryDetails = computed(() => {
   gap: 8px;
 }
 
-.skill-type {
+.skill-type,
+.skill-meta {
   color: var(--theme-text-secondary);
   font-size: 0.95em;
 

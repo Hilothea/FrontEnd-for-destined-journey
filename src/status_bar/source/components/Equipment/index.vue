@@ -30,6 +30,8 @@ const equipmentData = computed(() => {
     const items: Array<{
       name: string;
       quality: string;
+      tags: string;
+      effect: string;
       description: string;
       position: string;
     }> = [];
@@ -42,6 +44,8 @@ const equipmentData = computed(() => {
       items.push({
         name: key,
         quality: safeGet(equipData, '品质', '') as string,
+        tags: safeGet(equipData, '标签', '') as string,
+        effect: safeGet(equipData, '效果', '') as string,
         description: safeGet(equipData, '描述', '') as string,
         position: safeGet(equipData, '位置', '') as string,
       });
@@ -79,6 +83,8 @@ const totalEquipmentCount = computed(() => {
               :key="item.name"
               :equipment-name="item.name"
               :quality="item.quality"
+              :tags="item.tags"
+              :effect="item.effect"
               :description="item.description"
               :position="item.position"
             />

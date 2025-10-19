@@ -7,6 +7,10 @@ interface Props {
   equipmentName: string;
   /** 装备品质 */
   quality?: string;
+  /** 装备标签 */
+  tags?: string;
+  /** 装备效果 */
+  effect?: string;
   /** 装备描述 */
   description?: string;
   /** 装备位置 */
@@ -15,6 +19,8 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   quality: '',
+  tags: '',
+  effect: '',
   description: '',
   position: '',
 });
@@ -48,7 +54,17 @@ const summaryDetails = computed(() => {
       </span>
     </template>
 
-    <div class="equipment-details value-main">{{ description }}</div>
+    <div class="equipment-details value-main">
+      <div class="equipment-meta">
+        <strong>标签：</strong>{{ tags }}
+      </div>
+      <div class="equipment-meta">
+        <strong>效果：</strong>{{ effect }}
+      </div>
+      <div class="equipment-meta">
+        <strong>描述：</strong>{{ description }}
+      </div>
+    </div>
   </CommonStatus>
 </template>
 
@@ -64,5 +80,17 @@ const summaryDetails = computed(() => {
 .equipment-details {
   color: var(--theme-text-primary);
   line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.equipment-meta {
+  color: var(--theme-text-secondary);
+  font-size: 0.95em;
+
+  strong {
+    color: var(--theme-text-tertiary);
+  }
 }
 </style>

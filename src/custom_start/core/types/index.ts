@@ -3,27 +3,65 @@ export type Rarity =
   | 'only' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
 
 // 物品类型
-export type Item = {
+export interface Item {
   name: string;
-  type: string;
   cost: number;
+  type: string;
+  tag: string;
   rarity: Rarity;
+  effect: string;
   description: string;
-  [key: string]: any;
 };
 
-export type Equipment = Item;
+export interface Equipment {
+  name: string;
+  cost: number;
+  type: string;
+  effect: string;
+  description: string;
+  position: string;
+};
 
 // 技能类型
-export type Skill = Item;
+export interface Skill {
+  name: string;
+  cost: number;
+  consume: string;
+  tag: string;
+  type: string;
+  effect: string;
+  description: string;
+};
 
 // 红线对象类型
 export interface RedThread {
   name: string;
-  type: string;
   cost: number;
-  description: string;
-  [key: string]: any;
+  lifeLevel: string;
+  level: number;
+  race: string;
+  identity: string[];
+  career: string[];
+  personality: string;
+  like: string;
+  app: string;
+  cloth: string;
+  equip: string;
+  attributes: {
+    strength: number;
+    dexterity: number;
+    constitution: number;
+    intelligence: number;
+    mind: number;
+  },
+  stairway: string;
+  isRedLine: string;
+  affinity: number;
+  comment?: string;
+  backgroundInfo?: string;
+  skills: {
+    [key: string]: string;
+  };
 }
 
 // 背景类型

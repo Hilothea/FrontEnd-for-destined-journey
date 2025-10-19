@@ -32,6 +32,8 @@ const skills = computed(() => {
       name: key,
       quality: safeGet(skill, '品质', ''),
       cost: safeGet(skill, '消耗', ''),
+      tags: safeGet(skill, '标签', ''),
+      effect: safeGet(skill, '效果', ''),
       description: safeGet(skill, '描述', ''),
       type: skillType,
     };
@@ -70,6 +72,8 @@ const skills = computed(() => {
             :name="skill.name"
             :quality="skill.quality"
             :cost="skill.cost"
+            :tags="skill.tags"
+            :effect="skill.effect"
             :description="skill.description"
             type="active"
           />
@@ -86,6 +90,8 @@ const skills = computed(() => {
             :key="skill.key"
             :name="skill.name"
             :quality="skill.quality"
+            :tags="skill.tags"
+            :effect="skill.effect"
             :description="skill.description"
             type="passive"
           />
@@ -103,6 +109,8 @@ const skills = computed(() => {
             :name="skill.name"
             :quality="skill.quality"
             :cost="skill.cost"
+            :tags="skill.tags"
+            :effect="skill.effect"
             :description="skill.description"
             :other-type-name="skill.type"
             type="other"

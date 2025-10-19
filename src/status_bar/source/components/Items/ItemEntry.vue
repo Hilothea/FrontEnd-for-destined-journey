@@ -11,6 +11,10 @@ interface Props {
   quantity: string | number;
   /** 物品类型 */
   type?: string;
+  /** 物品标签 */
+  tags?: string;
+  /** 物品效果 */
+  effect?: string;
   /** 物品描述 */
   description?: string;
 }
@@ -18,6 +22,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   quality: '',
   type: '其它物品',
+  tags: '',
+  effect: '',
   description: '无',
 });
 
@@ -39,6 +45,11 @@ const summaryDetails = computed(() => {
 const isOtherItem = computed(() => {
   return props.type && props.type !== '武器防具' && props.type !== '消耗品' && props.type !== '材料';
 });
+
+// 检查标签是否有效（不为空且不是"无"）
+const hasValidTags = computed(() => {
+  return props.tags && props.tags !== '无';
+});
 </script>
 
 <template>
@@ -59,7 +70,15 @@ const isOtherItem = computed(() => {
       <div v-if="isOtherItem" class="item-type">
         <strong>类型：</strong>{{ type }}
       </div>
-      <div>{{ description }}</div>
+      <div v-if="hasValidTags" class="item-meta">
+        <strong>标签：</strong>{{ tags }}
+      </div>
+      <div class="item-meta">
+        <strong>效果：</strong>{{ effect }}
+      </div>
+      <div class="item-meta">
+        <strong>描述：</strong>{{ description }}
+      </div>
     </div>
   </CommonStatus>
 </template>
@@ -81,7 +100,8 @@ const isOtherItem = computed(() => {
   gap: 8px;
 }
 
-.item-type {
+.item-type,
+.item-meta {
   color: var(--theme-text-secondary);
   font-size: 0.95em;
 
