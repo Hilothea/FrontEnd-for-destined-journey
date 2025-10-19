@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { BASE_STAT, generateInitialPoints, IDENTITY_COSTS, INITIAL_REINCARNATION_POINTS, RACE_COSTS } from '../data/base-info';
+import {
+  BASE_STAT,
+  generateInitialPoints,
+  IDENTITY_COSTS,
+  INITIAL_REINCARNATION_POINTS,
+  RACE_COSTS,
+} from '../data/base-info';
 import type { Attributes, CharacterConfig } from '../types';
 
 export const useCharacterStore = defineStore('character', () => {
@@ -51,15 +57,11 @@ export const useCharacterStore = defineStore('character', () => {
     total += IDENTITY_COSTS[character.value.identity] || 0;
 
     // 属性加点消耗 (每点1个转生点)
-    const attributeAddPoints = Object.values(character.value.attributePoints).reduce(
-      (sum, points) => sum + points,
-      0
-    );
+    const attributeAddPoints = Object.values(character.value.attributePoints).reduce((sum, points) => sum + points, 0);
     total += attributeAddPoints;
 
     return total;
   });
-
 
   // Actions
 

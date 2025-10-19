@@ -62,10 +62,7 @@ export const useThemeStore = defineStore('status-bar-theme', () => {
   const saveThemeToTavern = async () => {
     try {
       // 使用 insertOrAssignVariables 来只更新 status_bar_theme 变量，不影响其他变量
-      await insertOrAssignVariables(
-        { status_bar_theme: userTheme.value || {} },
-        { type: 'character' }
-      );
+      await insertOrAssignVariables({ status_bar_theme: userTheme.value || {} }, { type: 'character' });
     } catch (error) {
       console.error('保存主题配置失败:', error);
     }

@@ -45,19 +45,14 @@ const handleReset = () => {
   resetPageTrigger.value++;
 };
 
-const stepTitles = ref([
-  { title: '信息/属性' },
-  { title: '装备/技能' },
-  { title: '对象/背景' },
-  { title: '确认' }
-]);
+const stepTitles = ref([{ title: '信息/属性' }, { title: '装备/技能' }, { title: '对象/背景' }, { title: '确认' }]);
 
 // 路由到步骤的映射
 const routeToStep: Record<string, number> = {
-  'BasicInfo': 1,
-  'Selections': 2,
-  'Background': 3,
-  'Confirm': 4
+  BasicInfo: 1,
+  Selections: 2,
+  Background: 3,
+  Confirm: 4,
 };
 
 // 步骤到路由的映射
@@ -65,7 +60,7 @@ const stepToRoute: Record<number, string> = {
   1: 'BasicInfo',
   2: 'Selections',
   3: 'Background',
-  4: 'Confirm'
+  4: 'Confirm',
 };
 
 // 从路由元信息或路由名获取当前步骤
@@ -110,13 +105,16 @@ const nextButtonText = computed(() => {
 const transitionName = ref('slide-left');
 
 // 监听路由变化，设置过渡方向
-watch(() => route.name, (newRoute, oldRoute) => {
-  const newStep = routeToStep[newRoute as string] || 1;
-  const oldStep = routeToStep[oldRoute as string] || 1;
+watch(
+  () => route.name,
+  (newRoute, oldRoute) => {
+    const newStep = routeToStep[newRoute as string] || 1;
+    const oldStep = routeToStep[oldRoute as string] || 1;
 
-  // 根据步骤变化决定动画方向
-  transitionName.value = newStep > oldStep ? 'slide-left' : 'slide-right';
-});
+    // 根据步骤变化决定动画方向
+    transitionName.value = newStep > oldStep ? 'slide-left' : 'slide-right';
+  },
+);
 </script>
 
 <template>
@@ -127,7 +125,7 @@ watch(() => route.name, (newRoute, oldRoute) => {
     <div class="points-panel">
       <div class="points-display">
         <span class="points-label">可用转生点：</span>
-        <span class="points-value" :class="{ 'negative': availablePoints < 0 }">
+        <span class="points-value" :class="{ negative: availablePoints < 0 }">
           {{ availablePoints }}
         </span>
         <span class="points-total">/ {{ character.reincarnationPoints }}</span>
@@ -142,11 +140,7 @@ watch(() => route.name, (newRoute, oldRoute) => {
       </button>
     </div>
 
-    <Steps
-      ref="stepRef"
-      :steps="stepTitles"
-      :step="currentStep"
-    />
+    <Steps ref="stepRef" :steps="stepTitles" :step="currentStep" />
 
     <!-- 随机生成和重置按钮 -->
     <div class="action-buttons">
@@ -169,18 +163,11 @@ watch(() => route.name, (newRoute, oldRoute) => {
     </div>
 
     <div class="navigation">
-      <button
-        class="nav-button prev-button"
-        :disabled="!canGoPrevious"
-        @click="handlePrevious"
-      >
+      <button class="nav-button prev-button" :disabled="!canGoPrevious" @click="handlePrevious">
         <span class="text">上一步</span>
       </button>
 
-      <button
-        class="nav-button next-button"
-        @click="handleNext"
-      >
+      <button class="nav-button next-button" @click="handleNext">
         <span class="text">{{ nextButtonText }}</span>
       </button>
     </div>
@@ -279,7 +266,8 @@ watch(() => route.name, (newRoute, oldRoute) => {
 }
 
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
   25% {

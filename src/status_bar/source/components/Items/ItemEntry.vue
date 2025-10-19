@@ -67,18 +67,10 @@ const hasValidTags = computed(() => {
     </template>
 
     <div class="item-details value-main">
-      <div v-if="isOtherItem" class="item-type">
-        <strong>类型：</strong>{{ type }}
-      </div>
-      <div v-if="hasValidTags" class="item-meta">
-        <strong>标签：</strong>{{ tags }}
-      </div>
-      <div class="item-meta">
-        <strong>效果：</strong>{{ effect }}
-      </div>
-      <div class="item-meta">
-        <strong>描述：</strong>{{ description }}
-      </div>
+      <div v-if="isOtherItem" class="item-type"><strong>类型：</strong>{{ type }}</div>
+      <div v-if="hasValidTags" class="item-meta"><strong>标签：</strong>{{ tags }}</div>
+      <div class="item-meta"><strong>效果：</strong>{{ effect }}</div>
+      <div class="item-meta"><strong>描述：</strong>{{ description }}</div>
     </div>
   </CommonStatus>
 </template>

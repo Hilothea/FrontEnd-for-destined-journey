@@ -62,18 +62,10 @@ const summaryDetails = computed(() => {
     </template>
 
     <div class="skill-description value-main">
-      <div v-if="type === 'other' && otherTypeName" class="skill-type">
-        <strong>类型：</strong>{{ otherTypeName }}
-      </div>
-      <div class="skill-meta">
-        <strong>标签：</strong>{{ tags }}
-      </div>
-      <div class="skill-meta">
-        <strong>效果：</strong>{{ effect }}
-      </div>
-      <div class="skill-meta">
-        <strong>描述：</strong>{{ description }}
-      </div>
+      <div v-if="type === 'other' && otherTypeName" class="skill-type"><strong>类型：</strong>{{ otherTypeName }}</div>
+      <div class="skill-meta"><strong>标签：</strong>{{ tags }}</div>
+      <div class="skill-meta"><strong>效果：</strong>{{ effect }}</div>
+      <div class="skill-meta"><strong>描述：</strong>{{ description }}</div>
     </div>
   </CommonStatus>
 </template>

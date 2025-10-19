@@ -1259,6 +1259,6 @@ const Equipments: EquipmentData = {
 /**
  * 新增法环护符拓展
  */
-Equipments.Talismans = NewTalismans
+Equipments.Talismans = NewTalismans;
 
 export default Equipments;

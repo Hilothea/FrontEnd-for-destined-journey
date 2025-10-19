@@ -10,19 +10,19 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   steps: () => [],
-  step: 1
+  step: 1,
 });
 
 // 暴露 props 供父组件通过 ref 访问
 defineExpose({
   steps: props.steps,
-  step: props.step
+  step: props.step,
 });
 </script>
 
 <template>
   <div class="steps">
-    <div v-for="(item, index) in steps" :key="index" :class="['step', { 'pass': step >= index + 1 }]">
+    <div v-for="(item, index) in steps" :key="index" :class="['step', { pass: step >= index + 1 }]">
       <div class="title">{{ item.title }}</div>
     </div>
   </div>

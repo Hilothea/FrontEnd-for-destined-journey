@@ -35,13 +35,7 @@ const colorGroups = {
   },
   quality: {
     label: '品质颜色',
-    keys: [
-      'qualityMythic',
-      'qualityLegendary',
-      'qualityEpic',
-      'qualityRare',
-      'qualityUncommon',
-    ],
+    keys: ['qualityMythic', 'qualityLegendary', 'qualityEpic', 'qualityRare', 'qualityUncommon'],
   },
   resources: {
     label: '状态条颜色',
@@ -57,25 +51,11 @@ const colorGroups = {
   },
   special: {
     label: '特殊元素',
-    keys: [
-      'starActive',
-      'starInactive',
-      'affectionBar',
-      'newsImportant',
-      'newsNormal',
-      'newsMinor',
-    ],
+    keys: ['starActive', 'starInactive', 'affectionBar', 'newsImportant', 'newsNormal', 'newsMinor'],
   },
   status: {
     label: '状态颜色',
-    keys: [
-      'disabledBg',
-      'disabledText',
-      'titleBg',
-      'titleBgHover',
-      'openBg',
-      'openBorderColor',
-    ],
+    keys: ['disabledBg', 'disabledText', 'titleBg', 'titleBgHover', 'openBg', 'openBorderColor'],
   },
 };
 
@@ -126,7 +106,7 @@ const colorLabels: Record<keyof ThemeColors, string> = {
 const currentGroupColors = computed(() => {
   const group = colorGroups[editingGroup.value];
   const colors = themeStore.effectiveColors;
-  return group.keys.map((key) => ({
+  return group.keys.map(key => ({
     key: key as keyof ThemeColors,
     label: colorLabels[key as keyof ThemeColors],
     value: colors[key as keyof ThemeColors],
@@ -135,17 +115,11 @@ const currentGroupColors = computed(() => {
 
 // 判断颜色值是否为数字型（透明度或宽度）
 const isNumericValue = (key: keyof ThemeColors): boolean => {
-  return (
-    key === 'backgroundOpacity' ||
-    key === 'backgroundTertiaryOpacity' ||
-    key === 'mainBorderWidth'
-  );
+  return key === 'backgroundOpacity' || key === 'backgroundTertiaryOpacity' || key === 'mainBorderWidth';
 };
 
 // 获取数值范围
-const getNumericRange = (
-  key: keyof ThemeColors,
-): { min: number; max: number; step: number } => {
+const getNumericRange = (key: keyof ThemeColors): { min: number; max: number; step: number } => {
   if (key === 'backgroundOpacity' || key === 'backgroundTertiaryOpacity') {
     return { min: 0, max: 1, step: 0.1 };
   }
@@ -181,19 +155,13 @@ const handleReset = async () => {
       <div class="info-content">
         <h3>
           🎨 主题设置
-          <span v-if="themeStore.getThemeInfo().isCustomized" class="customized-tag">
-            自定义
-          </span>
+          <span v-if="themeStore.getThemeInfo().isCustomized" class="customized-tag"> 自定义 </span>
           <span v-else class="theme-name">
             {{ themeStore.getThemeInfo().name }}
           </span>
         </h3>
       </div>
-      <button
-        class="toggle-btn"
-        :class="{ active: isEditing }"
-        @click="isEditing = !isEditing"
-      >
+      <button class="toggle-btn" :class="{ active: isEditing }" @click="isEditing = !isEditing">
         {{ isEditing ? '折叠编辑' : '📝 编辑' }}
       </button>
     </div>
@@ -218,11 +186,7 @@ const handleReset = async () => {
         <h4>{{ colorGroups[editingGroup].label }}</h4>
 
         <div class="color-items">
-          <div
-            v-for="item in currentGroupColors"
-            :key="item.key"
-            class="color-item"
-          >
+          <div v-for="item in currentGroupColors" :key="item.key" class="color-item">
             <label>{{ item.label }}</label>
             <div class="input-group">
               <template v-if="isNumericValue(item.key)">
@@ -233,13 +197,7 @@ const handleReset = async () => {
                   :min="getNumericRange(item.key).min"
                   :max="getNumericRange(item.key).max"
                   :step="getNumericRange(item.key).step"
-                  @input="
-                    (e) =>
-                      handleColorChange(
-                        item.key,
-                        parseFloat((e.target as HTMLInputElement).value)
-                      )
-                  "
+                  @input="e => handleColorChange(item.key, parseFloat((e.target as HTMLInputElement).value))"
                 />
                 <span class="value-display">{{ item.value }}</span>
               </template>
@@ -248,19 +206,13 @@ const handleReset = async () => {
                   type="color"
                   class="color-input"
                   :value="item.value"
-                  @input="
-                    (e) =>
-                      handleColorChange(item.key, (e.target as HTMLInputElement).value)
-                  "
+                  @input="e => handleColorChange(item.key, (e.target as HTMLInputElement).value)"
                 />
                 <input
                   type="text"
                   class="text-input"
                   :value="item.value"
-                  @input="
-                    (e) =>
-                      handleColorChange(item.key, (e.target as HTMLInputElement).value)
-                  "
+                  @input="e => handleColorChange(item.key, (e.target as HTMLInputElement).value)"
                 />
               </template>
             </div>

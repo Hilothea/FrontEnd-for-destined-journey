@@ -14,7 +14,7 @@ export function useTheme() {
     () => {
       themeStore.applyCssVariables();
     },
-    { deep: true }
+    { deep: true },
   );
 
   return {

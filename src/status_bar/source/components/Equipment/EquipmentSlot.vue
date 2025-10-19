@@ -55,15 +55,9 @@ const summaryDetails = computed(() => {
     </template>
 
     <div class="equipment-details value-main">
-      <div class="equipment-meta">
-        <strong>标签：</strong>{{ tags }}
-      </div>
-      <div class="equipment-meta">
-        <strong>效果：</strong>{{ effect }}
-      </div>
-      <div class="equipment-meta">
-        <strong>描述：</strong>{{ description }}
-      </div>
+      <div class="equipment-meta"><strong>标签：</strong>{{ tags }}</div>
+      <div class="equipment-meta"><strong>效果：</strong>{{ effect }}</div>
+      <div class="equipment-meta"><strong>描述：</strong>{{ description }}</div>
     </div>
   </CommonStatus>
 </template>

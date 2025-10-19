@@ -11,18 +11,24 @@ const randomGenerateTrigger = inject<Ref<number>>('randomGenerateTrigger');
 const resetPageTrigger = inject<Ref<number>>('resetPageTrigger');
 
 // 监听随机生成事件
-watch(() => randomGenerateTrigger?.value, () => {
-  if (randomGenerateTrigger && randomGenerateTrigger.value > 0) {
-    randomGenerate();
-  }
-});
+watch(
+  () => randomGenerateTrigger?.value,
+  () => {
+    if (randomGenerateTrigger && randomGenerateTrigger.value > 0) {
+      randomGenerate();
+    }
+  },
+);
 
 // 监听重置事件
-watch(() => resetPageTrigger?.value, () => {
-  if (resetPageTrigger && resetPageTrigger.value > 0) {
-    resetPage();
-  }
-});
+watch(
+  () => resetPageTrigger?.value,
+  () => {
+    if (resetPageTrigger && resetPageTrigger.value > 0) {
+      resetPage();
+    }
+  },
+);
 
 // 随机生成基本信息
 const randomGenerate = () => {
@@ -116,7 +122,8 @@ h2 {
     color: var(--text-color);
   }
 
-  input, select {
+  input,
+  select {
     flex: 1;
     padding: var(--spacing-sm) var(--spacing-md);
     background: var(--input-bg);

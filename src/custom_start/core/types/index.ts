@@ -1,6 +1,5 @@
 // 稀有度类型
-export type Rarity =
-  | 'only' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
+export type Rarity = 'only' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'mythic';
 
 // 物品类型
 export interface Item {
@@ -11,7 +10,7 @@ export interface Item {
   rarity: Rarity;
   effect: string;
   description: string;
-};
+}
 
 export interface Equipment {
   name: string;
@@ -20,7 +19,7 @@ export interface Equipment {
   effect: string;
   description: string;
   position: string;
-};
+}
 
 // 技能类型
 export interface Skill {
@@ -31,7 +30,7 @@ export interface Skill {
   type: string;
   effect: string;
   description: string;
-};
+}
 
 // 红线对象类型
 export interface RedThread {
@@ -53,7 +52,7 @@ export interface RedThread {
     constitution: number;
     intelligence: number;
     mind: number;
-  },
+  };
   stairway: string;
   isRedLine: string;
   affinity: number;
