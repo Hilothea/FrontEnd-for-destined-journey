@@ -42,7 +42,7 @@
       padding: 25px 30px;
       background-color: rgba(240, 230, 210, 0.9);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      max-width: 550px;
+      /* max-width: 550px; */
       width: 95%;
       margin: auto;
       max-height: 90vh;
@@ -440,12 +440,12 @@
     .rarity-common {
       color: #6c757d;
     }
-
-    .rarity-uncommon {
+    
+    .rarity-uncommon, .tier-2 {
       color: #4caf50;
     }
 
-    .rarity-rare {
+    .rarity-rare, .tier-3 {
       color: #2196f3;
     }
 
@@ -461,13 +461,29 @@
       color: #f44336;
     }
 
-    .skill-main-info .rarity-common,
+    .rarity-only {
+      font-weight: bold;
+      background: linear-gradient(to right, #f44336, #ffc107, #4caf50, #2196f3, #9c27b0, #f44336);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: rainbow-animation 5s ease-in-out infinite;
+      background-size: 400% 100%;
+    }
+
     .skill-main-info .rarity-uncommon,
     .skill-main-info .rarity-rare,
     .skill-main-info .rarity-epic,
     .skill-main-info .rarity-legendary,
-    .skill-main-info .rarity-mythic {
+    .skill-main-info .rarity-mythic,
+    .skill-main-info .tier-2,
+    .skill-main-info .tier-3 {
       font-weight: bold;
+    }
+
+    @keyframes rainbow-animation {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
     }
 
     .modal {
@@ -489,7 +505,7 @@
       padding: 25px;
       border: 2px solid var(--border-color-strong);
       width: 90%;
-      max-width: 600px;
+      /* max-width: 600px; */
       position: relative;
       animation: slideIn 0.3s;
     }
@@ -529,6 +545,39 @@
       margin-bottom: 15px;
       padding-bottom: 10px;
       border-bottom: 3px solid var(--border-color-light);
+    }
+
+    .modal-filter-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+      padding-top: 10px;
+    }
+
+    .modal-filter-btn {
+      padding: 5px 10px;
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 0.9em;
+      color: var(--text-color);
+      background-color: var(--input-bg-color);
+      border: 1px solid var(--border-color-light);
+      border-radius: 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .modal-filter-btn:hover {
+      border-color: var(--border-color-strong);
+      color: var(--title-color);
+    }
+
+    .modal-filter-btn.active {
+      background-color: var(--title-color);
+      color: var(--bg-color);
+      border-color: var(--border-color-strong);
+      font-weight: 700;
     }
 
     .modal-tab {
@@ -868,6 +917,8 @@
         <span class="close-btn">&times;</span>
       </div>
       <div id="modalTabsContainer" class="modal-tabs-container">
+      </div>
+      <div id="modalFilterContainer" class="modal-filter-container">
       </div>
       <div id="modalOptionsList" class="modal-options-list">
       </div>
@@ -1274,7 +1325,6 @@ const ALL_POSSIBLE_EQUIPMENTS = [
         {"name": "毒雾","type": "主动","cost": 25,"rarity":"common_prayer","description": "在前方形成一片毒雾，对雾中目标施加中毒累积，消耗40MP"},
         {"name": "火焰啊，赐予我力量！","type": "主动","cost":26,"rarity":"common_prayer","description": "使用后30秒内，提升自身物理和火属性伤害，加快精力回复，消耗75MP"},
         { name: '圣域', type: '主动', cost: 50, rarity: 'common_prayer', description: '将武器插地生成半径5米的光环，持续回血，敌人入内受光伤。消耗120SP，100MP' },
-
         // common_ritual: '普通-仪式'
 
         // common_other: '普通-其他'
@@ -1332,16 +1382,16 @@ const ALL_POSSIBLE_EQUIPMENTS = [
       ];
 
       const ALL_POSSIBLE_TALISMANS = [
-        { name: '红琥珀链坠', type: '饰品', cost: 13, rarity: 'uncommon', description: '镶有小块红色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中红琥珀蕴藏了原始的生命力。能提升生命值的上限（+6%最大生命值HP）。' },
+        { name: '红琥珀小链坠', type: '饰品', cost: 13, rarity: 'uncommon', description: '镶有小块红色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中红琥珀蕴藏了原始的生命力。能提升生命值的上限（+6%最大生命值HP）。' },
         { name: '红琥珀链坠', type: '饰品', cost: 26, rarity: 'rare', description: '镶有多块红色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中红琥珀蕴藏了原始的生命力。能提升生命值的上限（+12%最大生命值HP）。' },
-        { name: '蓝琥珀链坠', type: '饰品', cost: 13, rarity: 'uncommon', description: '镶有小块蓝色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中蓝琥珀蕴藏了原始的魔力。能提升专注值的上限（+6%最大专注值MP）。' },
+        { name: '蓝琥珀小链坠', type: '饰品', cost: 13, rarity: 'uncommon', description: '镶有小块蓝色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中蓝琥珀蕴藏了原始的魔力。能提升专注值的上限（+6%最大专注值MP）。' },
         { name: '蓝琥珀链坠', type: '饰品', cost: 26, rarity: 'rare', description: '镶有多块蓝色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中蓝琥珀蕴藏了原始的魔力。能提升专注值的上限（+12%最大专注值MP）。' },
-        { name: '绿琥珀链坠', type: '饰品', cost: 13, rarity: 'uncommon', description: '镶有小块绿色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中绿琥珀蕴藏了原始的活力。能提升精力值的上限（+6%最大精力值SP）。' },
+        { name: '绿琥珀小链坠', type: '饰品', cost: 13, rarity: 'uncommon', description: '镶有小块绿色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中绿琥珀蕴藏了原始的活力。能提升精力值的上限（+6%最大精力值SP）。' },
         { name: '绿琥珀链坠', type: '饰品', cost: 26, rarity: 'rare', description: '镶有多块绿色琥珀的链坠。在世界各地都有琥珀，封存了一小块久远的过去，其中绿琥珀蕴藏了原始的活力。能提升精力值的上限（+12%最大精力值SP）。' },
-        { name: '恩惠露滴护符', type: '饰品', cost: 25, rarity: 'rare', description: '用金色琥珀与黄铜制成，参考久远以前，大地上的生命承接世界树滴下的露滴时的模样。随时间缓慢恢复生命值（生命值HP+20/min）。' },
+        { name: '恩惠露滴护符', type: '饰品', cost: 25, rarity: 'rare', description: '用金色琥珀与黄铜制成，参考久远以前，大地上的生命承接世界树滴下的露滴时的模样。随时间缓慢恢复生命值（生命值HP+10/min）。' },
         { name: '蓝色恩惠露滴护符', type: '饰品', cost: 25, rarity: 'rare', description: '用蓝色琥珀与黄铜制成，参考久远以前，大地上的生命承接世界树滴下的露滴时的模样。随时间缓慢恢复专注值（专注值MP+10/min）。' },
-        { name: '绿龟挂坠', type: '饰品', cost: 14, rarity: 'uncommon', description: '参考绿乌龟的模样制成的护符。乌龟是著名的营养食材，为精力无穷的象征。据说称呼乌龟为睿智兽物的魔法师们，认为那是野蛮的习俗。随时间缓慢恢复精力值（精力值SP+20/min）。' },
-        { name: '双头绿龟挂坠', type: '饰品', cost: 28, rarity: 'rare', description: '参考双头绿乌龟的模样制成的护符。乌龟是著名的营养食材，为精力无穷的象征。据说称呼乌龟为睿智兽物的魔法师们，认为那是野蛮的习俗。随时间缓慢恢复精力值（精力值SP+30/min）。' },
+        { name: '绿龟挂坠', type: '饰品', cost: 14, rarity: 'uncommon', description: '参考绿乌龟的模样制成的护符。乌龟是著名的营养食材，为精力无穷的象征。据说称呼乌龟为睿智兽物的魔法师们，认为那是野蛮的习俗。随时间缓慢恢复精力值（精力值SP+5/min）。' },
+        { name: '双头绿龟挂坠', type: '饰品', cost: 28, rarity: 'rare', description: '参考双头绿乌龟的模样制成的护符。乌龟是著名的营养食材，为精力无穷的象征。据说称呼乌龟为睿智兽物的魔法师们，认为那是野蛮的习俗。随时间缓慢恢复精力值（精力值SP+10/min）。' },
         { name: '红种子坠饰', type: '饰品', cost: 27, rarity: 'rare', description: '将红琥珀与黄金制成种子的样子，是祈求世界树为之响应的美好愿景。能提升生命值的恢复能力（生命值HP回复效果+30%）。' },
         { name: '蓝种子坠饰', type: '饰品', cost: 27, rarity: 'rare', description: '将蓝琥珀与黄金制成种子的样子，是祈求世界树为之响应的美好愿景。能提升专注值的恢复能力（生命值HP回复效果+30%）。' },
         { name: '世界树的恩惠', type: '饰品', cost: 45, rarity: 'epic', description: '用黄金制成，是为久远以前，大地上的生命赞颂世界树时使用的古老饰品。能大幅提升生命值、专注值、精力值的上限（+18%最大生命值HP、最大专注值MP、最大精力值SP）。' },
@@ -1406,7 +1456,8 @@ const ALL_POSSIBLE_EQUIPMENTS = [
         { name: '蓝羽七刃剑', type: '饰品', cost: 34, rarity: 'rare', description: '源自古代死亡仪式的护符。蓝色羽毛的护符，与死亡比邻时，情绪会为之高昂————那拚命求生的模样，会让随后到来的死亡更加耀眼。在面临死亡时，能提升减伤率。（生命值HP低于20%时，受到的损伤*30%）。' },
         { name: '献斗剑坠饰', type: '饰品', cost: 28, rarity: 'rare', description: '过去献给战王与神祇的战斗仪式————参考用于仪式中的剑制成的护符。如今战斗仪式早已废除，北境各处的竞技场是遗留下来的产物。生命值全满时，提升攻击力（攻击力提升10%）。' },
         { name: '献斗盾坠饰', type: '饰品', cost: 28, rarity: 'rare', description: '过去献给战王与神祇的战斗仪式————参考用于仪式中的盾制成的护符。如今战斗仪式早已废除，北境各处的竞技场是遗留下来的产物。生命值全满时，提升减伤率（受到的损伤*50%）。' },
-        { name: '羽翼护符', type: '饰品', cost: 19, rarity: 'uncommon', description: '以翼民的起源为形象制成的护符。在那过去，羽翼还未宽大、优美。提升闪避成功率，但增加受到的损伤（闪避提升10%，受到的损伤提升30%）。' },
+        { name: '羽翼护符', type: '饰品', cost: 19, rarity: 'uncommon', description: '以翼民的起源为形象制成的护符。在过去，羽翼还未宽大、优美。提升闪避成功率，但增加受到的损伤（闪避提升10%，受到的损伤提升30%）。' },
+        { name: '精制羽翼护符', type: '饰品', cost: 19, rarity: 'rare', description: '以翼民的起源为形象制成的护符。在那过去，羽翼还未宽大、优美。提升闪避成功率，但增加受到的损伤（闪避提升20%，受到的损伤提升20%）。' },
         { name: '久远羽翼护符', type: '饰品', cost: 48, rarity: 'epic', description: '以翼民的起源为形象制成的护符。在久远的过去，羽翼还未宽大、优美。提升闪避成功率，但增加受到的损伤（闪避提升30%，受到的损伤提升10%）。' },
         { name: '染红凶刀', type: '饰品', cost: 30, rarity: 'rare', description: '形状蜿蜒，染上红色的匕首。曾经发生的轰动大陆的刺杀，此为其中一把凶刃的摸样。在敌人未曾察觉之时发出的一击，能恢复生命值（能恢复85+最大生命值10%的生命值HP）。' },
         { name: '染蓝凶刀', type: '饰品', cost: 30, rarity: 'rare', description: '形状蜿蜒，染上蓝色的匕首。曾经发生的轰动大陆的刺杀，此为其中一把凶刃的摸样。在敌人未曾察觉之时发出的一击，能恢复专注值（能恢复85+最大专注值10%的专注值MP）。' },
@@ -1430,11 +1481,11 @@ const ALL_POSSIBLE_EQUIPMENTS = [
         { name: '腐败眷属的欢愉', type: '饰品', cost: 26, rarity: 'rare', description: '以剧毒虫群欢欣的模样制成的护符。向猩红之主献上腐败吧──在遥远他方封印的神祇，回到我们这群弃子的身旁吧。当周围人物中毒时，能提升攻击力。（一小时内提升20%攻击力，无法叠加）。' },
         { name: '鲜血君王的欢愉', type: '饰品', cost: 26, rarity: 'rare', description: '以鲜血君王欢欣的模样制成的护符。向鲜血君王献上鲜血吧──王的神祇正在渴望。当周围人物流血时，能提升攻击力。（一小时内提升1%攻击力，最多叠加40次）。' },
         { name: '狂怒神兽', type: '饰品', cost: 48, rarity: 'epic', description: '久远的古代，进行祭祀时，神兽于其中舞动──参考那狂怒舞动的模样制成的护符。据说古人信仰神兽是来自上天的使者──它的愤怒会造成天空失序，而其中最显著的，就是风暴。提升风暴的攻击力（攻击力提升+30%）。' },
-        { name: '星与火浮雕坠饰', type: '饰品', cost: 48, rarity: 'epic', description: '星火骑士——执掌魔剑与火剑的双剑骑士，雕着她面容凛然的肖像护符。摆出攻击架式，并维持一定时间后，能强化之后使出的攻击（维持准备攻击的动作架势1秒后，发动攻击增伤50%）。' },
+        { name: '星与火浮雕坠饰', type: '饰品', cost: 48, rarity: 'epic', description: '星火骑士——执掌魔剑与火剑的双剑骑士，雕着她凛然面容的肖像护符。摆出攻击架式，并维持一定时间后，能强化之后使出的攻击（维持准备攻击的动作架势1秒后，发动攻击增伤50%）。' },
         { name: '狂龙护符', type: '饰品', cost: 90, rarity: 'legendary', description: '参考飞龙首领的模样制成的护符。飞龙的首领是裹挟着焰雷的狂龙，当他发出轰然咆哮，大地会涌出沸腾的熔岩。据说它曾挑战古龙之王，最后落得两败俱伤。提升熔岩、雷电、火焰的攻击力（熔岩攻击力+100%，雷电、火焰攻击力+60%）。' },
         { name: '王受赐护符', type: '饰品', cost: 85, rarity: 'legendary', description: '参考绝强的战王，誓约神祇并受到赐福时的模样制成的护符。王受赐露滴时气势非凡、充满魄力──据说在受赐的当下，他文风不动。誓约神祇之王，耸立于大地。提升使用恢复方法时的强韧度（神级以下的武器道具和第七层级以下的生命体无法打断你的恢复过程，但依然可以正常对你造成伤害）。' },
         { name: '亲爱的星尘', type: '饰品', cost: 95, rarity: 'legendary', description: '以老者手指轻捏星屑的模样制成的护符。塔的大法师疾呼：对星星怀抱浪漫思维、对星尘满怀爱意──能办到如此，就能成为顶尖魔法师。你呀，要去学会爱。能最大幅缩短魔法的咏唱时间，但增加受到的损伤。（魔法吟唱时间缩短到极限，只剩下必须的施法动作，受到的损伤+100%）。' },
-        { name: '战王的肖像', type: '饰品', cost: 80, rarity: 'legendary', description: '以古代王者的形象制成的小肖像，这位王者是勇猛的战士，与神祇誓约。能强化蓄力的攻击（任何蓄力攻击提升35%的伤害）。' },
+        { name: '战王的肖像', type: '饰品', cost: 80, rarity: 'legendary', description: '以古代王者的形象制成的小肖像，这位王者是勇猛的战士，与神祇誓约。能强化蓄力的攻击（任何蓄力攻击提升60%的伤害）。' },
         { name: '法王的肖像', type: '饰品', cost: 80, rarity: 'legendary', description: '以古代王者的形象制成的小肖像，这位王者精通魔法，与神祇相连。能大幅缩短所有法术的吟唱时间。（只留下必要的关键吟唱语句）' },
         { name: '古王护符', type: '饰品', cost: 90, rarity: 'legendary', description: '参考远古巨龙之王的形象制成的远古熟铁护符，龙是那个时代的主宰。古王的城，据说还在遥远天际的彼端矗立。能提升所有增益效果的持续时间和效果（持续时间+200%、效果+50%）。' },
         { name: '神祇', type: '饰品', cost: 70, rarity: 'legendary', description: '关于神祇传说的雕制护符。神祇，曾见过世界树全貌的存在，那是世间唯一、万物伊始。能提升体质属性（体质+1）。' },
@@ -1451,7 +1502,7 @@ const ALL_POSSIBLE_EQUIPMENTS = [
       const MODAL_TABS_CONFIG = {
         equipments: [
           { name: '基础装备', data: ALL_POSSIBLE_EQUIPMENTS, isDefault: true },
-          { name: '法环护符拓展', data: ALL_POSSIBLE_TALISMANS }
+          { name: '护符拓展', data: ALL_POSSIBLE_TALISMANS }
         ],
         items: [
           { name: '基础物资', data: ALL_POSSIBLE_ITEMS, isDefault: true },
@@ -1500,6 +1551,7 @@ const ALL_POSSIBLE_EQUIPMENTS = [
         modal: document.getElementById('selectionModal'), modalTitle: document.getElementById('modalTitle'),
         modalOptionsList: document.getElementById('modalOptionsList'), modalConfirmBtn: document.getElementById('modalConfirmBtn'),
         modalTabsContainer: document.getElementById('modalTabsContainer'), 
+        modalFilterContainer: document.getElementById('modalFilterContainer'), 
         closeBtn: document.querySelector('.close-btn'),
         equipmentsSummary: document.getElementById('equipmentsSummary'),
         itemsSummary: document.getElementById('itemsSummary'),
@@ -1524,6 +1576,7 @@ const ALL_POSSIBLE_EQUIPMENTS = [
         backgrounds: null,
       };
       let currentOpenCategory = null;
+      let activeEquipmentFilter = '全部'; 
 
       function updateBackgroundStoryVisibility() {
         const show = selections.backgrounds === '【自定义开局】';
@@ -1531,6 +1584,9 @@ const ALL_POSSIBLE_EQUIPMENTS = [
       }
 
       function openModal(category) {
+        if (category === 'equipments') {
+            activeEquipmentFilter = '全部'; 
+        }
         currentOpenCategory = category;
         elements.modal.style.display = 'block';
         populateModal(category);
@@ -1542,10 +1598,40 @@ const ALL_POSSIBLE_EQUIPMENTS = [
         currentOpenCategory = null;
       }
 
+      /**
+       @param {Array} fullData 
+      */
+
+      function renderFilteredEquipmentView(fullData) {
+        elements.modalFilterContainer.innerHTML = '';
+        const types = ['全部', ...new Set(fullData.map(item => item.type).filter(Boolean))]; 
+        
+        types.forEach(type => {
+            const filterBtn = document.createElement('button');
+            filterBtn.className = 'modal-filter-btn';
+            filterBtn.textContent = type;
+            if (type === activeEquipmentFilter) {
+                filterBtn.classList.add('active');
+            }
+            
+            filterBtn.addEventListener('click', () => {
+                activeEquipmentFilter = type; 
+                renderFilteredEquipmentView(fullData); 
+            });
+            
+            elements.modalFilterContainer.appendChild(filterBtn);
+        });
+        const filteredData = activeEquipmentFilter === '全部'
+            ? fullData
+            : fullData.filter(item => item.type === activeEquipmentFilter);
+        populateTabContent(filteredData, 'equipments', false);
+      }
+
       function populateModal(category) {
         if (!category) { return; } 
         let title, isRadio = false;
-        let mainData; 
+        let mainData;
+
         switch (category) {
           case 'equipments': title = '选择初始装备'; break;
           case 'items': mainData = ALL_POSSIBLE_ITEMS; title = '选择初始物品'; break;
@@ -1553,28 +1639,37 @@ const ALL_POSSIBLE_EQUIPMENTS = [
           case 'redThreads': mainData = ALL_POSSIBLE_RED_THREADS; title = '选择初始红线对象'; isRadio = true; break;
           case 'backgrounds': mainData = ALL_POSSIBLE_BACKGROUNDS; title = '选择初始背景'; isRadio = true; break;
         }
+
         elements.modalTitle.textContent = title;
         elements.modalTabsContainer.innerHTML = '';
+        elements.modalFilterContainer.innerHTML = ''; 
         elements.modalOptionsList.innerHTML = '';
+        
         const tabsConfig = MODAL_TABS_CONFIG[category];
-        if (tabsConfig) {
-          let defaultTabIndex = tabsConfig.findIndex(tab => tab.isDefault) || 0;
-          tabsConfig.forEach((tabConfig, index) => {
-            const tabElement = document.createElement('button');
-            tabElement.className = 'modal-tab';
-            tabElement.textContent = tabConfig.name;
-            tabElement.dataset.tabIndex = index;
-            tabElement.addEventListener('click', () => {
-              elements.modalTabsContainer.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
-              tabElement.classList.add('active');
-              populateTabContent(tabConfig.data, category, isRadio);
+
+        if (tabsConfig && category === 'equipments') {
+            let defaultTabIndex = tabsConfig.findIndex(tab => tab.isDefault) || 0;
+          
+            tabsConfig.forEach((tabConfig, index) => {
+                const tabElement = document.createElement('button');
+                tabElement.className = 'modal-tab';
+                tabElement.textContent = tabConfig.name;
+                
+                tabElement.addEventListener('click', () => {
+                    elements.modalTabsContainer.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+                    tabElement.classList.add('active');
+                    activeEquipmentFilter = '全部'; 
+                    renderFilteredEquipmentView(tabConfig.data);
+                });
+                
+                elements.modalTabsContainer.appendChild(tabElement);
             });
-            elements.modalTabsContainer.appendChild(tabElement);
-          });
-          elements.modalTabsContainer.querySelector(`[data-tab-index="${defaultTabIndex}"]`).click();
-        } else {
-          populateTabContent(mainData, category, isRadio);
+            elements.modalTabsContainer.children[defaultTabIndex].click();
+
+        } else if (mainData) {
+            populateTabContent(mainData, category, isRadio);
         }
+
         if (category === 'backgrounds') {
           updateBackgroundAvailabilityInModal();
         }
@@ -1584,21 +1679,22 @@ const ALL_POSSIBLE_EQUIPMENTS = [
         elements.modalOptionsList.innerHTML = '';
         if (!data) return; 
         const currentSelections = selections[category] || [];
+
         let groupByKey, groupKeyMap, groupOrder;
-        
         if (category === 'backgrounds') {
             groupByKey = 'bgType';
             groupKeyMap = BACKGROUND_TYPE_MAP;
             groupOrder = ['通用背景', '种族限定', '地区限定'];
         } else if (category === 'redThreads') {
-            groupByKey = 'type'; 
-            groupKeyMap = null; 
-            groupOrder = ['第一层级', '第二层级', '第三层级']; 
+            groupByKey = 'type';
+            groupKeyMap = null;
+            groupOrder = ['第一层级', '第二层级', '第三层级'];
         } else {
-            groupByKey = 'rarity'; 
+            groupByKey = 'rarity';
             groupKeyMap = RARITY_MAP;
-            groupOrder = ['唯一', '普通', '优良', '稀有', '史诗', '传说', '神话', '普通-战技', '普通-法术', '普通-祷告', '普通-仪式', '普通-其他'];
+            groupOrder = ['唯一', '普通', '优良', '稀有','史诗', '传说', '神话', '普通-战技', '普通-法术', '普通-祷告', '普通-仪式', '普通-其他'];
         }
+
         const groupedData = data.reduce((acc, item) => {
           const key = item[groupByKey];
           const groupName = groupKeyMap ? (groupKeyMap[key] || '其他') : (key || '其他');
@@ -1608,6 +1704,7 @@ const ALL_POSSIBLE_EQUIPMENTS = [
           acc[groupName].push(item);
           return acc;
         }, {});
+
         const sortedGroupKeys = Object.keys(groupedData).sort((a, b) => {
           const indexA = groupOrder.indexOf(a);
           const indexB = groupOrder.indexOf(b);
@@ -1615,8 +1712,9 @@ const ALL_POSSIBLE_EQUIPMENTS = [
           if (indexB === -1) return -1;
           return indexA - indexB;
         });
+
         sortedGroupKeys.forEach(groupName => {
-          if (groupedData[groupName].length === 0) return; 
+          if (groupedData[groupName].length === 0) return;
           const groupContainer = document.createElement('div');
           groupContainer.className = 'accordion-group';
           const header = document.createElement('button');
@@ -1626,6 +1724,24 @@ const ALL_POSSIBLE_EQUIPMENTS = [
           content.className = 'accordion-content';
 
           groupedData[groupName].forEach(item => {
+            let itemNameHTML = item.name; 
+            let itemClass = '';
+
+            if (category === 'redThreads') {
+                if (item.type === '第二层级') itemClass = 'tier-2';
+                else if (item.type === '第三层级') itemClass = 'tier-3';
+            } else if (item.rarity) {
+                const rarityClasses = {
+                    'uncommon': 'rarity-uncommon', 'rare': 'rarity-rare', 'epic': 'rarity-epic',
+                    'legendary': 'rarity-legendary', 'mythic': 'rarity-mythic', 'only': 'rarity-only'
+                };
+                itemClass = rarityClasses[item.rarity] || '';
+            }
+
+            if (itemClass) {
+                itemNameHTML = `<span class="${itemClass}">${item.name}</span>`;
+            }
+
             const isChecked = currentSelections.includes(item.name);
             const inputType = isRadio ? 'radio' : 'checkbox';
             const costText = item.cost ? `|${item.cost}点` : '';
@@ -1637,11 +1753,11 @@ const ALL_POSSIBLE_EQUIPMENTS = [
               <input type="${inputType}" name="${category}" value="${item.name}" data-cost="${item.cost || 0}" ${isChecked ? 'checked' : ''}>
               <div class="skill-option-content">
                   <span class="skill-main-info">
-                      ${item.name} ${typeText} ${costText}
+                      ${itemNameHTML} ${typeText} ${costText} 
                   </span>
                   <small class="skill-description">${item.description}</small>
               </div>
-            `;
+            `; 
             content.appendChild(label);
           });
 
