@@ -10,14 +10,27 @@ interface Props {
   max: number;
   /** 进度条颜色 */
   color: string;
+  /** 是否达到最高等级（仅对经验条有效） */
+  isMaxLevel?: boolean;
 }
 
-defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  isMaxLevel: false,
+});
 
 // 计算进度条百分比
-const getPercentage = (current: number, max: number) => {
-  return Math.min(100, (current / max) * 100);
-};
+const getPercentage = computed(() => {
+  // 如果达到最高等级，进度条填满
+  if (props.isMaxLevel) {
+    return 100;
+  }
+  return Math.min(100, (props.current / props.max) * 100);
+});
+
+// 显示的最大值文本
+const maxDisplayText = computed(() => {
+  return props.isMaxLevel ? 'MAX' : props.max;
+});
 </script>
 
 <template>
@@ -25,13 +38,13 @@ const getPercentage = (current: number, max: number) => {
     <div class="resource-label">
       <span class="property-name">{{ icon }} {{ label }}:</span>
       <span class="value-main">{{ current }}</span> /
-      <span class="value-main">{{ max }}</span>
+      <span class="value-main" :class="{ 'max-level': isMaxLevel }">{{ maxDisplayText }}</span>
     </div>
     <div class="progress-bar-container">
       <div
         class="progress-bar-value"
         :style="{
-          width: `${getPercentage(current, max)}%`,
+          width: `${getPercentage}%`,
           backgroundColor: color,
         }"
       ></div>
@@ -55,6 +68,12 @@ const getPercentage = (current: number, max: number) => {
   color: var(--theme-text-secondary);
   text-shadow: 0 0 1px rgba(0, 0, 0, 0.08);
   margin-right: 4px;
+}
+
+.max-level {
+  color: var(--theme-quality-legendary);
+  font-weight: bold;
+  text-shadow: 0 0 2px rgba(158, 113, 33, 0.3);
 }
 
 /* 进度条样式 */

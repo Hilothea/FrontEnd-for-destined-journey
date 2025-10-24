@@ -17,11 +17,15 @@ const resourcesData = computed(() => {
       hp: { current: 0, max: 0 },
       mp: { current: 0, max: 0 },
       sp: { current: 0, max: 0 },
-      exp: { current: 0, needed: 0 },
+      exp: { current: 0, needed: 0, isMaxLevel: false },
     };
 
   const resources = safeGet(statData.value, '角色.资源', {});
   const status = safeGet(statData.value, '角色.状态', {});
+  const level = safeGet(status, '等级', 1);
+
+  // 判断是否达到最高等级（25级）
+  const isMaxLevel = level >= 25;
 
   return {
     hp: {
@@ -39,6 +43,7 @@ const resourcesData = computed(() => {
     exp: {
       current: safeGet(status, '累计经验值', 0),
       needed: safeGet(status, '升级所需经验', 0),
+      isMaxLevel,
     },
   };
 });
@@ -128,6 +133,7 @@ const summaryDetails = computed(() => {
         :current="resourcesData.exp.current"
         :max="resourcesData.exp.needed"
         :color="themeStore.effectiveColors.resourceExp"
+        :is-max-level="resourcesData.exp.isMaxLevel"
       />
     </div>
 
