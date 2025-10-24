@@ -11,7 +11,7 @@ const goldLionNews = computed(() => safeGet(statData.value, '每日新闻.阿斯
 
 const tavernNews = computed(() => safeGet(statData.value, '每日新闻.酒馆留言板', ''));
 
-const teaPartyNews = computed(() => safeGet(statData.value, '每日新闻.红线助手的午后茶会', ''));
+const teaPartyNews = computed(() => safeGet(statData.value, '每日新闻.午后茶会', ''));
 
 // 触发更新新闻
 const handleUpdateNews = () => {
@@ -47,7 +47,7 @@ const handleUpdateNews = () => {
 
     <!-- 红线助手的午后茶会 -->
     <NewsSection
-      title="☕ 红线助手的午后茶会"
+      title="☕ 午后茶会"
       :content="teaPartyNews"
       empty-message="茶会上没什么新八卦"
       title-class="news-tea-party"

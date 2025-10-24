@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useStatData } from '../../composables/use-stat-data';
 import { getExtensibleItems, safeGet } from '../../utils/data-adapter';
+import { sortByRarity } from '../../utils/quality';
 import CommonStatus from '../common/CommonStatus.vue';
 import ItemEntry from './ItemEntry.vue';
 
@@ -13,16 +14,6 @@ const typeOrder: Record<string, number> = {
   其它物品: 3,
   消耗品: 2,
   材料: 1,
-};
-
-// 品质排序权重
-const rarityOrder: Record<string, number> = {
-  神话: 6,
-  传说: 5,
-  史诗: 4,
-  稀有: 3,
-  优良: 2,
-  普通: 1,
 };
 
 // 获取货币数据
@@ -70,11 +61,7 @@ const itemsByType = computed(() => {
 
   // 对每个分组内的物品按品质排序
   Object.values(grouped).forEach(items => {
-    items.sort((a, b) => {
-      const rarityA = rarityOrder[a.quality] || 0;
-      const rarityB = rarityOrder[b.quality] || 0;
-      return rarityB - rarityA;
-    });
+    items.sort(sortByRarity);
   });
 
   return grouped;

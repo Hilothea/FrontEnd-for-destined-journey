@@ -15,6 +15,12 @@
 }
 
 /* 品质颜色 - 使用主题变量 */
+.quality-unique {
+  color: var(--theme-quality-unique);
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(255, 111, 0, 0.3);
+}
+
 .quality-mythic {
   color: var(--theme-quality-mythic);
   font-weight: bold;

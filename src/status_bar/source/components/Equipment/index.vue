@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useStatData } from '../../composables/use-stat-data';
 import { safeGet } from '../../utils/data-adapter';
+import { sortItemsByRarity } from '../../utils/quality';
 import CommonStatus from '../common/CommonStatus.vue';
 import EquipmentSlot from './EquipmentSlot.vue';
 
@@ -50,6 +51,9 @@ const equipmentData = computed(() => {
         position: safeGet(equipData, '位置', '') as string,
       });
     });
+
+    // 按品质排序装备
+    sortItemsByRarity(items);
 
     return {
       ...category,

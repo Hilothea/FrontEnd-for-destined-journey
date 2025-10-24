@@ -1,20 +1,11 @@
 <script lang="ts" setup>
 import { useStatData } from '../../composables/use-stat-data';
 import { getExtensibleItems, safeGet } from '../../utils/data-adapter';
+import { sortByRarity } from '../../utils/quality';
 import CommonStatus from '../common/CommonStatus.vue';
 import SkillItem from './SkillItem.vue';
 
 const { statData } = useStatData();
-
-// 品质排序权重
-const rarityOrder: Record<string, number> = {
-  神话: 6,
-  传说: 5,
-  史诗: 4,
-  稀有: 3,
-  优良: 2,
-  普通: 1,
-};
 
 // 获取并分类技能
 const skills = computed(() => {
@@ -49,8 +40,6 @@ const skills = computed(() => {
   });
 
   // 按品质排序
-  const sortByRarity = (a: any, b: any) => (rarityOrder[b.quality] || 0) - (rarityOrder[a.quality] || 0);
-
   active.sort(sortByRarity);
   passive.sort(sortByRarity);
   other.sort(sortByRarity);

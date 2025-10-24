@@ -38,6 +38,8 @@ export interface ThemeColors {
   textMuted: string;
 
   // ===== 品质颜色系统 =====
+  /** 唯一品质 */
+  qualityUnique: string;
   /** 神话品质 */
   qualityMythic: string;
   /** 传说品质 */
@@ -141,6 +143,7 @@ export const defaultTheme: Theme = {
     textMuted: '#7a655d',
 
     // 品质颜色
+    qualityUnique: '#ff6f00',
     qualityMythic: '#d32f2f',
     qualityLegendary: '#9e7121',
     qualityEpic: '#9c27b0',
