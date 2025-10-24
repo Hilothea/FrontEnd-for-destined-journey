@@ -12,6 +12,7 @@ interface AscensionItem {
 interface DivinityInfo {
   name: string;
   kingdom: string;
+  kingdomDesc: string;
 }
 
 // 使用状态数据
@@ -70,11 +71,12 @@ const lawsData = computed((): AscensionItem[] => {
 
 // 获取神位/神国数据
 const divinityData = computed((): DivinityInfo => {
-  if (!ascensionData.value) return { name: '', kingdom: '' };
+  if (!ascensionData.value) return { name: '', kingdom: '', kingdomDesc: '' };
 
   return {
     name: safeGet(ascensionData.value, '神位', ''),
     kingdom: safeGet(ascensionData.value, '神国.名称', ''),
+    kingdomDesc: safeGet(ascensionData.value, '神国.描述', ''),
   };
 });
 
@@ -116,7 +118,7 @@ const summaryDetails = computed(() => {
             <span class="item-desc">{{ item.description }}</span>
           </div>
         </div>
-        <p v-else class="empty-slot">（尚无要素）</p>
+        <p v-else class="empty-slot">尚无要素</p>
       </div>
     </CommonStatus>
 
@@ -131,7 +133,7 @@ const summaryDetails = computed(() => {
             <span class="item-desc">{{ item.description }}</span>
           </div>
         </div>
-        <p v-else class="empty-slot">（尚无权能）</p>
+        <p v-else class="empty-slot">尚无权能</p>
       </div>
     </CommonStatus>
 
@@ -159,14 +161,22 @@ const summaryDetails = computed(() => {
           <div class="step-item">
             <span class="item-name">神位: </span>
             <span v-if="divinityData.name" class="value-main">{{ divinityData.name }}</span>
-            <span v-else class="empty-slot">（尚未登临）</span>
+            <span v-else class="empty-slot">尚未登临</span>
           </div>
         </div>
         <div>
-          <div class="step-item">
+          <template v-if="divinityData.kingdom">
+            <div class="step-item">
+              <span class="item-name">神国: </span>
+              <span class="value-main">{{ divinityData.kingdom }}</span>
+            </div>
+            <div v-if="divinityData.kingdomDesc" class="step-item kingdom-desc">
+              <span class="item-desc">{{ divinityData.kingdomDesc }}</span>
+            </div>
+          </template>
+          <div v-else class="step-item">
             <span class="item-name">神国: </span>
-            <span v-if="divinityData.kingdom" class="value-main">{{ divinityData.kingdom }}</span>
-            <span v-else class="empty-slot">（尚未开辟）</span>
+            <span class="empty-slot">尚未开辟</span>
           </div>
         </div>
       </div>
@@ -221,6 +231,16 @@ const summaryDetails = computed(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+}
+
+/* 神国描述缩进 */
+.kingdom-desc {
+  margin-top: -5px;
+
+  .item-desc {
+    margin-left: 0;
+    padding-left: 1.5em;
+  }
 }
 
 /* 响应式布局 */
