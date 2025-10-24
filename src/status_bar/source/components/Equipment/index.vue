@@ -3,7 +3,7 @@ import { useStatData } from '../../composables/use-stat-data';
 import { safeGet } from '../../utils/data-adapter';
 import { sortItemsByRarity } from '../../utils/quality';
 import CommonStatus from '../common/CommonStatus.vue';
-import EquipmentSlot from './EquipmentSlot.vue';
+import EquipmentSlot from '../common/EquipmentSlot.vue';
 
 // 使用状态数据
 const { statData } = useStatData();

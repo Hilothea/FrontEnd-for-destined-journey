@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import { getExtensibleItems } from '../../utils/data-adapter';
+import { getExtensibleItems, safeGet } from '../../utils/data-adapter';
 import CommonStatus from '../common/CommonStatus.vue';
+import EquipmentSlot from '../common/EquipmentSlot.vue';
+import SkillItem from '../common/SkillItem.vue';
 
 interface Props {
   /** 角色名称 */
@@ -23,9 +25,9 @@ interface Props {
   appearance?: string;
   /** 衣物装饰 */
   adornments?: string;
-  /** 角色装备 */
-  equipment?: string;
-  /** 角色属性（五维） */
+  /** 装备（可扩展对象） */
+  equipment?: Record<string, any>;
+  /** 属性（五维） */
   attributes?: {
     力量?: number;
     敏捷?: number;
@@ -33,9 +35,9 @@ interface Props {
     智力?: number;
     精神?: number;
   };
-  /** 登神长阶 */
-  ascension?: string;
-  /** 是否缔结红线 */
+  /** 登神长阶（对象） */
+  ascension?: Record<string, any>;
+  /** 是否缔结契约 */
   isTied?: string;
   /** 好感度（格式：当前/最大） */
   affection?: number;
@@ -43,8 +45,8 @@ interface Props {
   evaluation?: string;
   /** 背景故事 */
   backstory?: string;
-  /** 羁绊技能 */
-  bondSkill?: Record<string, string>;
+  /** 技能（可扩展对象） */
+  skills?: Record<string, any>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -57,14 +59,14 @@ const props = withDefaults(defineProps<Props>(), {
   favorites: '未知',
   appearance: '未知',
   adornments: '未知',
-  equipment: '未知',
+  equipment: () => ({}),
   attributes: () => ({}),
-  ascension: '未开启',
+  ascension: () => ({}),
   isTied: '否',
   affection: 0,
   evaluation: '',
   backstory: '未知',
-  bondSkill: () => ({}),
+  skills: () => ({}),
 });
 
 // 响应式的窗口宽度
@@ -138,21 +140,97 @@ const affectionData = computed(() => {
   };
 });
 
-const bondSkills = computed(() => {
-  if (props.isTied !== '是' || !props.bondSkill) {
-    return [];
-  }
+// 解析装备数据
+const equipmentList = computed(() => {
+  if (!props.equipment) return [];
 
-  const extensibleItems = getExtensibleItems(props.bondSkill);
+  const extensibleItems = getExtensibleItems(props.equipment);
   const entries = Object.entries(extensibleItems);
-  if (entries.length === 0) {
-    return [];
+
+  return entries.map(([equipName, equipData]: [string, any]) => ({
+    name: equipName,
+    quality: safeGet(equipData, '品质', ''),
+    type: safeGet(equipData, '类型', ''),
+    tags: safeGet(equipData, '标签', ''),
+    effect: safeGet(equipData, '效果', ''),
+    description: safeGet(equipData, '描述', ''),
+  }));
+});
+
+// 解析技能数据
+const skillsList = computed(() => {
+  if (!props.skills) return [];
+
+  const extensibleItems = getExtensibleItems(props.skills);
+  const entries = Object.entries(extensibleItems);
+
+  return entries.map(([skillName, skillData]: [string, any]) => ({
+    name: skillName,
+    quality: safeGet(skillData, '品质', ''),
+    type: safeGet(skillData, '类型', ''),
+    cost: safeGet(skillData, '消耗', ''),
+    tags: safeGet(skillData, '标签', ''),
+    effect: safeGet(skillData, '效果', ''),
+    description: safeGet(skillData, '描述', ''),
+  }));
+});
+
+// 解析登神长阶数据
+const ascensionInfo = computed(() => {
+  if (!props.ascension || typeof props.ascension !== 'object') {
+    return {
+      enabled: false,
+      elements: [] as Array<{ name: string; description: string }>,
+      powers: [] as Array<{ name: string; description: string }>,
+      laws: [] as Array<{ name: string; description: string }>,
+      position: '',
+      realm: { name: '', description: '' }
+    };
   }
 
-  return entries.map(([skillName, skillDescription]) => ({
-    name: skillName,
-    description: String(skillDescription),
-  }));
+  const isEnabled = String(safeGet(props.ascension, '是否开启', '否')) === '是';
+
+  const elementsObj = getExtensibleItems(safeGet(props.ascension, '要素', {}));
+  const powersObj = getExtensibleItems(safeGet(props.ascension, '权能', {}));
+  const lawsObj = getExtensibleItems(safeGet(props.ascension, '法则', {}));
+
+  return {
+    enabled: isEnabled,
+    elements: Object.entries(elementsObj).map(([name, desc]) => ({ name, description: String(desc || '') })),
+    powers: Object.entries(powersObj).map(([name, desc]) => ({ name, description: String(desc || '') })),
+    laws: Object.entries(lawsObj).map(([name, desc]) => ({ name, description: String(desc || '') })),
+    position: safeGet(props.ascension, '神位', ''),
+    realm: {
+      name: safeGet(props.ascension, '神国.名称', ''),
+      description: safeGet(props.ascension, '神国.描述', '')
+    }
+  };
+});
+
+// 格式化登神长阶摘要信息
+const ascensionSummary = computed(() => {
+  if (!ascensionInfo.value.enabled) return '未开启';
+
+  const parts: string[] = [];
+
+  // 显示具体名称而不是数量
+  if (ascensionInfo.value.elements.length > 0) {
+    const names = ascensionInfo.value.elements.map(e => e.name).join('，');
+    parts.push(`要素: ${names}`);
+  }
+  if (ascensionInfo.value.powers.length > 0) {
+    const names = ascensionInfo.value.powers.map(p => p.name).join('，');
+    parts.push(`权能: ${names}`);
+  }
+  if (ascensionInfo.value.laws.length > 0) {
+    const names = ascensionInfo.value.laws.map(l => l.name).join('，');
+    parts.push(`法则: ${names}`);
+  }
+  if (ascensionInfo.value.position) {
+    parts.push(`神位: ${ascensionInfo.value.position}`);
+  }
+
+  return parts.length > 0 ? parts.join(' | ') : '已开启';
 });
 
 // 基本信息数据结构
@@ -166,8 +244,6 @@ const basicInfoFields = computed(() => [
   { icon: '💖', label: '喜爱', value: props.favorites },
   { icon: '🌸', label: '外貌特质', value: props.appearance },
   { icon: '👗', label: '衣物装饰', value: props.adornments },
-  { icon: '⚔️', label: '角色装备', value: props.equipment },
-  { icon: '♾️', label: '登神长阶', value: props.ascension },
 ]);
 
 // 五维属性数据结构
@@ -184,7 +260,7 @@ const attributesFields = computed(() => {
 
 // 命运关系数据结构
 const destinyFields = computed(() => [
-  { icon: '', label: '是否缔结红线', value: props.isTied },
+  { icon: '💍', label: '是否缔结契约', value: props.isTied },
   { icon: '❤️', label: '好感度', value: affectionData.value.text, showBar: true },
   { icon: '💭', label: '评价', value: props.evaluation || '暂无评价' },
   { icon: '📜', label: '背景故事', value: props.backstory },
@@ -199,84 +275,171 @@ const destinyFields = computed(() => [
     :summary-details="`❤️ ${affectionData.text}`"
     custom-class="destiny-character"
   >
-    <div class="character-info">
-      <!-- 基本信息区 -->
-      <div class="info-section">
-        <div
-          v-for="field in basicInfoFields"
-          :key="field.label"
-          class="info-row"
-          :class="{ 'wrap-value': shouldWrapText(field.value) }"
-        >
-          <span class="property-name">{{ field.icon }} {{ field.label }}:</span>
-          <span class="value-main">{{ field.value }}</span>
-        </div>
+    <!-- 基本信息区 -->
+    <div class="info-section">
+      <div
+        v-for="field in basicInfoFields"
+        :key="field.label"
+        class="info-row"
+        :class="{ 'wrap-value': shouldWrapText(field.value) }"
+      >
+        <span class="property-name">{{ field.icon }} {{ field.label }}:</span>
+        <span class="value-main">{{ field.value }}</span>
       </div>
+    </div>
 
-      <hr class="divider" />
-
-      <!-- 五维属性区 -->
-      <div class="info-section">
-        <div v-for="field in attributesFields" :key="field.label" class="info-row">
-          <span class="property-name">{{ field.icon }} {{ field.label }}:</span>
-          <span class="value-main">{{ field.value }}</span>
-        </div>
-      </div>
-
-      <hr class="divider" />
-
-      <!-- 命运关系区 -->
-      <div class="destiny-section">
-        <template v-for="field in destinyFields" :key="field.label">
-          <div class="info-row" :class="{ 'wrap-value': shouldWrapText(field.value) }">
-            <span class="property-name">{{ field.icon }}{{ field.icon ? ' ' : '' }}{{ field.label }}:</span>
-            <span class="value-main">{{ field.value }}</span>
-          </div>
-          <div v-if="field.showBar" class="affection-bar-container">
-            <div class="affection-bar-value" :style="{ width: `${affectionData.percentage}%` }"></div>
+    <!-- 登神长阶 -->
+    <CommonStatus
+      title="♾️ 登神长阶"
+      variant="sub-section"
+      :default-open="false"
+      :locked="!ascensionInfo.enabled"
+      :summary-details="ascensionSummary"
+      custom-class="ascension-section"
+    >
+      <template v-if="ascensionInfo.enabled">
+        <!-- 要素 -->
+        <template v-if="ascensionInfo.elements.length > 0">
+          <div class="subsection-content">
+            <div class="subsection-label">❖ 要素</div>
+            <div v-for="item in ascensionInfo.elements" :key="item.name" class="ascension-item">
+              <span class="item-name">{{ item.name }}:</span>
+              <span class="item-desc">{{ item.description }}</span>
+            </div>
           </div>
         </template>
+
+        <!-- 权能 -->
+        <template v-if="ascensionInfo.powers.length > 0">
+          <div class="subsection-content">
+            <div class="subsection-label">❖ 权能</div>
+            <div v-for="item in ascensionInfo.powers" :key="item.name" class="ascension-item">
+              <span class="item-name">{{ item.name }}:</span>
+              <span class="item-desc">{{ item.description }}</span>
+            </div>
+          </div>
+        </template>
+
+        <!-- 法则 -->
+        <template v-if="ascensionInfo.laws.length > 0">
+          <div class="subsection-content">
+            <div class="subsection-label">❖ 法则</div>
+            <div v-for="item in ascensionInfo.laws" :key="item.name" class="ascension-item">
+              <span class="item-name">{{ item.name }}:</span>
+              <span class="item-desc">{{ item.description }}</span>
+            </div>
+          </div>
+        </template>
+
+        <!-- 神位/神国 -->
+        <template v-if="ascensionInfo.position || ascensionInfo.realm.name">
+          <div class="subsection-content">
+            <div class="subsection-label">❖ 神位 / 神国</div>
+            <div v-if="ascensionInfo.position" class="ascension-item">
+              <span class="item-name">神位:</span>
+              <span class="value-main">{{ ascensionInfo.position }}</span>
+            </div>
+            <div v-if="ascensionInfo.realm.name" class="ascension-item">
+              <span class="item-name">神国:</span>
+              <span class="value-main">{{ ascensionInfo.realm.name }}</span>
+            </div>
+            <div v-if="ascensionInfo.realm.description" class="ascension-item">
+              <span class="item-desc">{{ ascensionInfo.realm.description }}</span>
+            </div>
+          </div>
+        </template>
+      </template>
+    </CommonStatus>
+
+    <!-- 战斗相关区 -->
+    <div class="info-section">
+      <div class="section-header">⚔️ 战斗相关</div>
+
+      <!-- 五维属性 -->
+      <div class="subsection-content">
+        <div class="subsection-label">属性</div>
+        <div class="attributes-grid">
+          <div v-for="field in attributesFields" :key="field.label" class="attribute-item">
+            <span class="property-name">{{ field.icon }} {{ field.label }}:</span>
+            <span class="value-main">{{ field.value }}</span>
+          </div>
+        </div>
       </div>
 
-      <hr class="divider" />
-
-      <!-- 羁绊技能区 -->
-      <CommonStatus title="💞 羁绊技能" variant="sub-section" :default-open="false" custom-class="bond-skill-section">
-        <div class="bond-skill-content">
-          <template v-if="isTied !== '是'">
-            <p class="value-main">无羁绊技能</p>
-          </template>
-          <template v-else-if="bondSkills.length > 0">
-            <div v-for="skill in bondSkills" :key="skill.name" class="skill-item">
-              <div class="skill-name">{{ skill.name }}</div>
-              <div class="skill-description">{{ skill.description }}</div>
-            </div>
-          </template>
-          <template v-else>
-            <p class="value-main">尚未觉醒</p>
-          </template>
+      <!-- 装备 -->
+      <template v-if="equipmentList.length > 0">
+        <div class="subsection-content">
+          <div class="subsection-label">装备</div>
+          <div class="equipment-list">
+            <EquipmentSlot
+              v-for="equip in equipmentList"
+              :key="equip.name"
+              :equipment-name="equip.name"
+              :quality="equip.quality"
+              :type="equip.type"
+              :tags="equip.tags"
+              :effect="equip.effect"
+              :description="equip.description"
+            />
+          </div>
         </div>
-      </CommonStatus>
+      </template>
+
+      <!-- 技能 -->
+      <template v-if="skillsList.length > 0">
+        <div class="subsection-content">
+          <div class="subsection-label">技能</div>
+          <div class="skills-list">
+            <SkillItem
+              v-for="skill in skillsList"
+              :key="skill.name"
+              :name="skill.name"
+              :quality="skill.quality"
+              :type="skill.type === '主动' ? 'active' : skill.type === '被动' ? 'passive' : 'other'"
+              :other-type-name="skill.type"
+              :cost="skill.cost"
+              :tags="skill.tags"
+              :effect="skill.effect"
+              :description="skill.description"
+            />
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- 命运关系区 -->
+    <div class="info-section">
+      <div class="section-header">💞 命运关系</div>
+      <template v-for="field in destinyFields" :key="field.label">
+        <div class="info-row" :class="{ 'wrap-value': shouldWrapText(field.value) }">
+          <span class="property-name">{{ field.icon }}{{ field.icon ? ' ' : '' }}{{ field.label }}:</span>
+          <span class="value-main">{{ field.value }}</span>
+        </div>
+        <div v-if="field.showBar" class="affection-bar-container">
+          <div class="affection-bar-value" :style="{ width: `${affectionData.percentage}%` }"></div>
+        </div>
+      </template>
     </div>
   </CommonStatus>
 </template>
-
 <style lang="scss" scoped>
 .destiny-character {
   margin-bottom: 6px;
 }
 
-.character-info {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.info-section,
-.destiny-section {
+.info-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.section-header {
+  font-weight: bold;
+  font-size: 1.05em;
+  color: var(--theme-text-tertiary);
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--theme-border-light);
 }
 
 .info-row {
@@ -309,12 +472,6 @@ const destinyFields = computed(() => [
   }
 }
 
-.divider {
-  border: 0;
-  border-top: 1px solid var(--theme-border-dark);
-  width: 100%;
-}
-
 /* 好感度进度条 */
 .affection-bar-container {
   background-color: var(--theme-progress-bar-bg);
@@ -336,29 +493,98 @@ const destinyFields = computed(() => [
   box-shadow: inset 0 -1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.bond-skill-section {
-  margin-top: 10px;
-}
+/* 登神长阶区块 */
+.ascension-section {
+  margin-top: 12px;
+  margin-bottom: 12px;
 
-.bond-skill-content {
-  white-space: pre-wrap;
-  line-height: 1.6;
-}
-
-.skill-item {
-  & + .skill-item {
-    margin-top: 8px;
+  :deep(.details-content-inner) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 }
 
-.skill-name {
-  font-weight: bold;
-  color: var(--theme-text-tertiary);
+.subsection-content {
+  margin-top: 2px;
+
+  & + .subsection-content {
+    margin-top: 4px;
+  }
 }
 
-.skill-description {
-  font-size: 0.9em;
+.subsection-label {
+  font-weight: bold;
+  color: var(--theme-text-secondary);
+  font-size: 0.95em;
+  margin-bottom: 8px;
+  padding-left: 4px;
+  border-left: 3px solid var(--theme-border-light);
+}
+
+/* 属性网格布局 */
+.attributes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 12px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.attribute-item {
+  display: flex;
+  gap: 6px;
+  line-height: 1.6;
+
+  .property-name {
+    font-weight: bold;
+    color: var(--theme-text-secondary);
+    flex-shrink: 0;
+  }
+
+  .value-main {
+    color: var(--theme-text-primary);
+  }
+}
+
+/* 装备和技能列表 */
+.equipment-list,
+.skills-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skills-list {
+  margin-bottom: 6px;
+}
+
+/* 登神长阶样式 */
+.ascension-item {
+  margin-bottom: 4px;
+  line-height: 1.6;
+
+  .item-name {
+    font-weight: bold;
+    color: var(--theme-text-secondary);
+    margin-right: 4px;
+  }
+
+  .item-desc {
+    font-size: 0.9em;
+    color: var(--theme-text-muted);
+    font-style: italic;
+    display: block;
+    margin-left: 1.5em;
+  }
+}
+
+/* 空状态提示 */
+.empty-message {
   color: var(--theme-text-muted);
-  padding-left: 1em;
+  font-style: italic;
+  margin: 0;
 }
 </style>

@@ -13,8 +13,10 @@ interface Props {
   effect?: string;
   /** 装备描述 */
   description?: string;
-  /** 装备位置 */
+  /** 装备位置（主角装备用） */
   position?: string;
+  /** 装备类型（命定之人装备用） */
+  type?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,6 +25,7 @@ const props = withDefaults(defineProps<Props>(), {
   effect: '',
   description: '',
   position: '',
+  type: '',
 });
 
 // 计算装备标题（只包含名称和品质）
@@ -34,9 +37,11 @@ const equipmentTitle = computed(() => {
   return title;
 });
 
-// 计算摘要详情（显示位置）
+// 计算摘要详情（显示位置或类型）
 const summaryDetails = computed(() => {
-  return props.position ? `位置: ${props.position}` : '';
+  if (props.position) return `位置: ${props.position}`;
+  if (props.type) return `类型: ${props.type}`;
+  return '';
 });
 </script>
 

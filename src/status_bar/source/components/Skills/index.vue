@@ -3,7 +3,7 @@ import { useStatData } from '../../composables/use-stat-data';
 import { getExtensibleItems, safeGet } from '../../utils/data-adapter';
 import { sortByRarity } from '../../utils/quality';
 import CommonStatus from '../common/CommonStatus.vue';
-import SkillItem from './SkillItem.vue';
+import SkillItem from '../common/SkillItem.vue';
 
 const { statData } = useStatData();
 
