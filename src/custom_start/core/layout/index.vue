@@ -9,7 +9,7 @@ const route = useRoute();
 const characterStore = useCharacterStore();
 const { character, consumedPoints } = storeToRefs(characterStore);
 
-// 在组件中计算可用点数
+// 计算可用点数
 const availablePoints = computed(() => {
   return character.value.reincarnationPoints - consumedPoints.value;
 });

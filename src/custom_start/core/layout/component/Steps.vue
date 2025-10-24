@@ -13,7 +13,6 @@ const props = withDefaults(defineProps<Props>(), {
   step: 1,
 });
 
-// 暴露 props 供父组件通过 ref 访问
 defineExpose({
   steps: props.steps,
   step: props.step,

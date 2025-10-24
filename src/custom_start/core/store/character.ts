@@ -10,7 +10,7 @@ import {
 import type { Attributes, CharacterConfig } from '../types';
 
 export const useCharacterStore = defineStore('character', () => {
-  // ============ State ============
+  // State
   const character = ref<CharacterConfig>({
     name: '',
     gender: '男',
