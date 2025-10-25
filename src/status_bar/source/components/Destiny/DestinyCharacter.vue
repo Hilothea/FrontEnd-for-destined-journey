@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { getExtensibleItems, safeGet } from '../../utils/data-adapter';
+import { sortItemsByRarity } from '../../utils/quality';
 import CommonStatus from '../common/CommonStatus.vue';
 import EquipmentSlot from '../common/EquipmentSlot.vue';
 import SkillItem from '../common/SkillItem.vue';
@@ -162,14 +163,14 @@ const affectionData = computed(() => {
   };
 });
 
-// 解析装备数据
+// 解析装备数据（按品质权重降序排列）
 const equipmentList = computed(() => {
   if (!props.equipment) return [];
 
   const extensibleItems = getExtensibleItems(props.equipment);
   const entries = Object.entries(extensibleItems);
 
-  return entries.map(([equipName, equipData]: [string, any]) => ({
+  const items = entries.map(([equipName, equipData]: [string, any]) => ({
     name: equipName,
     quality: safeGet(equipData, '品质', ''),
     type: safeGet(equipData, '类型', ''),
@@ -177,16 +178,19 @@ const equipmentList = computed(() => {
     effect: safeGet(equipData, '效果', ''),
     description: safeGet(equipData, '描述', ''),
   }));
+
+  // 按品质权重降序排列
+  return sortItemsByRarity(items);
 });
 
-// 解析技能数据
+// 解析技能数据（按类型和品质排序：主动→被动→其它，每组内按品质降序）
 const skillsList = computed(() => {
   if (!props.skills) return [];
 
   const extensibleItems = getExtensibleItems(props.skills);
   const entries = Object.entries(extensibleItems);
 
-  return entries.map(([skillName, skillData]: [string, any]) => ({
+  const items = entries.map(([skillName, skillData]: [string, any]) => ({
     name: skillName,
     quality: safeGet(skillData, '品质', ''),
     type: safeGet(skillData, '类型', ''),
@@ -195,6 +199,19 @@ const skillsList = computed(() => {
     effect: safeGet(skillData, '效果', ''),
     description: safeGet(skillData, '描述', ''),
   }));
+
+  // 按类型分组
+  const activeSkills = items.filter(s => s.type === '主动');
+  const passiveSkills = items.filter(s => s.type === '被动');
+  const otherSkills = items.filter(s => s.type !== '主动' && s.type !== '被动');
+
+  // 每组内按品质权重降序排列
+  sortItemsByRarity(activeSkills);
+  sortItemsByRarity(passiveSkills);
+  sortItemsByRarity(otherSkills);
+
+  // 按顺序合并：主动→被动→其它
+  return [...activeSkills, ...passiveSkills, ...otherSkills];
 });
 
 // 解析登神长阶数据
