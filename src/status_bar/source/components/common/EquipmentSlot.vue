@@ -37,11 +37,21 @@ const equipmentTitle = computed(() => {
   return title;
 });
 
-// 计算摘要详情（显示位置或类型）
+// 计算摘要详情（显示类型和位置，有则显示）
 const summaryDetails = computed(() => {
-  if (props.position) return `位置: ${props.position}`;
-  if (props.type) return `类型: ${props.type}`;
-  return '';
+  const parts: string[] = [];
+
+  // 类型优先显示
+  if (props.type) {
+    parts.push(`类型: ${props.type}`);
+  }
+
+  // 位置其次
+  if (props.position) {
+    parts.push(`位置: ${props.position}`);
+  }
+
+  return parts.join(' | ');
 });
 </script>
 
