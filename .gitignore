@@ -9,4 +9,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+auto-imports.d.ts
+components.d.ts
+
 初始模板
