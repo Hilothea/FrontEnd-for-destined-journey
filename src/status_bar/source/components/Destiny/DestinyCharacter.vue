@@ -128,15 +128,34 @@ const occupationText = computed(() => {
   return '未知';
 });
 
-// 解析好感度
+// 解析好感度（范围：-100 ~ 100，分段独立显示）
 const affectionData = computed(() => {
   const current = props.affection || 0;
-  const max = 1000;
+  const min = -100;
+  const max = 100;
+
+  // 判断是负数还是正数
+  const isNegative = current < 0;
+  const isPositive = current > 0;
+
+  // 分段计算百分比（0 始终是 0%）
+  let percentage = 0;
+  if (isNegative) {
+    // 负数：0~-100 映射到 0~100%
+    percentage = (Math.abs(current) / 100) * 100;
+  } else if (isPositive) {
+    // 正数：0~100 映射到 0~100%
+    percentage = (current / 100) * 100;
+  }
+
   return {
     current,
+    min,
     max,
-    text: `${current}/${max}`,
-    percentage: ((current / max) * 100).toFixed(1),
+    text: `${current}`,
+    percentage: percentage.toFixed(1),
+    isNegative,
+    isPositive,
   };
 });
 
@@ -417,7 +436,11 @@ const destinyFields = computed(() => [
           <span class="value-main">{{ field.value }}</span>
         </div>
         <div v-if="field.showBar" class="affection-bar-container">
-          <div class="affection-bar-value" :style="{ width: `${affectionData.percentage}%` }"></div>
+          <div
+            class="affection-bar-value"
+            :class="{ 'negative': affectionData.isNegative }"
+            :style="{ width: `${affectionData.percentage}%` }"
+          ></div>
         </div>
       </template>
     </div>
@@ -473,7 +496,7 @@ const destinyFields = computed(() => [
   }
 }
 
-/* 好感度进度条 */
+/* 好感度进度条（支持负数显示，-100~100映射到0~100%） */
 .affection-bar-container {
   background-color: var(--theme-progress-bar-bg);
   border-radius: 9px;
@@ -487,11 +510,18 @@ const destinyFields = computed(() => [
 
 .affection-bar-value {
   height: 100%;
-  transition: width 0.8s ease-out;
+  transition: width 0.8s ease-out, background-color 0.3s ease;
   border-radius: 9px;
-  background-color: var(--theme-affection-bar);
   background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.1));
   box-shadow: inset 0 -1px 3px rgba(0, 0, 0, 0.1);
+
+  /* 正数（0~100）：粉色 */
+  background-color: var(--theme-affection-bar);
+
+  /* 负数（-100~0）：红色 */
+  &.negative {
+    background-color: var(--theme-affection-bar-negative);
+  }
 }
 
 /* 登神长阶区块 */

@@ -93,14 +93,14 @@ export const useThemeStore = defineStore('status-bar-theme', () => {
 
   /**
    * 重置为默认主题
-   * 将所有默认值存入变量，确保覆盖之前的自定义配置
+   * 清空用户自定义配置，恢复到预设主题
    */
   const resetToDefault = async () => {
-    // 将默认主题的所有颜色值存入用户主题
-    userTheme.value = JSON.parse(JSON.stringify(defaultTheme.colors));
+    // 清空用户主题，使其使用默认主题
+    userTheme.value = null;
     try {
-      // 保存默认值到酒馆变量，覆盖之前的配置
-      await saveThemeToTavern();
+      // 删除酒馆变量中的主题配置
+      await deleteVariable('status_bar_theme', { type: 'character' });
     } catch (error) {
       console.error('重置主题配置失败:', error);
     }

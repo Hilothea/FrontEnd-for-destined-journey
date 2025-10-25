@@ -35,11 +35,14 @@ const colorGroups = {
   },
   quality: {
     label: '品质颜色',
-    keys: ['qualityMythic', 'qualityLegendary', 'qualityEpic', 'qualityRare', 'qualityUncommon'],
-  },
-  resources: {
-    label: '状态条颜色',
-    keys: ['resourceHp', 'resourceMp', 'resourceSp', 'resourceExp'],
+    keys: [
+      'qualityUnique',
+      'qualityMythic',
+      'qualityLegendary',
+      'qualityEpic',
+      'qualityRare',
+      'qualityUncommon',
+    ],
   },
   button: {
     label: '按钮颜色',
@@ -47,11 +50,26 @@ const colorGroups = {
   },
   progress: {
     label: '进度条颜色',
-    keys: ['progressBarBg', 'progressBarFill'],
+    keys: [
+      'progressBarBg',
+      'progressBarFill',
+      'resourceHp',
+      'resourceMp',
+      'resourceSp',
+      'resourceExp',
+      'affectionBar',
+      'affectionBarNegative',
+    ],
   },
   special: {
     label: '特殊元素',
-    keys: ['starActive', 'starInactive', 'affectionBar', 'newsImportant', 'newsNormal', 'newsMinor'],
+    keys: [
+      'starActive',
+      'starInactive',
+      'newsImportant',
+      'newsNormal',
+      'newsMinor',
+    ],
   },
   status: {
     label: '状态颜色',
@@ -74,6 +92,7 @@ const colorLabels: Record<keyof ThemeColors, string> = {
   textSecondary: '次文本色',
   textTertiary: '三级文本色',
   textMuted: '淡化文本色',
+  qualityUnique: '唯一品质',
   qualityMythic: '神话品质',
   qualityLegendary: '传说品质',
   qualityEpic: '史诗品质',
@@ -91,6 +110,7 @@ const colorLabels: Record<keyof ThemeColors, string> = {
   starActive: '激活星标',
   starInactive: '非激活星标',
   affectionBar: '好感度进度条',
+  affectionBarNegative: '负好感度进度条',
   newsImportant: '阿斯塔利亚快讯',
   newsNormal: '酒馆留言板',
   newsMinor: '午后茶会',

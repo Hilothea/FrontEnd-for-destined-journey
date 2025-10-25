@@ -80,8 +80,10 @@ export interface ThemeColors {
   starActive: string;
   /** 非激活状态星标 */
   starInactive: string;
-  /** 好感度进度条 (DestinyCharacter) */
+  /** 好感度进度条 (DestinyCharacter - 正数) */
   affectionBar: string;
+  /** 负好感度进度条 (DestinyCharacter - 负数) */
+  affectionBarNegative: string;
   /** 重要新闻标题色 */
   newsImportant: string;
   /** 普通新闻标题色 */
@@ -169,6 +171,7 @@ export const defaultTheme: Theme = {
     starActive: '#f7d75a',
     starInactive: '#a39281',
     affectionBar: '#ec407a',
+    affectionBarNegative: '#ff6b6b',
     newsImportant: '#b9892d',
     newsNormal: '#6d4c41',
     newsMinor: '#c2185b',
