@@ -496,7 +496,7 @@ const destinyFields = computed(() => [
   }
 }
 
-/* 好感度进度条（支持负数显示，-100~100映射到0~100%） */
+/* 好感度进度条 */
 .affection-bar-container {
   background-color: var(--theme-progress-bar-bg);
   border-radius: 9px;
