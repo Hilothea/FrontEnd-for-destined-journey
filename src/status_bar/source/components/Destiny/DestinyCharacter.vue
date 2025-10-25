@@ -401,6 +401,7 @@ const destinyFields = computed(() => [
               :tags="skill.tags"
               :effect="skill.effect"
               :description="skill.description"
+              :show-type-in-summary="true"
             />
           </div>
         </div>
