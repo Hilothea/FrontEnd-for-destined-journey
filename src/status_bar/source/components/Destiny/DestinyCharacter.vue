@@ -148,11 +148,14 @@ const affectionData = computed(() => {
     percentage = (current / 100) * 100;
   }
 
+  // 显示格式：当前值/上下限
+  const displayText = isNegative ? `${current}/${min}` : `${current}/${max}`;
+
   return {
     current,
     min,
     max,
-    text: `${current}`,
+    text: displayText,
     percentage: percentage.toFixed(1),
     isNegative,
     isPositive,
