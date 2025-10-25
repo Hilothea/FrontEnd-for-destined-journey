@@ -206,7 +206,7 @@ const ascensionInfo = computed(() => {
       powers: [] as Array<{ name: string; description: string }>,
       laws: [] as Array<{ name: string; description: string }>,
       position: '',
-      realm: { name: '', description: '' }
+      realm: { name: '', description: '' },
     };
   }
 
@@ -224,8 +224,8 @@ const ascensionInfo = computed(() => {
     position: safeGet(props.ascension, '神位', ''),
     realm: {
       name: safeGet(props.ascension, '神国.名称', ''),
-      description: safeGet(props.ascension, '神国.描述', '')
-    }
+      description: safeGet(props.ascension, '神国.描述', ''),
+    },
   };
 });
 
@@ -441,7 +441,7 @@ const destinyFields = computed(() => [
         <div v-if="field.showBar" class="affection-bar-container">
           <div
             class="affection-bar-value"
-            :class="{ 'negative': affectionData.isNegative }"
+            :class="{ negative: affectionData.isNegative }"
             :style="{ width: `${affectionData.percentage}%` }"
           ></div>
         </div>
@@ -513,7 +513,9 @@ const destinyFields = computed(() => [
 
 .affection-bar-value {
   height: 100%;
-  transition: width 0.8s ease-out, background-color 0.3s ease;
+  transition:
+    width 0.8s ease-out,
+    background-color 0.3s ease;
   border-radius: 9px;
   background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.1));
   box-shadow: inset 0 -1px 3px rgba(0, 0, 0, 0.1);

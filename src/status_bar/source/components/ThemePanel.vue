@@ -35,14 +35,7 @@ const colorGroups = {
   },
   quality: {
     label: '品质颜色',
-    keys: [
-      'qualityUnique',
-      'qualityMythic',
-      'qualityLegendary',
-      'qualityEpic',
-      'qualityRare',
-      'qualityUncommon',
-    ],
+    keys: ['qualityUnique', 'qualityMythic', 'qualityLegendary', 'qualityEpic', 'qualityRare', 'qualityUncommon'],
   },
   button: {
     label: '按钮颜色',
@@ -63,13 +56,7 @@ const colorGroups = {
   },
   special: {
     label: '特殊元素',
-    keys: [
-      'starActive',
-      'starInactive',
-      'newsImportant',
-      'newsNormal',
-      'newsMinor',
-    ],
+    keys: ['starActive', 'starInactive', 'newsImportant', 'newsNormal', 'newsMinor'],
   },
   status: {
     label: '状态颜色',
