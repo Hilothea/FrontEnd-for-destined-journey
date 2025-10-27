@@ -12,28 +12,19 @@ export interface Item {
   description: string;
 }
 
-export interface Equipment {
-  name: string;
-  cost: number;
-  type: string;
-  effect: string;
-  description: string;
-  position: string;
-}
+// 货币类型
+export type Currency = Omit<Item, 'tag' | 'effect'>;
+
+// 装备类型
+export type Equipment = Item;
 
 // 技能类型
-export interface Skill {
-  name: string;
-  cost: number;
-  consume: string;
-  tag: string;
-  type: string;
-  effect: string;
-  description: string;
+export interface Skill extends Item {
+  consume?: string;
 }
 
-// 红线对象类型
-export interface RedThread {
+// 命定之人类型
+export interface DestinedOne {
   name: string;
   cost: number;
   lifeLevel: string;
@@ -45,7 +36,7 @@ export interface RedThread {
   like: string;
   app: string;
   cloth: string;
-  equip: string;
+  equip: Partial<Omit<Equipment, 'cost'>>[];
   attributes: {
     strength: number;
     dexterity: number;
@@ -53,14 +44,28 @@ export interface RedThread {
     intelligence: number;
     mind: number;
   };
-  stairway: string;
-  isRedLine: string;
+  stairway: {
+    isOpen: boolean;
+    elements?: {
+      [key: string]: string;
+    };
+    powers?: {
+      [key: string]: string;
+    };
+    laws?: {
+      [key: string]: string;
+    };
+    godlyRank?: string;
+    godKingdom?: {
+      name: string;
+      description: string;
+    };
+  };
+  isContract: string;
   affinity: number;
   comment?: string;
   backgroundInfo?: string;
-  skills: {
-    [key: string]: string;
-  };
+  skills: Omit<Skill, 'cost'>[];
 }
 
 // 背景类型
