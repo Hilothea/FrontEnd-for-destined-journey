@@ -51,10 +51,12 @@ export const useCharacterStore = defineStore('character', () => {
     let total = 0;
 
     // 种族消耗
-    total += RACE_COSTS[character.value.race] || 0;
+    const raceCost = RACE_COSTS[character.value.race] || 0;
+    total += raceCost;
 
     // 身份消耗
-    total += IDENTITY_COSTS[character.value.identity] || 0;
+    const identityCost = IDENTITY_COSTS[character.value.identity] || 0;
+    total += identityCost;
 
     // 属性加点消耗 (每点1个转生点)
     const attributeAddPoints = Object.values(character.value.attributePoints).reduce((sum, points) => sum + points, 0);

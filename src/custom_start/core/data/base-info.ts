@@ -78,8 +78,58 @@ export const INITIAL_REINCARNATION_POINTS = 300;
 // 属性列表
 export const ATTRIBUTES = ['力量', '敏捷', '体质', '智力', '精神'] as const;
 
-// 初始可用AP点数
-export const INITIAL_AP = 5;
+// 等级相关常量
+export const MAX_LEVEL = 10;
+export const MIN_LEVEL = 1;
 
 // 基础属性值
 export const BASE_STAT = 4;
+
+/**
+ * 根据等级计算可用的AP点数
+ * @param level 角色等级 (1-10)
+ * @returns 总AP点数
+ */
+export const calculateAPByLevel = (level: number): number => {
+  // 基础属性点
+  const baseAP = 5;
+
+  // 层级属性点计算
+  let tierAP = 0;
+  if (level >= 1 && level <= 4) {
+    tierAP = 0;
+  } else if (level >= 5 && level <= 8) {
+    tierAP = 1;
+  } else if (level >= 9 && level <= 12) {
+    tierAP = 2;
+  } else if (level >= 13 && level <= 16) {
+    tierAP = 3;
+  } else if (level >= 17 && level <= 20) {
+    tierAP = 4;
+  } else if (level >= 21 && level <= 24) {
+    tierAP = 5;
+  } else if (level >= 25) {
+    tierAP = 6;
+  }
+
+  // 额外属性点 = 等级 - 1
+  const extraAP = level - 1;
+
+  return baseAP + tierAP + extraAP;
+};
+
+/**
+ * 获取等级对应的层级名称
+ * @param level 角色等级
+ * @returns 层级名称
+ */
+export const getLevelTierName = (level: number): string => {
+  if (level >= 1 && level <= 4) return '第一层级';
+  if (level >= 5 && level <= 8) return '第二层级';
+  if (level >= 9 && level <= 12) return '第三层级';
+  if (level >= 13 && level <= 16) return '第四层级';
+  if (level >= 17 && level <= 20) return '第五层级';
+  if (level >= 21 && level <= 24) return '第六层级';
+  if (level >= 25) return '第七层级';
+  return '未知层级';
+};

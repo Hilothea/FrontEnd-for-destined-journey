@@ -7,16 +7,17 @@ import Steps from './component/Steps.vue';
 const router = useRouter();
 const route = useRoute();
 const characterStore = useCharacterStore();
-const { character, consumedPoints } = storeToRefs(characterStore);
+const { character } = storeToRefs(characterStore);
 
 // 计算可用点数
 const availablePoints = computed(() => {
-  return character.value.reincarnationPoints - consumedPoints.value;
+  const consumed = characterStore.consumedPoints;
+  return character.value.reincarnationPoints - consumed;
 });
 
 // 判断是否可以 Roll 点数（只有在没有消耗点数时才允许）
 const canRollPoints = computed(() => {
-  return consumedPoints.value === 0;
+  return characterStore.consumedPoints === 0;
 });
 
 const stepRef = ref<InstanceType<typeof Steps> | null>(null);
@@ -31,8 +32,7 @@ provide('resetPageTrigger', resetPageTrigger);
 
 // Roll 转生点数
 const handleRollPoints = () => {
-  const newPoints = characterStore.rollInitialPoints();
-  console.log(`Roll 到新的转生点数: ${newPoints}`);
+  characterStore.rollInitialPoints();
 };
 
 // 随机生成当前页面内容

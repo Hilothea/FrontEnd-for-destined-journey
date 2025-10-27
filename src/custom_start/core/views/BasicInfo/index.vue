@@ -1,14 +1,82 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { GENDERS, START_LOCATIONS } from '../../data/base-info';
+import { computed } from 'vue';
+import {
+  FormInput,
+  FormLabel,
+  FormNumber,
+  FormRadio,
+  FormSelect,
+  FormStepper,
+  FormTextarea,
+} from '../../components/Form';
+import {
+  ATTRIBUTES,
+  calculateAPByLevel,
+  GENDERS,
+  getLevelTierName,
+  IDENTITY_COSTS,
+  MAX_LEVEL,
+  MIN_LEVEL,
+  RACE_COSTS,
+  START_LOCATIONS,
+} from '../../data/base-info';
 import { useCharacterStore } from '../../store';
 
 const characterStore = useCharacterStore();
 const { character } = storeToRefs(characterStore);
+const { addAttributePoint, removeAttributePoint } = characterStore;
 
 // 注入父组件提供的触发器
 const randomGenerateTrigger = inject<Ref<number>>('randomGenerateTrigger');
 const resetPageTrigger = inject<Ref<number>>('resetPageTrigger');
+
+// 从消耗点数对象中获取选项列表
+const raceOptions = computed(() => Object.keys(RACE_COSTS));
+const identityOptions = computed(() => Object.keys(IDENTITY_COSTS));
+
+// 计算已分配的AP点数
+const usedAP = computed(() => {
+  return Object.values(character.value.attributePoints).reduce((sum, points) => sum + points, 0);
+});
+
+// 根据等级计算的最大可用AP点数
+const maxAP = computed(() => calculateAPByLevel(character.value.level));
+
+// 计算剩余可分配的AP点数（受等级限制）
+const remainingAP = computed(() => maxAP.value - usedAP.value);
+
+// 计算剩余可用转生点数
+const availableReincarnationPoints = computed(() => {
+  return character.value.reincarnationPoints - characterStore.consumedPoints;
+});
+
+// 计算当前等级的AP点数详细信息
+const apInfo = computed(() => {
+  const level = character.value.level;
+  const totalAP = calculateAPByLevel(level);
+  const tierName = getLevelTierName(level);
+
+  // 计算各部分AP
+  const baseAP = 5;
+  let tierAP = 0;
+  if (level >= 5 && level <= 8) tierAP = 1;
+  else if (level >= 9 && level <= 12) tierAP = 2;
+  else if (level >= 13 && level <= 16) tierAP = 3;
+  else if (level >= 17 && level <= 20) tierAP = 4;
+  else if (level >= 21 && level <= 24) tierAP = 5;
+  else if (level >= 25) tierAP = 6;
+
+  const extraAP = level - 1;
+
+  return {
+    total: totalAP,
+    tierName,
+    baseAP,
+    tierAP,
+    extraAP,
+  };
+});
 
 // 监听随机生成事件
 watch(
@@ -32,14 +100,27 @@ watch(
 
 // 随机生成基本信息
 const randomGenerate = () => {
-  // 随机性别
-  character.value.gender = GENDERS[Math.floor(Math.random() * (GENDERS.length - 1))];
+  // 随机性别（排除自定义）
+  const genderList = GENDERS.filter(g => g !== '自定义');
+  character.value.gender = genderList[Math.floor(Math.random() * genderList.length)];
 
   // 随机年龄 (18-100)
   character.value.age = Math.floor(Math.random() * 83) + 18;
 
-  // 随机出生地
-  character.value.startLocation = START_LOCATIONS[Math.floor(Math.random() * (START_LOCATIONS.length - 1))];
+  // 随机种族（排除自定义）
+  const races = raceOptions.value.filter(r => r !== '自定义');
+  character.value.race = races[Math.floor(Math.random() * races.length)];
+
+  // 随机身份（排除自定义）
+  const identities = identityOptions.value.filter(i => i !== '自定义');
+  character.value.identity = identities[Math.floor(Math.random() * identities.length)];
+
+  // 随机等级 (1-10)
+  character.value.level = Math.floor(Math.random() * MAX_LEVEL) + MIN_LEVEL;
+
+  // 随机出生地（排除自定义）
+  const locations = START_LOCATIONS.filter(l => l !== '自定义');
+  character.value.startLocation = locations[Math.floor(Math.random() * locations.length)];
 
   console.log('基本信息已随机生成');
 };
@@ -50,6 +131,11 @@ const resetPage = () => {
   character.value.gender = '男';
   character.value.customGender = '';
   character.value.age = 18;
+  character.value.race = '人类';
+  character.value.customRace = '';
+  character.value.identity = '自由平民';
+  character.value.customIdentity = '';
+  character.value.level = 1;
   character.value.startLocation = '大陆东南部区域-索伦蒂斯王国';
   character.value.customStartLocation = '';
 
@@ -59,101 +145,312 @@ const resetPage = () => {
 
 <template>
   <div class="basic-info">
-    <h2>基本信息</h2>
+    <div class="form-container">
+      <!-- 第一行：姓名和性别 -->
+      <div class="form-row">
+        <div class="form-field">
+          <FormLabel label="姓名" required />
+          <FormInput v-model="character.name" placeholder="请输入角色姓名" />
+        </div>
+        <div class="form-field">
+          <FormLabel label="性别" required />
+          <FormSelect v-model="character.gender" :options="GENDERS" />
+          <FormTextarea
+            v-if="character.gender === '自定义'"
+            v-model="character.customGender"
+            :rows="2"
+            placeholder="请输入自定义性别"
+          />
+        </div>
+      </div>
 
-    <div class="form-group">
-      <label>姓名：</label>
-      <input v-model="character.name" type="text" placeholder="请输入角色姓名" />
-    </div>
+      <!-- 第二行：年龄和等级 -->
+      <div class="form-row">
+        <div class="form-field">
+          <FormLabel label="年龄" />
+          <FormNumber v-model="character.age" :min="1" :max="10000" />
+        </div>
+        <div class="form-field">
+          <FormLabel label="等级" required />
+          <div class="level-input-group">
+            <FormNumber v-model="character.level" :min="MIN_LEVEL" :max="MAX_LEVEL" />
+            <span class="level-indicator">{{ apInfo.tierName }}</span>
+          </div>
+        </div>
+      </div>
 
-    <div class="form-group">
-      <label>性别：</label>
-      <select v-model="character.gender">
-        <option v-for="gender in GENDERS" :key="gender" :value="gender">
-          {{ gender }}
-        </option>
-      </select>
-    </div>
+      <!-- 第三行：种族和身份 -->
+      <div class="form-row">
+        <div class="form-field">
+          <FormLabel label="种族" required />
+          <FormSelect
+            v-model="character.race"
+            :options="
+              raceOptions.map(race => ({
+                label:
+                  race +
+                  (RACE_COSTS[race] !== 0
+                    ? ` (${RACE_COSTS[race] > 0 ? '-' : '+'}${Math.abs(RACE_COSTS[race])}点)`
+                    : ''),
+                value: race,
+              }))
+            "
+          />
+          <FormTextarea
+            v-if="character.race === '自定义'"
+            v-model="character.customRace"
+            :rows="2"
+            placeholder="请输入自定义种族"
+          />
+        </div>
+        <div class="form-field">
+          <FormLabel label="身份" required />
+          <FormSelect
+            v-model="character.identity"
+            :options="
+              identityOptions.map(identity => ({
+                label:
+                  identity +
+                  (IDENTITY_COSTS[identity] !== 0
+                    ? ` (${IDENTITY_COSTS[identity] > 0 ? '-' : '+'}${Math.abs(IDENTITY_COSTS[identity])}点)`
+                    : ''),
+                value: identity,
+              }))
+            "
+          />
+          <FormTextarea
+            v-if="character.identity === '自定义'"
+            v-model="character.customIdentity"
+            :rows="2"
+            placeholder="请输入自定义身份"
+          />
+        </div>
+      </div>
 
-    <div class="form-group">
-      <label>年龄：</label>
-      <input v-model.number="character.age" type="number" min="1" max="10000" />
-    </div>
+      <!-- 第四行：起始地点 -->
+      <div class="form-row full-width">
+        <div class="form-field location-field">
+          <FormLabel label="起始地点" required />
+          <FormRadio v-model="character.startLocation" :options="START_LOCATIONS" layout="vertical" />
+          <FormTextarea
+            v-if="character.startLocation === '自定义'"
+            v-model="character.customStartLocation"
+            :rows="2"
+            placeholder="请输入自定义起始地点"
+          />
+        </div>
+      </div>
 
-    <div class="form-group">
-      <label>出生地：</label>
-      <select v-model="character.startLocation">
-        <option v-for="location in START_LOCATIONS" :key="location" :value="location">
-          {{ location }}
-        </option>
-      </select>
-    </div>
+      <!-- 初始属性分配面板 -->
+      <div class="attributes-panel">
+        <div class="panel-header">
+          <h3>初始属性分配</h3>
+          <div class="ap-info">
+            <span
+              >剩余AP:
+              <strong :class="{ error: remainingAP < 0, success: remainingAP === 0 }">{{ remainingAP }}</strong> /
+              {{ maxAP }}</span
+            >
+          </div>
+        </div>
 
-    <div class="info-display">
-      <p><strong>当前配置：</strong></p>
-      <p>姓名：{{ character.name || '未设置' }}</p>
-      <p>性别：{{ character.gender }}</p>
-      <p>年龄：{{ character.age }}</p>
-      <p>出生地：{{ character.startLocation }}</p>
+        <div class="panel-content">
+          <div class="attributes-grid">
+            <FormStepper
+              v-for="attr in ATTRIBUTES"
+              :key="attr"
+              :model-value="character.attributePoints[attr]"
+              :label="attr"
+              :min="0"
+              :max="maxAP"
+              :disabled="remainingAP <= 0 && character.attributePoints[attr] === 0"
+              @increment="addAttributePoint(attr)"
+              @decrement="removeAttributePoint(attr)"
+            />
+          </div>
+
+          <div v-if="availableReincarnationPoints < 0" class="status-message error">⚠️ 转生点数不足！</div>
+          <div v-else-if="remainingAP === 0" class="status-message success">✓ 属性点已全部分配</div>
+          <div v-else-if="remainingAP > 0" class="status-message info">还有 {{ remainingAP }} 点未分配</div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.basic-info {
-  padding: var(--spacing-lg);
-}
-
-h2 {
-  margin-bottom: var(--spacing-xl);
-  color: var(--title-color);
-  text-align: center;
-}
-
-.form-group {
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
+
+  &.full-width {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-field {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
+  flex-direction: column;
+  gap: var(--spacing-sm);
 
   label {
-    min-width: 80px;
     font-weight: 600;
-    color: var(--text-color);
-  }
-
-  input,
-  select {
-    flex: 1;
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
+    color: var(--accent-color);
     font-size: 1rem;
-    color: var(--text-color);
-    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    letter-spacing: 0.5px;
 
-    &:focus {
-      outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
+    &.required::after {
+      content: '*';
+      color: #ff6b6b;
+      font-weight: bold;
+      margin-left: 2px;
     }
   }
 }
 
-.info-display {
-  margin-top: var(--spacing-2xl);
-  padding: var(--spacing-lg);
-  background: rgba(212, 196, 176, 0.3);
-  border-radius: var(--radius-md);
-  border: 1px dashed var(--border-color);
+.level-input-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
 
-  p {
-    margin: var(--spacing-xs) 0;
-    color: var(--text-color);
+  .number-input-wrapper {
+    flex: 1;
+  }
 
-    strong {
+  .level-indicator {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+}
+
+.attributes-panel {
+  margin: var(--spacing-2xl) 0 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+
+  .panel-header {
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: linear-gradient(to bottom, var(--primary-bg), var(--card-bg));
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+
+    h3 {
+      margin: 0;
       color: var(--title-color);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .ap-info {
+      font-size: 1rem;
+      color: var(--text-color);
+
+      strong {
+        color: var(--accent-color);
+        font-size: 1.2rem;
+
+        &.error {
+          color: var(--error-color);
+        }
+
+        &.success {
+          color: var(--success-color);
+        }
+      }
+    }
+  }
+
+  .panel-content {
+    padding: var(--spacing-lg);
+  }
+
+  .attributes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .status-message {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 1px solid;
+
+    &.error {
+      background: rgba(211, 47, 47, 0.1);
+      color: var(--error-color);
+      border-color: var(--error-color);
+    }
+
+    &.success {
+      background: rgba(56, 142, 60, 0.1);
+      color: var(--success-color);
+      border-color: var(--success-color);
+    }
+
+    &.info {
+      background: rgba(212, 175, 55, 0.1);
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+  }
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+
+    &.full-width {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .level-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .location-field {
+    .location-options {
+      max-height: 300px;
+    }
+
+    .location-option {
+      .location-label {
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  .attributes-panel {
+    .panel-header {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .attributes-grid {
+      grid-template-columns: 1fr;
     }
   }
 }
