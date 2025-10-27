@@ -22,6 +22,7 @@ const charactersData = computed(() => {
 
   return Object.entries(characters).map(([charName, charData]: [string, any]) => ({
     name: charName,
+    bePresent: safeGet(charData, '是否在场', '是'),
     lifeLevel: safeGet(charData, '生命层级', ''),
     level: safeGet(charData, '等级', 1),
     race: safeGet(charData, '种族', ''),
@@ -76,6 +77,7 @@ const handleGacha = () => {
       <DestinyCharacter
         v-for="(char, index) in charactersData"
         :key="index"
+        :be-present="char.bePresent"
         :name="char.name"
         :life-level="char.lifeLevel"
         :level="char.level"

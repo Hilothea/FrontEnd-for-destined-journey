@@ -70,10 +70,10 @@ const statusData = computed(() => {
     lifeLevel: safeGet(status, '生命层级', '第一层级/普通层级'),
     level: safeGet(status, '等级', 1),
     race: safeGet(character, '种族', '未知'),
-    identity: Array.isArray(identity) ? (identity.length > 0 ? identity.join(', ') : '暂无') : identity || '暂无',
+    identity: Array.isArray(identity) ? (identity.length > 0 ? identity.join('、') : '暂无') : identity || '暂无',
     occupation: Array.isArray(occupation)
       ? occupation.length > 0
-        ? occupation.join(', ')
+        ? occupation.join('、')
         : '暂无'
       : occupation || '暂无',
     adventurerRank: safeGet(status, '冒险者等级', '未评级'),

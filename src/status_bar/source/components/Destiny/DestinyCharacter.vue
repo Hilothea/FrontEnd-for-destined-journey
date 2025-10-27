@@ -6,6 +6,8 @@ import EquipmentSlot from '../common/EquipmentSlot.vue';
 import SkillItem from '../common/SkillItem.vue';
 
 interface Props {
+  /* 是否在场景中 */
+  bePresent: string;
   /** 角色名称 */
   name: string;
   /** 生命层级 */
@@ -113,7 +115,7 @@ const identityText = computed(() => {
   if (typeof props.identity === 'string') return props.identity;
   if (Array.isArray(props.identity)) {
     if (props.identity.length === 0) return '未知';
-    return props.identity.join('，');
+    return props.identity.join('、');
   }
   return '未知';
 });
@@ -124,7 +126,7 @@ const occupationText = computed(() => {
   if (typeof props.occupation === 'string') return props.occupation;
   if (Array.isArray(props.occupation)) {
     if (props.occupation.length === 0) return '未知';
-    return props.occupation.join('，');
+    return props.occupation.join('、');
   }
   return '未知';
 });
@@ -274,6 +276,7 @@ const ascensionSummary = computed(() => {
 
 // 基本信息数据结构
 const basicInfoFields = computed(() => [
+  { icon: '✔️', label: '是否在场', value: props.bePresent },
   { icon: '⚜️', label: '生命层级', value: props.lifeLevel },
   { icon: '🎯', label: '等级', value: String(props.level) },
   { icon: '🧬', label: '种族', value: props.race },
