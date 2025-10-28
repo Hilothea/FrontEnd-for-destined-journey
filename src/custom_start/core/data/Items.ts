@@ -19,14 +19,14 @@ export const InitialItems: ItemData = {
     // 蓝 (Rare, 21-35)
     { name: '不算少的钱', type: '货币', cost: 40, rarity: 'rare', description: '初始自带60银币、60铜币。' },
     // 紫 (Epic, 36-50)
-    { name: '很多钱', type: '货币', cost: 80, rarity: 'epic', description: '初始自带5金币、50银币、50铜币。' },
+    { name: '很多钱', type: '货币', cost: 80, rarity: 'epic', description: '初始自带30金币、50银币、50铜币。' },
     // 金 (Legendary, 51-100)
     {
       name: '很多很多钱',
       type: '货币',
       cost: 150,
       rarity: 'legendary',
-      description: '初始自带1白金币、50金币、50银币、50铜币。',
+      description: '初始自带150金币、50银币、50铜币。',
     },
   ],
 
