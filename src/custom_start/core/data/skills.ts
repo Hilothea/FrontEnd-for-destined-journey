@@ -10,7 +10,7 @@ interface Skills {
 // 主动技能
 export const ActiveSkills: Skills = {
   // 战技
-  Combat: [
+  战技: [
     // 普通
     {
       name: '冲锋',
@@ -171,7 +171,7 @@ export const ActiveSkills: Skills = {
     },
   ],
   // 法术
-  Magic: [
+  法术: [
     // 普通
     {
       name: '魔法伎俩',
@@ -513,7 +513,7 @@ export const ActiveSkills: Skills = {
     },
   ],
   // 祷告
-  Prayer: [
+  祷告: [
     // 普通
     {
       name: '祝福圣水',
@@ -787,7 +787,7 @@ export const ActiveSkills: Skills = {
     },
   ],
   // 其它
-  Other: [
+  其它: [
     // 优良
     {
       name: '净化饮食',
@@ -837,7 +837,7 @@ export const ActiveSkills: Skills = {
 // 被动技能
 export const PassiveSkills: Skills = {
   // 战技
-  Combat: [
+  战技: [
     // 普通
     {
       name: '初级徒手战斗掌握',
@@ -914,7 +914,7 @@ export const PassiveSkills: Skills = {
     },
   ],
   // 法术
-  Magic: [
+  法术: [
     // 普通
     {
       name: '初级元素亲和',
@@ -990,7 +990,7 @@ export const PassiveSkills: Skills = {
     },
   ],
   // 其它
-  Other: [
+  其它: [
     // 普通
     {
       name: '草药辨识',

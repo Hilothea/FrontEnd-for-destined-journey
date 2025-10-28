@@ -10,7 +10,7 @@ interface EquipmentData {
  */
 const Equipments: EquipmentData = {
   // 法师武器
-  MageWeapon: [
+  法师武器: [
     // 普通
     {
       name: '学徒法杖',
@@ -100,7 +100,7 @@ const Equipments: EquipmentData = {
   ],
 
   // 牧师武器
-  ChaplainWeapon: [
+  牧师武器: [
     // 普通
     {
       name: '木制圣徽',
@@ -188,7 +188,7 @@ const Equipments: EquipmentData = {
   ],
 
   // 法袍
-  RoleMagi: [
+  法袍: [
     // 普通
     {
       name: '学徒法袍',
@@ -240,7 +240,7 @@ const Equipments: EquipmentData = {
   ],
 
   // 近战武器
-  MeleeWeapon: [
+  近战武器: [
     // 普通
     {
       name: '精铁长剑',
@@ -616,7 +616,7 @@ const Equipments: EquipmentData = {
   ],
 
   // 远程武器
-  RangedWeapon: [
+  远程武器: [
     // 普通
     {
       name: '复合短弓',
@@ -761,7 +761,7 @@ const Equipments: EquipmentData = {
   ],
 
   // 副手武器
-  OffHandWeapon: [
+  副手武器: [
     // 普通
     {
       name: '投石索',
@@ -886,7 +886,7 @@ const Equipments: EquipmentData = {
   ],
 
   // 副手防具
-  OffHandArmor: [
+  副手防具: [
     // 普通
     {
       name: '小圆盾',
@@ -1039,7 +1039,7 @@ const Equipments: EquipmentData = {
   ],
 
   // 防具
-  Armor: [
+  防具: [
     {
       name: '棉甲套装',
       cost: 20,
@@ -1362,7 +1362,7 @@ const Equipments: EquipmentData = {
   ],
 
   // 饰品
-  Jewelry: [
+  饰品: [
     // 普通
     {
       name: '银戒指',
@@ -1525,6 +1525,6 @@ const Equipments: EquipmentData = {
 /**
  * 新增法环护符拓展
  */
-Equipments.Talismans = NewTalismans;
+Equipments.法环护符拓展 = NewTalismans;
 
 export default Equipments;

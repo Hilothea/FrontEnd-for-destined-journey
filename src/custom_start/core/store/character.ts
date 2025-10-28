@@ -7,7 +7,7 @@ import {
   INITIAL_REINCARNATION_POINTS,
   RACE_COSTS,
 } from '../data/base-info';
-import type { Attributes, CharacterConfig } from '../types';
+import type { Attributes, CharacterConfig, Equipment, Item, Skill } from '../types';
 
 export const useCharacterStore = defineStore('character', () => {
   // State
@@ -42,6 +42,11 @@ export const useCharacterStore = defineStore('character', () => {
     destinyPoints: 0, // 命运点数
   });
 
+  // 选择的装备、道具、技能
+  const selectedEquipments = ref<Equipment[]>([]);
+  const selectedItems = ref<Item[]>([]);
+  const selectedSkills = ref<Skill[]>([]);
+
   // Computed
 
   /**
@@ -61,6 +66,18 @@ export const useCharacterStore = defineStore('character', () => {
     // 属性加点消耗 (每点1个转生点)
     const attributeAddPoints = Object.values(character.value.attributePoints).reduce((sum, points) => sum + points, 0);
     total += attributeAddPoints;
+
+    // 装备消耗
+    const equipmentCost = selectedEquipments.value.reduce((sum, item) => sum + item.cost, 0);
+    total += equipmentCost;
+
+    // 道具消耗
+    const itemCost = selectedItems.value.reduce((sum, item) => sum + item.cost, 0);
+    total += itemCost;
+
+    // 技能消耗
+    const skillCost = selectedSkills.value.reduce((sum, skill) => sum + skill.cost, 0);
+    total += skillCost;
 
     return total;
   });
@@ -128,14 +145,64 @@ export const useCharacterStore = defineStore('character', () => {
     };
   };
 
+  // 装备、道具、技能相关操作
+  const addEquipment = (equipment: Equipment) => {
+    selectedEquipments.value.push(equipment);
+  };
+
+  const removeEquipment = (equipment: Equipment) => {
+    const index = selectedEquipments.value.findIndex(e => e.name === equipment.name);
+    if (index !== -1) {
+      selectedEquipments.value.splice(index, 1);
+    }
+  };
+
+  const addItem = (item: Item) => {
+    selectedItems.value.push(item);
+  };
+
+  const removeItem = (item: Item) => {
+    const index = selectedItems.value.findIndex(i => i.name === item.name);
+    if (index !== -1) {
+      selectedItems.value.splice(index, 1);
+    }
+  };
+
+  const addSkill = (skill: Skill) => {
+    selectedSkills.value.push(skill);
+  };
+
+  const removeSkill = (skill: Skill) => {
+    const index = selectedSkills.value.findIndex(s => s.name === skill.name);
+    if (index !== -1) {
+      selectedSkills.value.splice(index, 1);
+    }
+  };
+
+  const clearSelections = () => {
+    selectedEquipments.value = [];
+    selectedItems.value = [];
+    selectedSkills.value = [];
+  };
+
   return {
     character,
     consumedPoints,
+    selectedEquipments,
+    selectedItems,
+    selectedSkills,
     updateCharacterField,
     updateAttribute,
     addAttributePoint,
     removeAttributePoint,
     rollInitialPoints,
     resetCharacter,
+    addEquipment,
+    removeEquipment,
+    addItem,
+    removeItem,
+    addSkill,
+    removeSkill,
+    clearSelections,
   };
 });

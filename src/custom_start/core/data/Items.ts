@@ -31,7 +31,7 @@ export const InitialItems: ItemData = {
   ],
 
   // 消耗品
-  Consumables: [
+  消耗品: [
     {
       name: '邂逅的黄金罗盘',
       cost: 0,
@@ -145,7 +145,7 @@ export const InitialItems: ItemData = {
   ],
 
   // 其它物品
-  Other: [
+  其它: [
     {
       name: '古旧神秘的地图',
       cost: 25,
