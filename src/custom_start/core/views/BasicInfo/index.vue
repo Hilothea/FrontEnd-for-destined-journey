@@ -1,15 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
-import {
-  FormInput,
-  FormLabel,
-  FormNumber,
-  FormRadio,
-  FormSelect,
-  FormStepper,
-  FormTextarea,
-} from '../../components/Form';
+import { FormInput, FormLabel, FormNumber, FormSelect, FormStepper, FormTextarea } from '../../components/Form';
 import {
   ATTRIBUTES,
   calculateAPByLevel,
@@ -229,9 +221,9 @@ const resetPage = () => {
 
       <!-- 第四行：起始地点 -->
       <div class="form-row full-width">
-        <div class="form-field location-field">
+        <div class="form-field">
           <FormLabel label="起始地点" required />
-          <FormRadio v-model="character.startLocation" :options="START_LOCATIONS" layout="vertical" />
+          <FormSelect v-model="character.startLocation" :options="START_LOCATIONS" />
           <FormTextarea
             v-if="character.startLocation === '自定义'"
             v-model="character.customStartLocation"
