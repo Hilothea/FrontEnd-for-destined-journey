@@ -9,7 +9,7 @@ interface Backgrounds {
  */
 export const Backgrounds: Backgrounds = {
   // 通用开局
-  Common: [
+  通用开局: [
     { name: '【自定义开局】', description: '自由发挥你的想象力，编写你自己的人物初始背景。' },
     {
       name: '【旅途与幸运】女神的指引',
@@ -38,7 +38,7 @@ export const Backgrounds: Backgrounds = {
     },
   ],
   // 种族限定开局
-  Race: [
+  种族限定: [
     {
       name: '【种族限定】圣金之翼的试炼',
       description:
@@ -59,7 +59,7 @@ export const Backgrounds: Backgrounds = {
     },
   ],
   // 地区限定开局
-  Location: [
+  地区限定: [
     {
       name: '【地区限定】踏星仪式',
       description:

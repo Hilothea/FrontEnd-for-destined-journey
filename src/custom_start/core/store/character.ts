@@ -7,7 +7,7 @@ import {
   INITIAL_REINCARNATION_POINTS,
   RACE_COSTS,
 } from '../data/base-info';
-import type { Attributes, CharacterConfig, Equipment, Item, Skill } from '../types';
+import type { Attributes, Background, CharacterConfig, DestinedOne, Equipment, Item, Skill } from '../types';
 
 export const useCharacterStore = defineStore('character', () => {
   // State
@@ -23,7 +23,6 @@ export const useCharacterStore = defineStore('character', () => {
     startLocation: '大陆东南部区域-索伦蒂斯王国',
     customStartLocation: '',
     level: 1,
-    backgroundStory: '',
     attributes: {
       力量: BASE_STAT,
       敏捷: BASE_STAT,
@@ -47,7 +46,14 @@ export const useCharacterStore = defineStore('character', () => {
   const selectedItems = ref<Item[]>([]);
   const selectedSkills = ref<Skill[]>([]);
 
+  // 选择的命定之人和背景
+  const selectedDestinedOnes = ref<DestinedOne[]>([]);
+  const selectedBackground = ref<Background | null>(null);
+
   // Computed
+
+  // 已兑换为命运点数的转生点数
+  const exchangedReincarnationPoints = ref(0);
 
   /**
    * 计算当前消耗的转生点数
@@ -78,6 +84,13 @@ export const useCharacterStore = defineStore('character', () => {
     // 技能消耗
     const skillCost = selectedSkills.value.reduce((sum, skill) => sum + skill.cost, 0);
     total += skillCost;
+
+    // 命定之人消耗
+    const destinedOnesCost = selectedDestinedOnes.value.reduce((sum, one) => sum + one.cost, 0);
+    total += destinedOnesCost;
+
+    // 兑换命运点数消耗的转生点数
+    total += exchangedReincarnationPoints.value;
 
     return total;
   });
@@ -125,7 +138,6 @@ export const useCharacterStore = defineStore('character', () => {
       startLocation: '大陆东南部区域-索伦蒂斯王国',
       customStartLocation: '',
       level: 1,
-      backgroundStory: '',
       attributes: {
         力量: BASE_STAT,
         敏捷: BASE_STAT,
@@ -185,12 +197,49 @@ export const useCharacterStore = defineStore('character', () => {
     selectedSkills.value = [];
   };
 
+  // 命定之人相关操作
+  const addDestinedOne = (destinedOne: DestinedOne) => {
+    selectedDestinedOnes.value.push(destinedOne);
+  };
+
+  const removeDestinedOne = (destinedOne: DestinedOne) => {
+    const index = selectedDestinedOnes.value.findIndex(d => d.name === destinedOne.name);
+    if (index !== -1) {
+      selectedDestinedOnes.value.splice(index, 1);
+    }
+  };
+
+  // 背景相关操作
+  const setBackground = (background: Background | null) => {
+    selectedBackground.value = background;
+  };
+
+  // 命运点数兑换相关操作
+  const exchangeDestinyPoints = (reincarnationPoints: number) => {
+    // 1 转生点 = 10 命运点
+    const destinyPointsToAdd = reincarnationPoints * 10;
+    character.value.destinyPoints += destinyPointsToAdd;
+    // 记录已兑换的转生点数
+    exchangedReincarnationPoints.value += reincarnationPoints;
+  };
+
+  const setDestinyPoints = (points: number) => {
+    character.value.destinyPoints = Math.max(0, points);
+  };
+
+  const resetExchangedPoints = () => {
+    exchangedReincarnationPoints.value = 0;
+  };
+
   return {
     character,
     consumedPoints,
+    exchangedReincarnationPoints,
     selectedEquipments,
     selectedItems,
     selectedSkills,
+    selectedDestinedOnes,
+    selectedBackground,
     updateCharacterField,
     updateAttribute,
     addAttributePoint,
@@ -204,5 +253,11 @@ export const useCharacterStore = defineStore('character', () => {
     addSkill,
     removeSkill,
     clearSelections,
+    addDestinedOne,
+    removeDestinedOne,
+    setBackground,
+    exchangeDestinyPoints,
+    setDestinyPoints,
+    resetExchangedPoints,
   };
 });

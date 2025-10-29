@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { FormInput, FormLabel, FormTextarea } from '../../../components/Form';
 import type { Equipment, Item, Rarity, Skill } from '../../../types';
 import { calculateCostByPosition, getCostRange } from '../../../utils/cost-calculator';
 
@@ -79,6 +80,7 @@ const handleAdd = () => {
     rarity: itemRarity.value,
     effect: itemEffect.value.trim(),
     description: itemDescription.value.trim() || '自定义物品',
+    isCustom: true, // 标记为自定义数据
   };
 
   let newItem: Equipment | Item | Skill;
@@ -87,6 +89,7 @@ const handleAdd = () => {
     newItem = {
       ...baseItem,
       consume: itemConsume.value.trim() || '',
+      isCustom: true, // 标记为自定义数据
     } as Skill;
   } else {
     newItem = baseItem as Equipment | Item;
@@ -127,25 +130,19 @@ const handleAdd = () => {
 
       <!-- 名称 -->
       <div class="form-row">
-        <label class="form-label">名称 *</label>
-        <input v-model="itemName" type="text" class="form-input" placeholder="请输入物品名称" maxlength="50" />
+        <FormLabel label="名称" required />
+        <FormInput v-model="itemName" placeholder="请输入物品名称" :maxlength="50" />
       </div>
 
       <!-- 类型 -->
       <div class="form-row">
-        <label class="form-label">类型 *</label>
-        <input
-          v-model="customItemType"
-          type="text"
-          class="form-input"
-          placeholder="例如：武器、防具、消耗品、主动、被动等"
-          maxlength="20"
-        />
+        <FormLabel label="类型" required />
+        <FormInput v-model="customItemType" placeholder="例如：武器、防具、消耗品、主动、被动等" :maxlength="20" />
       </div>
 
       <!-- 品质 -->
       <div class="form-row">
-        <label class="form-label">品质 *</label>
+        <FormLabel label="品质" required />
         <div class="rarity-buttons">
           <button
             v-for="option in rarityOptions"
@@ -167,31 +164,26 @@ const handleAdd = () => {
 
       <!-- 标签 -->
       <div class="form-row">
-        <label class="form-label">标签</label>
-        <input
-          v-model="itemTag"
-          type="text"
-          class="form-input"
-          placeholder="例如：[关联属性][目标类型][核心功能][威力: XXX][可选机制]"
-        />
+        <FormLabel label="标签" />
+        <FormInput v-model="itemTag" placeholder="例如：[关联属性][目标类型][核心功能][威力: XXX][可选机制]" />
       </div>
 
       <!-- 消耗（仅技能分类） -->
       <div v-if="categoryType === 'skill'" class="form-row">
-        <label class="form-label">消耗</label>
-        <input v-model="itemConsume" type="text" class="form-input" placeholder="例如：[动作: 50 SP]" />
+        <FormLabel label="消耗" />
+        <FormInput v-model="itemConsume" placeholder="例如：[动作: 50 SP]" />
       </div>
 
       <!-- 效果 -->
       <div class="form-row">
-        <label class="form-label">效果 *</label>
-        <textarea v-model="itemEffect" class="form-textarea" placeholder="请描述物品的效果..." rows="3" />
+        <FormLabel label="效果" required />
+        <FormTextarea v-model="itemEffect" placeholder="请描述物品的效果..." :rows="3" />
       </div>
 
       <!-- 描述 -->
       <div class="form-row">
-        <label class="form-label">描述</label>
-        <textarea v-model="itemDescription" class="form-textarea" placeholder="请描述物品的背景故事..." rows="2" />
+        <FormLabel label="描述" />
+        <FormTextarea v-model="itemDescription" placeholder="请描述物品的背景故事..." :rows="2" />
       </div>
 
       <!-- 操作按钮 -->
@@ -270,42 +262,6 @@ const handleAdd = () => {
     &:last-child {
       margin-bottom: 0;
     }
-  }
-
-  .form-label {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: var(--spacing-xs);
-  }
-
-  .form-input,
-  .form-textarea {
-    width: 100%;
-    padding: var(--spacing-sm);
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    font-size: 0.9rem;
-    color: var(--text-color);
-    transition: all var(--transition-fast);
-
-    &:focus {
-      outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.1);
-    }
-
-    &::placeholder {
-      color: var(--text-light);
-    }
-  }
-
-  .form-textarea {
-    resize: vertical;
-    min-height: 60px;
-    font-family: inherit;
   }
 
   .category-buttons,

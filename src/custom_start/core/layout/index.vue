@@ -2,6 +2,7 @@
 import { storeToRefs } from 'pinia';
 import { useRoute, useRouter } from 'vue-router';
 import { useCharacterStore } from '../store';
+import { generateAIPrompt, writeCharacterToMvu } from '../utils/data-exporter';
 import Steps from './component/Steps.vue';
 
 const router = useRouter();
@@ -82,11 +83,52 @@ const handlePrevious = () => {
 };
 
 // 下一页
-const handleNext = () => {
+const handleNext = async () => {
+  // 如果是最后一步，执行"踏上旅程"逻辑
+  if (currentStep.value === stepTitles.value.length) {
+    await handleStartJourney();
+    return;
+  }
+
+  // 否则跳转到下一步
   const nextStep = currentStep.value + 1;
   if (nextStep <= stepTitles.value.length) {
     const routeName = stepToRoute[nextStep];
     router.push({ name: routeName });
+  }
+};
+// 踏上旅程
+const handleStartJourney = async () => {
+  try {
+    // 1. 写入 MVU 变量
+    await writeCharacterToMvu(
+      character.value,
+      characterStore.selectedItems,
+      characterStore.selectedSkills,
+      characterStore.selectedDestinedOnes,
+    );
+    console.log('✅ 角色数据已写入 MVU 变量');
+
+    // 2. 生成 AI 提示词
+    const aiPrompt = generateAIPrompt(
+      character.value,
+      characterStore.selectedEquipments,
+      characterStore.selectedDestinedOnes,
+      characterStore.selectedBackground,
+      characterStore.selectedItems,
+      characterStore.selectedSkills,
+    );
+    console.log('✅ AI 提示词已生成：\n', aiPrompt);
+
+    // 3. 发送给 AI（使用 SillyTavern 的 triggerSlash 函数）
+
+    // 使用 /send 命令发送 AI 提示词
+    const sendCommand = `/send raw=true compact=false ${aiPrompt}`;
+    await triggerSlash(sendCommand);
+
+    console.log('✅ 角色信息已发送给 AI');
+  } catch (error) {
+    console.error('❌ 踏上旅程时发生错误：', error);
   }
 };
 
@@ -142,8 +184,8 @@ watch(
 
     <Steps ref="stepRef" :steps="stepTitles" :step="currentStep" />
 
-    <!-- 随机生成和重置按钮 -->
-    <div class="action-buttons">
+    <!-- 随机生成和重置按钮（确认页面不显示） -->
+    <div v-if="currentStep !== 4" class="action-buttons">
       <button class="action-button random-button" title="随机生成当前页面内容" @click="handleRandomGenerate">
         <span class="icon">✨</span>
         <span class="text">随机当前页</span>

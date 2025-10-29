@@ -10,6 +10,7 @@ export interface Item {
   rarity: Rarity;
   effect: string;
   description: string;
+  isCustom?: boolean; // 标识是否为自定义数据
 }
 
 // 货币类型
@@ -21,6 +22,7 @@ export type Equipment = Item;
 // 技能类型
 export interface Skill extends Item {
   consume?: string;
+  isCustom?: boolean; // 标识是否为自定义数据
 }
 
 // 命定之人类型
@@ -66,6 +68,7 @@ export interface DestinedOne {
   comment?: string;
   backgroundInfo?: string;
   skills: Omit<Skill, 'cost'>[];
+  isCustom?: boolean; // 标识是否为自定义数据
 }
 
 // 背景类型
@@ -99,7 +102,6 @@ export interface CharacterConfig {
   startLocation: string;
   customStartLocation: string;
   level: number;
-  backgroundStory: string;
   attributes: Attributes;
   attributePoints: Record<keyof Attributes, number>;
   reincarnationPoints: number; // 转生点数
