@@ -24,7 +24,7 @@ function parseCurrency(description: string): { gold: number; silver: number; cop
 
 /**
  * 将角色数据写入到 MVU 变量中
- * 同时写入聊天变量和消息楼层变量，防止被覆盖
+ * 使用 parseMessage 模拟 MVU 命令来保持可扩展性
  */
 export async function writeCharacterToMvu(
   character: CharacterConfig,
@@ -35,26 +35,19 @@ export async function writeCharacterToMvu(
   // 等待 Mvu 初始化
   await waitGlobalInitialized('Mvu');
 
-  // 获取聊天变量的 MVU 数据（主要存储位置）
-  const chatMvuData = Mvu.getMvuData({ type: 'chat' });
-
-  // 获取最新消息楼层的 MVU 数据（备份位置）
-  const messageMvuData = Mvu.getMvuData({ type: 'message', message_id: 'latest' });
-
   // 过滤掉自定义数据（只写入预设数据到 MVU）
   const presetSkills = skills.filter(skill => !skill.isCustom);
   const presetItems = items.filter(item => !item.isCustom);
   const presetDestinedOnes = destinedOnes.filter(one => !one.isCustom);
 
-  // 写入命运点数到两个位置
-  await Mvu.setMvuVariable(chatMvuData, '命定系统.命运点数', character.destinyPoints);
-  await Mvu.setMvuVariable(messageMvuData, '命定系统.命运点数', character.destinyPoints);
+  // 构建 MVU 命令字符串
+  const mvuCommands: string[] = [];
 
-  // 写入技能（只写入预设技能）到两个位置
-  const chatSkillList = (await Mvu.getMvuVariable(chatMvuData, '技能列表', { default_value: {} })) || {};
-  const messageSkillList = (await Mvu.getMvuVariable(messageMvuData, '技能列表', { default_value: {} })) || {};
+  // 写入命运点数
+  mvuCommands.push(`_.set('命定系统.命运点数', ${character.destinyPoints}); // 初始化命运点数`);
+
+  // 写入技能（只写入预设技能）
   for (const skill of presetSkills) {
-    console.log(`  写入技能: ${skill.name}`);
     const skillData = {
       品质: RARITY_MAP[skill.rarity] || '普通',
       类型: skill.type,
@@ -63,47 +56,28 @@ export async function writeCharacterToMvu(
       效果: skill.effect,
       描述: skill.description,
     };
-    chatSkillList[skill.name] = skillData;
-    messageSkillList[skill.name] = skillData;
+    mvuCommands.push(`_.insert('技能列表', '${skill.name}', ${JSON.stringify(skillData)}); // 添加技能：${skill.name}`);
   }
-  await Mvu.setMvuVariable(chatMvuData, '技能列表', chatSkillList);
-  await Mvu.setMvuVariable(messageMvuData, '技能列表', messageSkillList);
 
-  // 写入道具（只写入预设道具，区分货币和普通道具）到两个位置
-  const chatBackpack = (await Mvu.getMvuVariable(chatMvuData, '财产.背包', { default_value: {} })) || {};
-  const messageBackpack = (await Mvu.getMvuVariable(messageMvuData, '财产.背包', { default_value: {} })) || {};
-
+  // 写入道具（只写入预设道具，区分货币和普通道具）
   for (const item of presetItems) {
     // 检查是否是货币类型
     if (item.type === '货币') {
       // 解析货币描述，提取金币、银币、铜币
       const currency = parseCurrency(item.description);
 
-      // 写入到两个位置的货币变量
+      // 写入到货币变量
       if (currency.gold > 0) {
-        const chatGold = await Mvu.getMvuVariable(chatMvuData, '财产.货币.金币', { default_value: 0 });
-        await Mvu.setMvuVariable(chatMvuData, '财产.货币.金币', chatGold + currency.gold);
-
-        const messageGold = await Mvu.getMvuVariable(messageMvuData, '财产.货币.金币', { default_value: 0 });
-        await Mvu.setMvuVariable(messageMvuData, '财产.货币.金币', messageGold + currency.gold);
+        mvuCommands.push(`_.add('财产.货币.金币', ${currency.gold}); // 添加金币`);
       }
       if (currency.silver > 0) {
-        const chatSilver = await Mvu.getMvuVariable(chatMvuData, '财产.货币.银币', { default_value: 0 });
-        await Mvu.setMvuVariable(chatMvuData, '财产.货币.银币', chatSilver + currency.silver);
-
-        const messageSilver = await Mvu.getMvuVariable(messageMvuData, '财产.货币.银币', { default_value: 0 });
-        await Mvu.setMvuVariable(messageMvuData, '财产.货币.银币', messageSilver + currency.silver);
+        mvuCommands.push(`_.add('财产.货币.银币', ${currency.silver}); // 添加银币`);
       }
       if (currency.copper > 0) {
-        const chatCopper = await Mvu.getMvuVariable(chatMvuData, '财产.货币.铜币', { default_value: 0 });
-        await Mvu.setMvuVariable(chatMvuData, '财产.货币.铜币', chatCopper + currency.copper);
-
-        const messageCopper = await Mvu.getMvuVariable(messageMvuData, '财产.货币.铜币', { default_value: 0 });
-        await Mvu.setMvuVariable(messageMvuData, '财产.货币.铜币', messageCopper + currency.copper);
+        mvuCommands.push(`_.add('财产.货币.铜币', ${currency.copper}); // 添加铜币`);
       }
     } else {
-      // 普通道具添加到两个位置的背包对象中
-      console.log(`  写入道具: ${item.name}`);
+      // 普通道具添加到背包
       const itemData = {
         品质: RARITY_MAP[item.rarity] || '普通',
         数量: 1,
@@ -112,20 +86,11 @@ export async function writeCharacterToMvu(
         效果: item.effect,
         描述: item.description,
       };
-      chatBackpack[item.name] = itemData;
-      messageBackpack[item.name] = itemData;
+      mvuCommands.push(`_.insert('财产.背包', '${item.name}', ${JSON.stringify(itemData)}); // 添加道具：${item.name}`);
     }
   }
 
-  // 写回两个位置的背包对象
-  await Mvu.setMvuVariable(chatMvuData, '财产.背包', chatBackpack);
-  await Mvu.setMvuVariable(messageMvuData, '财产.背包', messageBackpack);
-
-  // 写入命定之人（只写入预设命定之人）到两个位置
-  const chatDestinedOnes = (await Mvu.getMvuVariable(chatMvuData, '命定系统.命定之人', { default_value: {} })) || {};
-  const messageDestinedOnes =
-    (await Mvu.getMvuVariable(messageMvuData, '命定系统.命定之人', { default_value: {} })) || {};
-
+  // 写入命定之人（只写入预设命定之人）
   for (const one of presetDestinedOnes) {
     // 创建命定之人数据对象
     const oneData: Record<string, any> = {
@@ -133,8 +98,8 @@ export async function writeCharacterToMvu(
       生命层级: one.lifeLevel,
       等级: one.level,
       种族: one.race,
-      身份: [...one.identity, '$__META_EXTENSIBLE__$'],
-      职业: [...one.career, '$__META_EXTENSIBLE__$'],
+      身份: [...one.identity],
+      职业: [...one.career],
       性格: one.personality,
       喜爱: one.like,
       外貌特质: one.app,
@@ -182,20 +147,26 @@ export async function writeCharacterToMvu(
       };
     }
 
-    // 将命定之人添加到两个位置的对象中
-    chatDestinedOnes[one.name] = oneData;
-    messageDestinedOnes[one.name] = oneData;
+    mvuCommands.push(
+      `_.insert('命定系统.命定之人', '${one.name}', ${JSON.stringify(oneData)}); // 添加命定之人：${one.name}`,
+    );
   }
 
-  // 写回两个位置的命定之人对象
-  await Mvu.setMvuVariable(chatMvuData, '命定系统.命定之人', chatDestinedOnes);
-  await Mvu.setMvuVariable(messageMvuData, '命定系统.命定之人', messageDestinedOnes);
+  // 使用 parseMessage 解析命令并更新聊天变量和消息楼层变量
+  const chatMvuData = Mvu.getMvuData({ type: 'chat' });
+  const messageMvuData = Mvu.getMvuData({ type: 'message', message_id: 'latest' });
+  const commandMessage = mvuCommands.join('\n');
 
-  // 保存两个位置的 MVU 数据
-  await Mvu.replaceMvuData(chatMvuData, { type: 'chat' });
-  await Mvu.replaceMvuData(messageMvuData, { type: 'message', message_id: 'latest' });
+  const updatedChatData = await Mvu.parseMessage(commandMessage, chatMvuData);
+  const updatedMessageData = await Mvu.parseMessage(commandMessage, messageMvuData);
 
-  console.log('✅ 预设数据已成功写入聊天变量和消息楼层变量');
+  if (updatedChatData && updatedMessageData) {
+    await Mvu.replaceMvuData(updatedChatData, { type: 'chat' });
+    await Mvu.replaceMvuData(updatedMessageData, { type: 'message', message_id: 'latest' });
+    console.log('✅ 预设数据已成功写入聊天变量和消息楼层变量（保持可扩展性）');
+  } else {
+    console.warn('⚠️ MVU 命令解析失败，数据未写入');
+  }
 }
 
 /**

@@ -113,9 +113,13 @@ const shouldWrapText = (text: string) => {
 const identityText = computed(() => {
   if (!props.identity) return '未知';
   if (typeof props.identity === 'string') return props.identity;
-  if (Array.isArray(props.identity)) {
-    if (props.identity.length === 0) return '未知';
-    return props.identity.join('、');
+
+  // 去除 '$__META_EXTENSIBLE__$' 字段
+  const filterIdentity = props.identity.filter(item => item !== '$__META_EXTENSIBLE__$');
+
+  if (Array.isArray(filterIdentity)) {
+    if (filterIdentity.length === 0) return '未知';
+    return filterIdentity.join('、');
   }
   return '未知';
 });
@@ -124,9 +128,13 @@ const identityText = computed(() => {
 const occupationText = computed(() => {
   if (!props.occupation) return '未知';
   if (typeof props.occupation === 'string') return props.occupation;
-  if (Array.isArray(props.occupation)) {
-    if (props.occupation.length === 0) return '未知';
-    return props.occupation.join('、');
+
+  // 去除 '$__META_EXTENSIBLE__$' 字段
+  const filterOccupation = props.occupation.filter(item => item !== '$__META_EXTENSIBLE__$');
+
+  if (Array.isArray(filterOccupation)) {
+    if (filterOccupation.length === 0) return '未知';
+    return filterOccupation.join('、');
   }
   return '未知';
 });
