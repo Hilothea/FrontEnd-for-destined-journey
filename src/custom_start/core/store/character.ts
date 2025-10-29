@@ -120,7 +120,7 @@ export const useCharacterStore = defineStore('character', () => {
   };
 
   const rollInitialPoints = () => {
-    const newPoints = generateInitialPoints();
+    const newPoints = generateInitialPoints(character.value.name);
     character.value.reincarnationPoints = newPoints;
     return newPoints;
   };

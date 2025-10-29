@@ -50,12 +50,29 @@ export const START_LOCATIONS = [
 ] as const;
 
 /**
+ * 检查是否启用开发者模式（通过姓名暗号）
+ * 暗号：名字包含特定字符序列
+ */
+const checkDevModeByName = (name: string): boolean => {
+  // 暗号：姓名中包含 "[dev]" 或 "[test]"（不区分大小写）
+  const devPatterns = ['[dev]', '[test]'];
+  const lowerName = name.toLowerCase();
+  return devPatterns.some(pattern => lowerName.includes(pattern));
+};
+
+/**
  * 生成随机初始转生点数
  * 范围: 100-1000
  * 概率分布: 降低300以上的概率
  * 使用加权随机，倾向于生成较低的点数
+ * @param characterName 可选的角色名，用于检测开发者模式
  */
-export const generateInitialPoints = (): number => {
+export const generateInitialPoints = (characterName?: string): number => {
+  // 开发者模式：如果角色名包含特定暗号，返回高点数
+  if (characterName && checkDevModeByName(characterName)) {
+    return 9999;
+  }
+
   const random = Math.random();
 
   // 70% 概率: 100-300 点
