@@ -22,6 +22,10 @@ Kitaikuyo，秋天的咸鱼，FL已躺平，yoyo514
 
 [状态栏 jsDelivr](https://testingcf.jsdelivr.net/gh/Hilothea/FrontEnd-for-destined-journey/dist/status_bar/index.html)
 
+## 添加预设数据
+
+**点击 [这里](./src/custom_start/core/data-enter/README.md) 查看文档**
+
 ## 环境
 
 - Node.js >= 22
