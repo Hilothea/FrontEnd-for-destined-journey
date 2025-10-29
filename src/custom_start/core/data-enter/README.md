@@ -6,7 +6,8 @@
 
 ```
 data-enter/
-├── README.md                  # 本说明文档
+├── README.md                  # 本说明文档（非技术人员勿动）
+├── loaer.ts                   # 加载数据用的代码文件（非技术人员勿动）
 ├── equipments.example.json    # 装备数据示例（仅供参考）
 ├── items.example.json         # 道具数据示例（仅供参考）
 ├── skills.example.json        # 技能数据示例（仅供参考）
