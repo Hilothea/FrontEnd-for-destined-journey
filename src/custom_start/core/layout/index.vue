@@ -135,8 +135,13 @@ const handleStartJourney = async () => {
 // 判断是否可以点击上一页
 const canGoPrevious = computed(() => currentStep.value > 1);
 
-// 判断是否可以点击下一页
-const canGoNext = computed(() => currentStep.value < stepTitles.value.length);
+// 判断“踏上旅程”按钮是否应被禁用
+const isNextButtonDisabled = computed(() => {
+  if (currentStep.value === stepTitles.value.length) {
+    return availablePoints.value < 0;
+  }
+  return false;
+});
 
 // 下一步按钮文字
 const nextButtonText = computed(() => {
@@ -209,7 +214,12 @@ watch(
         <span class="text">上一步</span>
       </button>
 
-      <button class="nav-button next-button" @click="handleNext">
+      <button
+        class="nav-button next-button"
+        :disabled="isNextButtonDisabled"
+        :title="isNextButtonDisabled ? '可用转生点数不能为负' : undefined"
+        @click="handleNext"
+      >
         <span class="text">{{ nextButtonText }}</span>
       </button>
     </div>
