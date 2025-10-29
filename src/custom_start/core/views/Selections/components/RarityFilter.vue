@@ -54,8 +54,6 @@ const handleSelect = (value: Rarity | 'all') => {
   gap: var(--spacing-md);
   padding: var(--spacing-sm) var(--spacing-md);
   background: var(--input-bg);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-md);
   flex-wrap: wrap;
 
   .filter-label {

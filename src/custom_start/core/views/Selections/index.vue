@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, watch, type Ref } from 'vue';
-import Equipments from '../../data/equipments';
-import { InitialItems } from '../../data/Items';
-import { ActiveSkills, PassiveSkills } from '../../data/skills';
+import { getEquipments } from '../../data/equipments';
+import { getInitialItems } from '../../data/Items';
+import { getActiveSkills, getPassiveSkills } from '../../data/skills';
 import { useCharacterStore } from '../../store/character';
 import type { Equipment, Item, Rarity, Skill } from '../../types';
 import CategoryTabs, { type CategoryType } from './components/CategoryTabs.vue';
@@ -40,9 +40,9 @@ const getCategoryDisplayName = (name: string): string => {
 const subCategories = computed(() => {
   switch (currentCategory.value) {
     case 'equipment':
-      return Object.keys(Equipments);
+      return Object.keys(getEquipments());
     case 'item':
-      return Object.keys(InitialItems);
+      return Object.keys(getInitialItems());
     case 'skill':
       return ['主动技能', '被动技能'];
     default:
@@ -55,9 +55,9 @@ const skillSubCategories = computed(() => {
   if (currentCategory.value !== 'skill') return [];
 
   if (currentSubCategory.value === '主动技能') {
-    return Object.keys(ActiveSkills);
+    return Object.keys(getActiveSkills());
   } else if (currentSubCategory.value === '被动技能') {
-    return Object.keys(PassiveSkills);
+    return Object.keys(getPassiveSkills());
   }
   return [];
 });
@@ -89,25 +89,25 @@ const currentItems = computed<(Equipment | Item | Skill)[]>(() => {
 
   switch (currentCategory.value) {
     case 'equipment':
-      items = (Equipments[currentSubCategory.value] || []) as Equipment[];
+      items = (getEquipments()[currentSubCategory.value] || []) as Equipment[];
       break;
     case 'item':
-      items = (InitialItems[currentSubCategory.value] || []) as Item[];
+      items = (getInitialItems()[currentSubCategory.value] || []) as Item[];
       break;
     case 'skill':
       // 如果选择了技能子分类，显示该子分类的技能
       if (currentSkillSubCategory.value) {
         if (currentSubCategory.value === '主动技能') {
-          items = (ActiveSkills[currentSkillSubCategory.value] || []) as Skill[];
+          items = (getActiveSkills()[currentSkillSubCategory.value] || []) as Skill[];
         } else if (currentSubCategory.value === '被动技能') {
-          items = (PassiveSkills[currentSkillSubCategory.value] || []) as Skill[];
+          items = (getPassiveSkills()[currentSkillSubCategory.value] || []) as Skill[];
         }
       } else if (currentSubCategory.value === '主动技能') {
         // 否则显示所有主动技能
-        items = Object.values(ActiveSkills).flat() as Skill[];
+        items = Object.values(getActiveSkills()).flat() as Skill[];
       } else if (currentSubCategory.value === '被动技能') {
         // 否则显示所有被动技能
-        items = Object.values(PassiveSkills).flat() as Skill[];
+        items = Object.values(getPassiveSkills()).flat() as Skill[];
       }
       break;
   }
@@ -481,9 +481,27 @@ const handleAddCustomItem = (item: Equipment | Item | Skill, type: 'equipment' |
 // 右侧物品内容区
 .items-content {
   background: var(--card-bg);
-  padding: var(--spacing-md);
   overflow-y: auto;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  // 品质筛选栏固定在顶部
+  :deep(.rarity-filter) {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--card-bg);
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm) var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  // 物品列表区域
+  :deep(.item-list) {
+    flex: 1;
+  }
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -530,10 +548,6 @@ const handleAddCustomItem = (item: Equipment | Item | Skill, type: 'equipment' |
       min-height: 28px;
       line-height: 1.3;
     }
-  }
-
-  .items-content {
-    padding: var(--spacing-sm);
   }
 
   .summary-area {

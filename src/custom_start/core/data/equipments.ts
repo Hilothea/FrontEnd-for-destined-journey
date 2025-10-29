@@ -1,3 +1,4 @@
+import { loadCustomEquipments, mergeData } from '../data-enter/loader';
 import type { Equipment } from '../types';
 import { NewTalismans } from './talismans';
 
@@ -1522,9 +1523,28 @@ const Equipments: EquipmentData = {
   ],
 };
 
-/**
- * 新增法环护符拓展
- */
-Equipments.法环护符拓展 = NewTalismans;
+// 加载并合并自定义装备数据
+let mergedEquipmentsData: EquipmentData | null = null;
 
-export default Equipments;
+/**
+ * 初始化装备数据（加载自定义数据并合并）
+ */
+async function initializeEquipments() {
+  const customData = await loadCustomEquipments();
+  const merged = mergeData(Equipments, customData) as EquipmentData;
+
+  // 更新法环护符拓展引用
+  merged.法环护符拓展 = NewTalismans;
+
+  mergedEquipmentsData = merged;
+}
+
+/**
+ * 获取合并后的装备数据
+ */
+export function getEquipments(): EquipmentData {
+  return mergedEquipmentsData || Equipments;
+}
+
+// 自动初始化
+initializeEquipments();
