@@ -70,8 +70,8 @@ const rarityColorMap: Record<string, string> = {
     <div class="confirm-panel">
       <!-- 标题 -->
       <div class="panel-header">
-        <h2 class="panel-title">角色信息确认</h2>
-        <p class="panel-subtitle">请仔细确认您的角色信息</p>
+        <h2 class="panel-title">信息确认</h2>
+        <p class="panel-subtitle">非自定义数据（除了装备）会直接写入 MVU 变量中，不会发送给 AI</p>
       </div>
 
       <!-- 文档内容 -->
