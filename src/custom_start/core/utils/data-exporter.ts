@@ -1,17 +1,5 @@
+import { RARITY_MAP } from '../data/constants';
 import type { Background, CharacterConfig, DestinedOne, Equipment, Item, Skill } from '../types';
-
-/**
- * 品质映射
- */
-const RARITY_MAP: Record<string, string> = {
-  common: '普通',
-  uncommon: '优秀',
-  rare: '稀有',
-  epic: '史诗',
-  legendary: '传说',
-  mythic: '神话',
-  only: '唯一',
-};
 
 /**
  * 解析货币描述，提取金币、银币、铜币数量
