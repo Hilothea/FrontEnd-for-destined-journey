@@ -51,9 +51,9 @@ const shouldWrapSummary = computed(() => {
 
   const textLength = props.summaryDetails.length;
 
-  // 移动端（<= 600px）：超过20个字符就换行
+  // 移动端（<= 600px）：超过10个字符就换行
   if (windowWidth.value <= 600) {
-    return textLength > 20;
+    return textLength > 10;
   }
 
   // 平板端（600px < width <= 1000px）：超过30个字符就换行
