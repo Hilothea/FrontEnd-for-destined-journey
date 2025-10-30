@@ -7,6 +7,7 @@ interface Props {
   max?: number;
   step?: number;
   disabled?: boolean;
+  disableIncrement?: boolean;
   label?: string;
 }
 
@@ -21,12 +22,13 @@ const props = withDefaults(defineProps<Props>(), {
   max: 100,
   step: 1,
   disabled: false,
+  disableIncrement: false,
 });
 
 const emit = defineEmits<Emits>();
 
 const canDecrement = computed(() => !props.disabled && props.modelValue > props.min);
-const canIncrement = computed(() => !props.disabled && props.modelValue < props.max);
+const canIncrement = computed(() => !props.disabled && !props.disableIncrement && props.modelValue < props.max);
 
 const increment = () => {
   if (canIncrement.value) {

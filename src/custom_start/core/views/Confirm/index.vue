@@ -1,21 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { BASE_STAT } from '../../data/base-info';
 import { useCharacterStore } from '../../store/character';
 
 const characterStore = useCharacterStore();
-
-// 计算最终属性值
-const finalAttributes = computed(() => {
-  const { attributes, attributePoints } = characterStore.character;
-  return {
-    力量: attributes.力量 + attributePoints.力量,
-    敏捷: attributes.敏捷 + attributePoints.敏捷,
-    体质: attributes.体质 + attributePoints.体质,
-    智力: attributes.智力 + attributePoints.智力,
-    精神: attributes.精神 + attributePoints.精神,
-  };
-});
 
 // 计算总消耗点数
 const totalConsumed = computed(() => characterStore.consumedPoints);
@@ -118,14 +105,10 @@ const rarityColorMap: Record<string, string> = {
         <section class="doc-section">
           <h3 class="section-title">⚔️ 角色属性</h3>
           <div class="doc-text attributes">
-            <p v-for="(value, attr) in finalAttributes" :key="attr">
+            <p v-for="(value, attr) in characterStore.finalAttributes" :key="attr">
               <strong>{{ attr }}：</strong>
               <span class="attr-detail">
-                {{ BASE_STAT }}
-                <span v-if="characterStore.character.attributePoints[attr] > 0" class="attr-add">
-                  +{{ characterStore.character.attributePoints[attr] }}
-                </span>
-                = <span class="attr-final">{{ value }}</span>
+                {{ value }}
               </span>
             </p>
           </div>
@@ -397,17 +380,9 @@ const rarityColorMap: Record<string, string> = {
 
     .attr-detail {
       font-family: var(--font-mono);
-
-      .attr-add {
-        color: var(--success-color);
-        font-weight: 600;
-      }
-
-      .attr-final {
-        color: var(--accent-color);
-        font-weight: 700;
-        font-size: 1.1em;
-      }
+      color: var(--accent-color);
+      font-weight: 700;
+      font-size: 1.1em;
     }
   }
 }

@@ -103,36 +103,33 @@ export const MIN_LEVEL = 1;
 export const BASE_STAT = 4;
 
 /**
- * 根据等级计算可用的AP点数
- * @param level 角色等级 (1-10)
- * @returns 总AP点数
+ * 根据等级计算可用的【额外】AP点数
+ * @param level 角色等级
+ * @returns 可自由分配的AP点数
  */
 export const calculateAPByLevel = (level: number): number => {
-  // 基础属性点
   const baseAP = 5;
 
-  // 层级属性点计算
-  let tierAP = 0;
-  if (level >= 1 && level <= 4) {
-    tierAP = 0;
-  } else if (level >= 5 && level <= 8) {
-    tierAP = 1;
-  } else if (level >= 9 && level <= 12) {
-    tierAP = 2;
-  } else if (level >= 13 && level <= 16) {
-    tierAP = 3;
-  } else if (level >= 17 && level <= 20) {
-    tierAP = 4;
-  } else if (level >= 21 && level <= 24) {
-    tierAP = 5;
-  } else if (level >= 25) {
-    tierAP = 6;
-  }
-
   // 额外属性点 = 等级 - 1
-  const extraAP = level - 1;
+  const extraAP = Math.max(0, level - 1);
 
-  return baseAP + tierAP + extraAP;
+  return baseAP + extraAP;
+};
+
+/**
+ * 获取等级对应的层级属性点
+ * @param level 角色等级
+ * @returns 每个属性获得的层级加成
+ */
+export const getTierAttributeBonus = (level: number): number => {
+  if (level >= 1 && level <= 4) return 0;
+  if (level >= 5 && level <= 8) return 1;
+  if (level >= 9 && level <= 12) return 2;
+  if (level >= 13 && level <= 16) return 3;
+  if (level >= 17 && level <= 20) return 4;
+  if (level >= 21 && level <= 24) return 5;
+  if (level >= 25) return 6;
+  return 0;
 };
 
 /**

@@ -4,9 +4,10 @@ import { computed } from 'vue';
 import { FormInput, FormLabel, FormNumber, FormSelect, FormStepper, FormTextarea } from '../../components/Form';
 import {
   ATTRIBUTES,
-  calculateAPByLevel,
+  BASE_STAT,
   GENDERS,
   getLevelTierName,
+  getTierAttributeBonus,
   IDENTITY_COSTS,
   MAX_LEVEL,
   MIN_LEVEL,
@@ -27,47 +28,20 @@ const resetPageTrigger = inject<Ref<number>>('resetPageTrigger');
 const raceOptions = computed(() => Object.keys(RACE_COSTS));
 const identityOptions = computed(() => Object.keys(IDENTITY_COSTS));
 
-// 计算已分配的AP点数
-const usedAP = computed(() => {
-  return Object.values(character.value.attributePoints).reduce((sum, points) => sum + points, 0);
-});
-
-// 根据等级计算的最大可用AP点数
-const maxAP = computed(() => calculateAPByLevel(character.value.level));
-
-// 计算剩余可分配的AP点数（受等级限制）
-const remainingAP = computed(() => maxAP.value - usedAP.value);
+// 计算当前等级的层级属性加成
+const tierAttributeBonus = computed(() => getTierAttributeBonus(character.value.level));
 
 // 计算剩余可用转生点数
 const availableReincarnationPoints = computed(() => {
   return character.value.reincarnationPoints - characterStore.consumedPoints;
 });
 
-// 计算当前等级的AP点数详细信息
-const apInfo = computed(() => {
+// 计算当前等级对应的层级
+const levelTierName = computed(() => {
   const level = character.value.level;
-  const totalAP = calculateAPByLevel(level);
   const tierName = getLevelTierName(level);
 
-  // 计算各部分AP
-  const baseAP = 5;
-  let tierAP = 0;
-  if (level >= 5 && level <= 8) tierAP = 1;
-  else if (level >= 9 && level <= 12) tierAP = 2;
-  else if (level >= 13 && level <= 16) tierAP = 3;
-  else if (level >= 17 && level <= 20) tierAP = 4;
-  else if (level >= 21 && level <= 24) tierAP = 5;
-  else if (level >= 25) tierAP = 6;
-
-  const extraAP = level - 1;
-
-  return {
-    total: totalAP,
-    tierName,
-    baseAP,
-    tierAP,
-    extraAP,
-  };
+  return tierName;
 });
 
 // 监听随机生成事件
@@ -166,7 +140,7 @@ const resetPage = () => {
           <FormLabel label="等级" required />
           <div class="level-input-group">
             <FormNumber v-model="character.level" :min="MIN_LEVEL" :max="MAX_LEVEL" />
-            <span class="level-indicator">{{ apInfo.tierName }}</span>
+            <span class="level-indicator">{{ levelTierName }}</span>
           </div>
         </div>
       </div>
@@ -240,30 +214,40 @@ const resetPage = () => {
           <div class="ap-info">
             <span
               >剩余AP:
-              <strong :class="{ error: remainingAP < 0, success: remainingAP === 0 }">{{ remainingAP }}</strong> /
-              {{ maxAP }}</span
+              <strong :class="{ error: characterStore.remainingAP < 0, success: characterStore.remainingAP === 0 }">{{
+                characterStore.remainingAP
+              }}</strong>
+              / {{ characterStore.maxAP }}</span
             >
           </div>
         </div>
 
         <div class="panel-content">
           <div class="attributes-grid">
-            <FormStepper
-              v-for="attr in ATTRIBUTES"
-              :key="attr"
-              :model-value="character.attributePoints[attr]"
-              :label="attr"
-              :min="0"
-              :max="maxAP"
-              :disabled="remainingAP <= 0 && character.attributePoints[attr] === 0"
-              @increment="addAttributePoint(attr)"
-              @decrement="removeAttributePoint(attr)"
-            />
+            <div v-for="attr in ATTRIBUTES" :key="attr" class="attribute-item">
+              <FormStepper
+                :model-value="character.attributePoints[attr]"
+                :label="attr"
+                :min="0"
+                :max="characterStore.maxAP"
+                :disable-increment="characterStore.remainingAP <= 0"
+                @increment="addAttributePoint(attr)"
+                @decrement="removeAttributePoint(attr)"
+              />
+              <div class="attribute-display">
+                {{ BASE_STAT }} <span class="dim">(基础)</span> + {{ tierAttributeBonus }}
+                <span class="dim">(层级)</span> + {{ character.attributePoints[attr] }}
+                <span class="dim">(额外)</span> =
+                <strong class="final-value">{{ characterStore.finalAttributes[attr] }}</strong>
+              </div>
+            </div>
           </div>
 
           <div v-if="availableReincarnationPoints < 0" class="status-message error">⚠️ 转生点数不足！</div>
-          <div v-else-if="remainingAP === 0" class="status-message success">✓ 属性点已全部分配</div>
-          <div v-else-if="remainingAP > 0" class="status-message info">还有 {{ remainingAP }} 点未分配</div>
+          <div v-else-if="characterStore.remainingAP === 0" class="status-message success">✓ 属性点已全部分配</div>
+          <div v-else-if="characterStore.remainingAP > 0" class="status-message info">
+            还有 {{ characterStore.remainingAP }} 点未分配
+          </div>
         </div>
       </div>
     </div>
@@ -378,6 +362,31 @@ const resetPage = () => {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--spacing-lg);
     margin-bottom: var(--spacing-lg);
+  }
+
+  .attribute-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .attribute-display {
+    font-size: 0.8rem;
+    color: var(--text-color-secondary);
+    text-align: center;
+    padding: var(--spacing-xs) 0;
+    background: var(--primary-bg);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+
+    .dim {
+      opacity: 0.7;
+    }
+
+    .final-value {
+      color: var(--accent-color);
+      font-weight: bold;
+    }
   }
 
   .status-message {

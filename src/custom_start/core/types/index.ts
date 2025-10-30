@@ -102,7 +102,6 @@ export interface CharacterConfig {
   startLocation: string;
   customStartLocation: string;
   level: number;
-  attributes: Attributes;
   attributePoints: Record<keyof Attributes, number>;
   reincarnationPoints: number; // 转生点数
   destinyPoints: number; // 命运点数

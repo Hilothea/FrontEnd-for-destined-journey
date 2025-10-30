@@ -1,3 +1,4 @@
+import { BASE_STAT, getTierAttributeBonus } from '../data/base-info';
 import { RARITY_MAP } from '../data/constants';
 import type { Background, CharacterConfig, DestinedOne, Equipment, Item, Skill } from '../types';
 
@@ -182,7 +183,7 @@ export function generateAIPrompt(
 ): string {
   const parts: string[] = [];
 
-  parts.push('# 角色创建信息\n');
+  parts.push('# 角色信息\n');
 
   // 基本信息
   const displayGender = character.gender === '自定义' ? character.customGender : character.gender;
@@ -201,12 +202,13 @@ export function generateAIPrompt(
   parts.push(`- 等级：Lv.${character.level}`);
 
   // 角色属性
+  const tierBonus = getTierAttributeBonus(character.level);
   const finalAttrs = {
-    力量: character.attributes.力量 + character.attributePoints.力量,
-    敏捷: character.attributes.敏捷 + character.attributePoints.敏捷,
-    体质: character.attributes.体质 + character.attributePoints.体质,
-    智力: character.attributes.智力 + character.attributePoints.智力,
-    精神: character.attributes.精神 + character.attributePoints.精神,
+    力量: BASE_STAT + tierBonus + character.attributePoints.力量,
+    敏捷: BASE_STAT + tierBonus + character.attributePoints.敏捷,
+    体质: BASE_STAT + tierBonus + character.attributePoints.体质,
+    智力: BASE_STAT + tierBonus + character.attributePoints.智力,
+    精神: BASE_STAT + tierBonus + character.attributePoints.精神,
   };
 
   parts.push(`\n## 角色属性`);

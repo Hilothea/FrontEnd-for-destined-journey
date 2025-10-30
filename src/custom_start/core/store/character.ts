@@ -1,8 +1,11 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import {
+  ATTRIBUTES,
   BASE_STAT,
+  calculateAPByLevel,
   generateInitialPoints,
+  getTierAttributeBonus,
   IDENTITY_COSTS,
   INITIAL_REINCARNATION_POINTS,
   RACE_COSTS,
@@ -11,7 +14,7 @@ import type { Attributes, Background, CharacterConfig, DestinedOne, Equipment, I
 
 export const useCharacterStore = defineStore('character', () => {
   // State
-  const character = ref<CharacterConfig>({
+  const character = ref<Omit<CharacterConfig, 'attributes'>>({
     name: '',
     gender: '男',
     customGender: '',
@@ -23,13 +26,6 @@ export const useCharacterStore = defineStore('character', () => {
     startLocation: '大陆东南部区域-索伦蒂斯王国',
     customStartLocation: '',
     level: 1,
-    attributes: {
-      力量: BASE_STAT,
-      敏捷: BASE_STAT,
-      体质: BASE_STAT,
-      智力: BASE_STAT,
-      精神: BASE_STAT,
-    },
     attributePoints: {
       力量: 0,
       敏捷: 0,
@@ -70,7 +66,7 @@ export const useCharacterStore = defineStore('character', () => {
     total += identityCost;
 
     // 属性加点消耗 (每点1个转生点)
-    const attributeAddPoints = Object.values(character.value.attributePoints).reduce((sum, points) => sum + points, 0);
+    const attributeAddPoints = usedAP.value;
     total += attributeAddPoints;
 
     // 装备消耗
@@ -106,9 +102,7 @@ export const useCharacterStore = defineStore('character', () => {
   };
 
   const addAttributePoint = (attr: keyof Attributes) => {
-    // 计算当前可用点数
-    const available = character.value.reincarnationPoints - consumedPoints.value;
-    if (available > 0) {
+    if (remainingAP.value > 0) {
       character.value.attributePoints[attr]++;
     }
   };
@@ -138,13 +132,6 @@ export const useCharacterStore = defineStore('character', () => {
       startLocation: '大陆东南部区域-索伦蒂斯王国',
       customStartLocation: '',
       level: 1,
-      attributes: {
-        力量: BASE_STAT,
-        敏捷: BASE_STAT,
-        体质: BASE_STAT,
-        智力: BASE_STAT,
-        精神: BASE_STAT,
-      },
       attributePoints: {
         力量: 0,
         敏捷: 0,
@@ -231,6 +218,23 @@ export const useCharacterStore = defineStore('character', () => {
     exchangedReincarnationPoints.value = 0;
   };
 
+  // 属性点相关计算
+  const usedAP = computed(() =>
+    Object.values(character.value.attributePoints).reduce((sum, points) => sum + points, 0),
+  );
+  const maxAP = computed(() => calculateAPByLevel(character.value.level));
+  const remainingAP = computed(() => maxAP.value - usedAP.value);
+
+  // 最终属性计算
+  const finalAttributes = computed(() => {
+    const tierBonus = getTierAttributeBonus(character.value.level);
+    const result: Partial<Attributes> = {};
+    for (const attr of ATTRIBUTES) {
+      result[attr] = BASE_STAT + tierBonus + character.value.attributePoints[attr];
+    }
+    return result as Attributes;
+  });
+
   return {
     character,
     consumedPoints,
@@ -240,6 +244,12 @@ export const useCharacterStore = defineStore('character', () => {
     selectedSkills,
     selectedDestinedOnes,
     selectedBackground,
+
+    usedAP,
+    maxAP,
+    remainingAP,
+    finalAttributes,
+
     updateCharacterField,
     updateAttribute,
     addAttributePoint,
