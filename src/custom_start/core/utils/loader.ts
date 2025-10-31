@@ -1,12 +1,18 @@
 import type { Equipment, Item, Skill } from '../types';
 
 /**
+ * 数据基础路径 - CDN 部署环境
+ */
+const DATA_BASE_PATH =
+  'https://testingcf.jsdelivr.net/gh/The-poem-of-destiny/FrontEnd-for-destined-journey@latest/public/assets/data';
+
+/**
  * 加载自定义装备数据
- * 从 data-enter 目录加载用户自定义的装备数据
+ * 从 public/assets/data 目录加载用户自定义的装备数据
  */
 export async function loadCustomEquipments(): Promise<Record<string, Equipment[]>> {
   try {
-    const response = await fetch('/src/custom_start/core/data-enter/equipments.json');
+    const response = await fetch(`${DATA_BASE_PATH}/equipments.json`);
     if (!response.ok) {
       console.log('📝 未找到自定义装备数据文件 (equipments.json)');
       return {};
@@ -22,11 +28,11 @@ export async function loadCustomEquipments(): Promise<Record<string, Equipment[]
 
 /**
  * 加载自定义道具数据
- * 从 data-enter 目录加载用户自定义的道具数据
+ * 从 public/assets/data 目录加载用户自定义的道具数据
  */
 export async function loadCustomItems(): Promise<Record<string, Item[]>> {
   try {
-    const response = await fetch('/src/custom_start/core/data-enter/items.json');
+    const response = await fetch(`${DATA_BASE_PATH}/items.json`);
     if (!response.ok) {
       console.log('📝 未找到自定义道具数据文件 (items.json)');
       return {};
@@ -42,14 +48,14 @@ export async function loadCustomItems(): Promise<Record<string, Item[]>> {
 
 /**
  * 加载自定义技能数据
- * 从 data-enter 目录加载用户自定义的技能数据
+ * 从 public/assets/data 目录加载用户自定义的技能数据
  */
 export async function loadCustomSkills(): Promise<{
   ActiveSkills?: Record<string, Skill[]>;
   PassiveSkills?: Record<string, Skill[]>;
 }> {
   try {
-    const response = await fetch('/src/custom_start/core/data-enter/skills.json');
+    const response = await fetch(`${DATA_BASE_PATH}/skills.json`);
     if (!response.ok) {
       console.log('📝 未找到自定义技能数据文件 (skills.json)');
       return {};

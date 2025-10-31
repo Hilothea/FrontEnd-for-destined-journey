@@ -5,9 +5,8 @@
 ## 📁 文件结构
 
 ```
-data-enter/
-├── README.md                  # 本说明文档（非技术人员勿动）
-├── loader.ts                  # 加载数据用的代码文件（非技术人员勿动）
+public/assets/data/
+├── README.md                  # 本说明文档
 ├── equipments.example.json    # 装备数据示例（仅供参考）
 ├── items.example.json         # 道具数据示例（仅供参考）
 ├── skills.example.json        # 技能数据示例（仅供参考）
@@ -27,8 +26,14 @@ data-enter/
    - 打开对应的 `.json` 文件（不是 `.example.json`）
    - 按照格式添加或修改数据
 
-3. **保存生效**：
-   - 保存文件后，系统会自动加载新数据
+3. **提交到仓库**：
+   - 本地修改后需要提交到 GitHub 仓库
+   - CDN 会自动同步最新的数据文件
+   - 本地开发时可以直接看到效果
+
+4. **验证数据**：
+   - 本地测试：在 `localhost` 或 `127.0.0.1` 环境下运行
+   - CDN 验证：通过 jsdelivr CDN 访问确认数据已更新
 
 ## ⚠️ 重要提示
 

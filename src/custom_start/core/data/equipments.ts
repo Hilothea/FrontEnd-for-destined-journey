@@ -1,6 +1,5 @@
-import { loadCustomEquipments, mergeData } from '../data-enter/loader';
 import type { Equipment } from '../types';
-import { NewTalismans } from './talismans';
+import { loadCustomEquipments, mergeData } from '../utils/loader';
 
 interface EquipmentData {
   [key: string]: Equipment[];
@@ -1532,9 +1531,6 @@ let mergedEquipmentsData: EquipmentData | null = null;
 async function initializeEquipments() {
   const customData = await loadCustomEquipments();
   const merged = mergeData(Equipments, customData) as EquipmentData;
-
-  // 更新法环护符拓展引用
-  merged.法环护符拓展 = NewTalismans;
 
   mergedEquipmentsData = merged;
 }

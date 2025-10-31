@@ -1,5 +1,5 @@
-import { loadCustomItems, mergeData } from '../data-enter/loader';
 import type { Currency, Item } from '../types';
+import { loadCustomItems, mergeData } from '../utils/loader';
 
 interface ItemData {
   Money: Currency[];

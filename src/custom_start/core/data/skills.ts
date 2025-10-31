@@ -1,5 +1,5 @@
-import { loadCustomSkills, mergeSkillData } from '../data-enter/loader';
 import { Skill } from '../types';
+import { loadCustomSkills, mergeSkillData } from '../utils/loader';
 
 /**
  * 初始技能

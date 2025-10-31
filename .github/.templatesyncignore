@@ -1,4 +1,7 @@
 .github/workflows
+.github/*
+.gitignore
+.vscode/settings.json
 @types
 dist
 README.md
