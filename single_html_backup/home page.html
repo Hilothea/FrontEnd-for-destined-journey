@@ -1,11 +1,108 @@
+```HTML
+
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-6">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>命定之诗与黄昏之歌</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@400;500;700&display=swap');
+
+        .recheck-container {
+            text-align: center;
+            margin: 25px 0 10px 0;
+        }
+
+        .recheck-button {
+            font-family: var(--body-font);
+            font-weight: 500;
+            font-size: 1em;
+            color: var(--title-color);
+            background-color: var(--item-bg-color);
+            border: 1px solid var(--border-color);
+            padding: 8px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .recheck-button:hover {
+            background-color: var(--item-bg-hover-color);
+            border-color: var(--border-strong-color);
+        }
+        .env-check-container {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: rgba(253, 250, 245, 0.9);
+            padding: 10px 20px;
+            margin: 25px 0;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .env-check-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .env-check-item:not(:last-child) {
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .env-check-label {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            color: var(--title-color);
+        }
+
+        .env-check-label .icon {
+            font-size: 1.4em;
+            margin-right: 12px;
+            opacity: 0.8;
+            line-height: 1;
+        }
+
+        .env-check-details {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+            gap: 15px;
+            text-align: right;
+        }
+
+        .env-check-details strong {
+            font-weight: 700;
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            min-width: 55px;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+
+        .status-ok {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .status-warn {
+            background-color: #fff3cd;
+            color: #856404;
+            border-color: #ffeeba;
+        }
+
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
 
         :root {
             --bg-color: #f5efe6;
@@ -47,7 +144,7 @@
             width: 100%;
             margin: auto;
         }
-        
+
         /* --- New Main Page Title --- */
         .page-super-title {
             font-family: var(--title-font);
@@ -67,6 +164,7 @@
             margin: 25px auto 30px auto;
             width: 85%;
         }
+
         .ornamental-divider::after {
             content: '❖';
             position: absolute;
@@ -89,7 +187,7 @@
             background-color: var(--item-bg-color);
         }
 
-        .info-panel > summary {
+        .info-panel>summary {
             font-family: var(--title-font);
             font-weight: 700;
             font-size: 1.1em;
@@ -103,21 +201,30 @@
             align-items: center;
             transition: background-color 0.2s;
         }
-        .info-panel > summary::-webkit-details-marker { display: none; }
-        .info-panel > summary:hover { background-color: #c9bba9; }
+
+        .info-panel>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .info-panel>summary:hover {
+            background-color: #c9bba9;
+        }
 
         .arrow-toggle {
             font-size: 0.8em;
             transition: transform 0.3s ease-out;
             display: inline-block;
         }
-        .info-panel[open] > summary .arrow-toggle { transform: rotate(90deg); }
+
+        .info-panel[open]>summary .arrow-toggle {
+            transform: rotate(90deg);
+        }
 
         .info-content {
             padding: 15px 25px 25px 25px;
             line-height: 1.7;
         }
-        
+
         .info-content h3 {
             font-family: var(--title-font);
             color: var(--title-color);
@@ -126,24 +233,46 @@
             margin: 25px 0 15px 0;
             font-size: 1.4em;
         }
-        .info-content h3:first-child { margin-top: 5px; }
 
-        .info-content p, .info-content ul { margin: 0 0 1em 0; }
-        .info-content ul { list-style: none; padding-left: 5px; }
-        .info-content li { padding-left: 20px; position: relative; }
+        .info-content h3:first-child {
+            margin-top: 5px;
+        }
+
+        .info-content p,
+        .info-content ul {
+            margin: 0 0 1em 0;
+        }
+
+        .info-content ul {
+            list-style: none;
+            padding-left: 5px;
+        }
+
+        .info-content li {
+            padding-left: 20px;
+            position: relative;
+        }
+
         .info-content li::before {
             content: '»';
-            position: absolute; left: 0; top: 0;
+            position: absolute;
+            left: 0;
+            top: 0;
             color: var(--border-strong-color);
             font-weight: bold;
         }
+
         .info-content a {
             color: var(--link-color);
             text-decoration: none;
             font-weight: 500;
             word-break: break-all;
         }
-        .info-content a:hover { text-decoration: underline; color: var(--title-color); }
+
+        .info-content a:hover {
+            text-decoration: underline;
+            color: var(--title-color);
+        }
 
         .prerequisites {
             background-color: var(--pre-bg-color);
@@ -152,6 +281,7 @@
             border-radius: 4px;
             margin-top: 10px;
         }
+
         .prerequisites h4 {
             font-family: var(--body-font);
             font-weight: 700;
@@ -159,8 +289,11 @@
             margin: 0 0 10px 0;
             font-size: 1.1em;
         }
-        .prerequisites ul { margin-bottom: 0; }
-        
+
+        .prerequisites ul {
+            margin-bottom: 0;
+        }
+
         /* --- Section Title --- */
         .main-title {
             font-family: var(--title-font);
@@ -186,7 +319,7 @@
             margin: 0;
             list-style: none;
         }
-        
+
         .scenario-option {
             font: inherit;
             color: inherit;
@@ -204,9 +337,12 @@
 
         .scenario-option::before {
             content: '📜';
-            position: absolute; left: 15px; top: 50%;
+            position: absolute;
+            left: 15px;
+            top: 50%;
             transform: translateY(-50%);
-            font-size: 1.1em; opacity: 0.7;
+            font-size: 1.1em;
+            opacity: 0.7;
             transition: all 0.2s ease-in-out;
         }
 
@@ -215,7 +351,7 @@
             border-color: var(--border-strong-color);
             transform: translateX(5px);
         }
-        
+
         .scenario-option:hover::before {
             opacity: 1;
             transform: translateY(-50%) rotate(-5deg);
@@ -226,118 +362,234 @@
             border-color: var(--title-color);
             color: var(--title-color);
             font-weight: 500;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        
+
         .scenario-option.selected::after {
             content: '✓';
-            position: absolute; right: 15px; top: 50%;
+            position: absolute;
+            right: 15px;
+            top: 50%;
             transform: translateY(-50%);
-            font-weight: bold; color: var(--title-color);
+            font-weight: bold;
+            color: var(--title-color);
         }
-        
+
         @media screen and (max-width: 600px) {
-            body { padding: 10px; }
-            .selector-scroll { padding: 15px; }
-            .page-super-title { font-size: 2em; }
-            .main-title { font-size: 1.8em; }
-            .scenario-option { padding: 10px 15px 10px 35px; font-size: 1em; }
-            .info-panel > summary { padding: 10px 15px; }
-            .info-content { padding: 15px; }
+            body {
+                padding: 10px;
+            }
+
+            .selector-scroll {
+                padding: 15px;
+            }
+
+            .page-super-title {
+                font-size: 2em;
+            }
+
+            .main-title {
+                font-size: 1.8em;
+            }
+
+            .scenario-option {
+                padding: 10px 15px 10px 35px;
+                font-size: 1em;
+            }
+
+            .info-panel>summary {
+                padding: 10px 15px;
+            }
+
+            .info-content {
+                padding: 15px;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<div class="selector-scroll">
-    
-    <h1 class="page-super-title">命定之诗与黄昏之歌</h1>
-    <hr class="ornamental-divider">
+    <div class="selector-scroll">
 
-    <!-- Collapsible Information Panel -->
-    <details class="info-panel">
-        <summary>
-            <span>作者与世界背景</span>
-            <span class="arrow-toggle">▶</span>
-        </summary>
-        <div class="info-content">
-            <p><strong>作者列表：</strong>@FL已放弃治疗、@十七、@Hilo、@秋天的咸鱼、@tongtny123、@快乐柠萌茶、@willing、@Kitaikuyo</p>
-            <p>获取最新更新：</p>
-            <ul>
-                <li><a href="https://discord.com/channels/1134557553011998840/1385833523226869782" target="_blank" rel="noopener noreferrer">Discord 更新频道 1</a></li>
-                <li><a href="https://discord.com/channels/1291925535324110879/1385834247469928540" target="_blank" rel="noopener noreferrer">Discord 更新频道 2</a></li>
-            </ul>
-
-            <div class="prerequisites">
-                <h4>❗ 重要：前置需求</h4>
+        <h1 class="page-super-title">命定之诗与黄昏之歌</h1>
+        <hr class="ornamental-divider">
+        <details class="info-panel">
+            <summary>
+                <span>相关信息</span>
+                <span class="arrow-toggle">▶</span>
+            </summary>
+            <div class="info-content">
+                <p><strong>作者列表：</strong>@FL已放弃治疗、@十七、@Hilo、@秋天的咸鱼、@tongtny123、@快乐柠萌茶、@willing、@Kitaikuyo</p>
+                <p>获取最新更新：</p>
                 <ul>
-                    <li>需要安装提示词模板：<a href="https://github.com/zonde306/ST-Prompt-Template/" target="_blank" rel="noopener noreferrer">ST-Prompt-Template</a></li>
-                    <li>需要安装酒馆助手：<a href="https://github.com/N0VI028/JS-Slash-Runner" target="_blank" rel="noopener noreferrer">JS-Slash-Runner</a></li>
+                    <li><a href="https://discord.com/channels/1134557553011998840/1385833523226869782" target="_blank"
+                            rel="noopener noreferrer">Discord 更新频道 1</a></li>
+                    <li><a href="https://discord.com/channels/1291925535324110879/1385834247469928540" target="_blank"
+                            rel="noopener noreferrer">Discord 更新频道 2</a></li>
                 </ul>
+        </details>
+        <details class="info-panel">
+            <summary>
+                <span>世界背景</span>
+                <span class="arrow-toggle">▶</span>
+            </summary>
+            <div class="info-content">
+                <h3>阿斯塔利亚世界</h3>
+                <p>小时候的你读过那样的故事吗？在剑与魔法的异世界中,幻想中的故事。一句澄澈而坚定的誓言,一段英雄的骑行,一页由凡人书写的史诗。</p>
+                <p>“家园已在身后,世界尽在眼前。” ‌</p>
+                <p>“长夜将至,我从今开始守望,至死方休。我将不娶妻、不封地、不生子。我将不戴宝冠,不争荣宠。我将尽忠职守,生死于斯。我是黑暗中的利剑,长城上的守卫,抵御寒冷的烈焰,破晓时分的光线,唤醒眠者的号角,守护王国的坚盾。我将生命与荣耀献给守夜人,今夜如此,夜夜皆然。”
+                    ‌</p>
+                <p>“荣耀即吾命！”</p>
+                <p>“愿黑松长青,愿号角长鸣,愿理想闪耀如初,愿长剑锋利如故。”</p>
+                <p>这里是阿斯塔利亚。“剑与魔法”、“诗与远方”、“历史与传说”、“生者与死者”、“英雄与史诗”、“神灵与命运”的世界。</p>
+                <p>请拿起你梦中与儿时最浪漫的笔,亲自书写属于你自己的冒险故事吧。</p>
+
+        </details>
+        <h2 class="main-title">环境检查</h2>
+        <div class="env-check-container">
+            <div class="env-check-item">
+                <div class="env-check-label">
+                    <span class="icon">⚙️</span>
+                    <span>酒馆助手</span>
+                </div>
+                <div class="env-check-details">
+                    <span>版本: <strong id="TavernHelper-Version">加载中...</strong></span>
+                    <span>状态: <strong id="TavernHelper-Status">加载中...</strong></span>
+                </div>
             </div>
-
-            <h3>阿斯塔利亚世界</h3>
-            <p>小时候的你读过那样的故事吗？在剑与魔法的异世界中，幻想中的故事。一句澄澈而坚定的誓言，一段英雄的骑行，一页由凡人书写的史诗。</p>
-            <p>“家园已在身后，世界尽在眼前。” ‌</p>
-            <p>“长夜将至，我从今开始守望，至死方休。我将不娶妻、不封地、不生子。我将不戴宝冠，不争荣宠。我将尽忠职守，生死于斯。我是黑暗中的利剑，长城上的守卫，抵御寒冷的烈焰，破晓时分的光线，唤醒眠者的号角，守护王国的坚盾。我将生命与荣耀献给守夜人，今夜如此，夜夜皆然。” ‌</p>
-            <p>“荣耀即吾命！”</p>
-            <p>“愿黑松长青，愿号角长鸣，愿理想闪耀如初，愿长剑锋利如故。”</p>
-            <p>这里是阿斯塔利亚。“剑与魔法”、“诗与远方”、“历史与传说”、“生者与死者”、“英雄与史诗”、“神灵与命运”的世界。</p>
-            <p>请拿起你梦中与儿时最浪漫的笔，亲自书写属于你自己的冒险故事吧。</p>
+            <div class="env-check-item">
+                <div class="env-check-label">
+                    <span class="icon">📄</span>
+                    <span>提示词模板 (EJS)</span>
+                </div>
+                <div class="env-check-details">
+                    <span>状态: <strong id="ejsTemplate-Status">加载中...</strong></span>
+                    <span>启用?: <strong id="ejsTemplate-Enabled">加载中...</strong></span>
+                </div>
+            </div>
+            <div class="env-check-item">
+                <div class="env-check-label">
+                    <span class="icon">🧩</span>
+                    <span>MVU 框架</span>
+                </div>
+                <div class="env-check-details">
+                    <span>状态: <strong id="MVU-Status">加载中...</strong></span>
+                </div>
+            </div>
         </div>
-    </details>
+        <div class="recheck-container">
+            <button id="recheck-btn" class="recheck-button">重新检查</button>
+        </div>
+        <h2 class="main-title">你的故事将从何开始</h2>
+        <ul class="scenario-list">
+            <li><button class="scenario-option" data-index="1">我的故事将由我亲手书写(自定义)</button></li>
+            <li><button class="scenario-option" data-index="2">《来自异世界的“勇者”》</button></li>
+            <li><button class="scenario-option" data-index="3">《红月之誓（画饼占坑）》</button></li>
+            <li><button class="scenario-option" data-index="4">《线与天堂与彼岸花》</button></li>
+            <li><button class="scenario-option" data-index="5">《慈悲的“魔王”（画饼占坑）》</button></li>
+        </ul>
+    </div>
 
-    <h2 class="main-title">选择你的开局</h2>
-    <p class="instructions">点击下方选项，即可开始你的冒险。</p>
-    
-    <ul class="scenario-list">
-        <li><button class="scenario-option" data-index="1">开局: 自定义开局</button></li>
-        <li><button class="scenario-option" data-index="2">特色开局1: 《来自异世界的“勇者”》</button></li>
-        <li><button class="scenario-option" data-index="3">特色开局2: 《红月之誓（画饼占坑）》</button></li>
-        <li><button class="scenario-option" data-index="4">DLC开局1: 《线与天堂与彼岸花》</button></li>
-        <li><button class="scenario-option" data-index="5">DLC开局2: 《慈悲的“魔王”（画饼占坑）》</button></li>
-    </ul>
-</div>
+    <script>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const options = document.querySelectorAll('.scenario-option');
+        document.addEventListener('DOMContentLoaded', () => {
+            const options = document.querySelectorAll('.scenario-option');
 
-    // Function to switch the starting message (swipe) in SillyTavern
-    async function switchSwipe(swipeId) {
-        if (typeof SillyTavern === 'undefined' || !SillyTavern.chat || SillyTavern.chat.length === 0) {
-            console.warn("SillyTavern environment not detected. Action will not be executed.");
-            return;
-        }
-        
-        const swipeIndex = swipeId; 
-        
-        if (typeof SillyTavern.chat[0].swipe_id !== 'undefined' && SillyTavern.chat[0].swipe_id !== swipeIndex) {
-            if(SillyTavern.chat[0].swipes && SillyTavern.chat[0].swipes.length > swipeIndex) {
-                SillyTavern.chat[0].swipe_id = swipeIndex;
-                SillyTavern.chat[0].mes = SillyTavern.chat[0].swipes[swipeIndex];
-                await SillyTavern.saveChat();
-                await SillyTavern.reloadCurrentChat();
-                console.log(`Successfully switched to scenario (swipe_id: ${swipeIndex}).`);
-            } else {
-                console.error(`Swipe index ${swipeIndex} is out of bounds or swipes array is missing.`);
+            // Function to switch the starting message (swipe) in SillyTavern
+            async function switchSwipe(swipeId) {
+                if (typeof SillyTavern === 'undefined' || !SillyTavern.chat || SillyTavern.chat.length === 0) {
+                    console.warn("SillyTavern environment not detected. Action will not be executed.");
+                    return;
+                }
+
+                const swipeIndex = swipeId;
+
+                if (typeof SillyTavern.chat[0].swipe_id !== 'undefined' && SillyTavern.chat[0].swipe_id !== swipeIndex) {
+                    if (SillyTavern.chat[0].swipes && SillyTavern.chat[0].swipes.length > swipeIndex) {
+                        SillyTavern.chat[0].swipe_id = swipeIndex;
+                        SillyTavern.chat[0].mes = SillyTavern.chat[0].swipes[swipeIndex];
+                        await SillyTavern.saveChat();
+                        await SillyTavern.reloadCurrentChat();
+                        console.log(`Successfully switched to scenario (swipe_id: ${swipeIndex}).`);
+                    } else {
+                        console.error(`Swipe index ${swipeIndex} is out of bounds or swipes array is missing.`);
+                    }
+                } else {
+                    console.log(`Scenario ${swipeIndex} is already selected or swipe data is unavailable.`);
+                }
             }
-        } else {
-            console.log(`Scenario ${swipeIndex} is already selected or swipe data is unavailable.`);
-        }
-    }
 
-    // Attach click event listeners to all scenario option buttons
-    options.forEach(button => {
-        button.addEventListener('click', function() {
-            const index = parseInt(this.dataset.index, 10);
-            options.forEach(opt => opt.classList.remove('selected'));
-            this.classList.add('selected');
-            switchSwipe(index);
+            // Attach click event listeners to all scenario option buttons
+            options.forEach(button => {
+                button.addEventListener('click', function () {
+                    const index = parseInt(this.dataset.index, 10);
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    switchSwipe(index);
+                });
+            });
+            envcheck()
+            const recheckButton = document.getElementById('recheck-btn');
+            if (recheckButton) {
+                recheckButton.addEventListener('click', envcheck);
+            }
         });
-    });
-});
-</script>
-
+        function envcheck() {
+            const TavernHelperVersion = getTavernHelperVersion();
+            if (TavernHelperVersion) {
+                if (compareVersion(TavernHelperVersion, "3.4.15") >= 0) {
+                    TavernHelperStatus = "正常";
+                } else {
+                    TavernHelperStatus = "版本过低";
+                }
+            } else {
+                TavernHelperVersion = "未知";
+                TavernHelperStatus = "未找到";
+            }
+            document.getElementById("TavernHelper-Version").innerText = TavernHelperVersion || "undefined";
+            document.getElementById("TavernHelper-Status").innerText = TavernHelperStatus || "undefined";
+            const context = window.top.SillyTavern.getContext();
+            const ejsTemplateSettings = context.extensionSettings.EjsTemplate;
+            if (ejsTemplateSettings) {
+                ejsTemplateStatus = "存在";
+                if (ejsTemplateSettings.enabled) {
+                    ejsTemplateEnabled = "已启用";
+                } else {
+                    ejsTemplateEnabled = "未启用";
+                }
+            } else {
+                ejsTemplateStatus = "未检测到提示词模板或无法访问";
+                ejsTemplateEnabled = "---"
+            };
+            document.getElementById("ejsTemplate-Status").innerText = ejsTemplateStatus || "undefined";
+            document.getElementById("ejsTemplate-Enabled").innerText = ejsTemplateEnabled || "undefined";
+            MVUcheck()
+            async function MVUcheck() {
+                let MVUStatus
+                try {
+                    await waitGlobalInitialized('Mvu');
+                    MVUStatus = "MVU框架正常"
+                } catch (error) {
+                    MVUStatus = "MVU框架异常或不可用"
+                }
+                document.getElementById("MVU-Status").innerText = MVUStatus || "undefined";
+            };
+            function compareVersion(v1, v2) {
+                const arr1 = v1.split(".").map(Number);
+                const arr2 = v2.split(".").map(Number);
+                const len = Math.max(arr1.length, arr2.length);
+                for (let i = 0; i < len; i++) {
+                    const num1 = arr1[i] || 0;
+                    const num2 = arr2[i] || 0;
+                    if (num1 > num2) return 1;
+                    if (num1 < num2) return -1;
+                }
+                return 0;
+            }
+        }
+    </script>
 </body>
 </html>
+
+```
