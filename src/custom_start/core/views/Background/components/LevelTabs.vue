@@ -1,23 +1,16 @@
 level-tabs
 <script setup lang="ts">
-import { computed } from 'vue';
-import { DestinedOnes } from '../../../data/destined-ones';
-
 interface Props {
   modelValue: string;
+  levels: string[];
 }
 
 interface Emits {
   (e: 'update:modelValue', value: string): void;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
-
-// 从数据中获取所有层级
-const levels = computed(() => {
-  return Object.keys(DestinedOnes);
-});
 
 const handleSelect = (level: string) => {
   emit('update:modelValue', level);
@@ -27,7 +20,7 @@ const handleSelect = (level: string) => {
 <template>
   <div class="level-tabs">
     <button
-      v-for="level in levels"
+      v-for="level in props.levels"
       :key="level"
       class="level-tab"
       :class="{ active: modelValue === level }"

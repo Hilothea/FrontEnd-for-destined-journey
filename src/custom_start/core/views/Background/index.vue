@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, watch, type Ref } from 'vue';
-import { Backgrounds } from '../../data/backgrounds';
-import { DestinedOnes } from '../../data/destined-ones';
+import { getBackgrounds } from '../../data/backgrounds';
+import { getAllDestinedOnes } from '../../data/destined-ones';
 import { useCharacterStore } from '../../store/character';
 import type { Background, DestinedOne } from '../../types';
 import BackgroundCategoryNav from './components/BackgroundCategoryNav.vue';
@@ -24,16 +24,20 @@ const currentLevel = ref<string>('');
 const currentBackgroundCategory = ref<string>('');
 const customBackgroundDescription = ref<string>('');
 
+// 提取分类和层级为计算属性，遵循 DRY 原则
+const destinedOneLevels = computed(() => Object.keys(getAllDestinedOnes()));
+const backgroundCategories = computed(() => Object.keys(getBackgrounds()));
+
 // 获取当前层级的命定之人列表
 const currentDestinedOnes = computed<DestinedOne[]>(() => {
   if (!currentLevel.value) return [];
-  return DestinedOnes[currentLevel.value] || [];
+  return getAllDestinedOnes()[currentLevel.value] || [];
 });
 
 // 获取当前分类的背景列表
 const currentBackgrounds = computed<Background[]>(() => {
   if (!currentBackgroundCategory.value) return [];
-  return Backgrounds[currentBackgroundCategory.value] || [];
+  return getBackgrounds()[currentBackgroundCategory.value] || [];
 });
 
 // 计算可用点数
@@ -115,14 +119,12 @@ const handleReset = () => {
   characterStore.resetExchangedPoints();
 
   // 重置到第一个分类
-  const levels = Object.keys(DestinedOnes);
-  if (levels.length > 0) {
-    currentLevel.value = levels[0];
+  if (destinedOneLevels.value.length > 0) {
+    currentLevel.value = destinedOneLevels.value[0];
   }
 
-  const categories = Object.keys(Backgrounds);
-  if (categories.length > 0) {
-    currentBackgroundCategory.value = categories[0];
+  if (backgroundCategories.value.length > 0) {
+    currentBackgroundCategory.value = backgroundCategories.value[0];
   }
 };
 
@@ -146,15 +148,13 @@ watch(resetPageTrigger, () => {
 // 初始化
 onMounted(() => {
   // 初始化命定之人层级
-  const levels = Object.keys(DestinedOnes);
-  if (levels.length > 0) {
-    currentLevel.value = levels[0];
+  if (destinedOneLevels.value.length > 0) {
+    currentLevel.value = destinedOneLevels.value[0];
   }
 
   // 初始化背景分类
-  const categories = Object.keys(Backgrounds);
-  if (categories.length > 0) {
-    currentBackgroundCategory.value = categories[0];
+  if (backgroundCategories.value.length > 0) {
+    currentBackgroundCategory.value = backgroundCategories.value[0];
   }
 });
 </script>
@@ -166,7 +166,7 @@ onMounted(() => {
       <h2 class="section-title">选择命定之人</h2>
 
       <!-- 层级导航 -->
-      <LevelTabs v-model="currentLevel" />
+      <LevelTabs v-model="currentLevel" :levels="destinedOneLevels" />
 
       <!-- 命定之人列表 -->
       <div class="destined-ones-content">
@@ -197,7 +197,7 @@ onMounted(() => {
       <div class="background-container">
         <!-- 左侧：分类导航 -->
         <div class="background-sidebar">
-          <BackgroundCategoryNav v-model="currentBackgroundCategory" />
+          <BackgroundCategoryNav v-model="currentBackgroundCategory" :categories="backgroundCategories" />
         </div>
 
         <!-- 右侧：背景列表 -->

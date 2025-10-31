@@ -1,22 +1,15 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { Backgrounds } from '../../../data/backgrounds';
-
 interface Props {
   modelValue: string;
+  categories: string[];
 }
 
 interface Emits {
   (e: 'update:modelValue', value: string): void;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
-
-// 从数据中获取所有分类
-const categories = computed(() => {
-  return Object.keys(Backgrounds);
-});
 
 const handleSelect = (category: string) => {
   emit('update:modelValue', category);
@@ -26,7 +19,7 @@ const handleSelect = (category: string) => {
 <template>
   <div class="background-category-nav">
     <button
-      v-for="category in categories"
+      v-for="category in props.categories"
       :key="category"
       class="category-item"
       :class="{ active: modelValue === category }"

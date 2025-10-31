@@ -36,13 +36,18 @@ const getCategoryDisplayName = (name: string): string => {
   return categoryNameMap[name] || name;
 };
 
+const equipments = computed(() => getEquipments());
+const initialItems = computed(() => getInitialItems());
+const activeSkills = computed(() => getActiveSkills());
+const passiveSkills = computed(() => getPassiveSkills());
+
 // 获取当前分类下的子分类列表
 const subCategories = computed(() => {
   switch (currentCategory.value) {
     case 'equipment':
-      return Object.keys(getEquipments());
+      return Object.keys(equipments.value);
     case 'item':
-      return Object.keys(getInitialItems());
+      return Object.keys(initialItems.value);
     case 'skill':
       return ['主动技能', '被动技能'];
     default:
@@ -55,9 +60,9 @@ const skillSubCategories = computed(() => {
   if (currentCategory.value !== 'skill') return [];
 
   if (currentSubCategory.value === '主动技能') {
-    return Object.keys(getActiveSkills());
+    return Object.keys(activeSkills.value);
   } else if (currentSubCategory.value === '被动技能') {
-    return Object.keys(getPassiveSkills());
+    return Object.keys(passiveSkills.value);
   }
   return [];
 });
@@ -85,39 +90,34 @@ onMounted(() => {
 
 // 获取当前要显示的物品列表（应用品质筛选）
 const currentItems = computed<(Equipment | Item | Skill)[]>(() => {
-  let items: (Equipment | Item | Skill)[] = [];
+  let sourceItems: (Equipment | Item | Skill)[] = [];
 
   switch (currentCategory.value) {
     case 'equipment':
-      items = (getEquipments()[currentSubCategory.value] || []) as Equipment[];
+      sourceItems = (equipments.value[currentSubCategory.value] || []) as Equipment[];
       break;
     case 'item':
-      items = (getInitialItems()[currentSubCategory.value] || []) as Item[];
+      sourceItems = (initialItems.value[currentSubCategory.value] || []) as Item[];
       break;
     case 'skill':
-      // 如果选择了技能子分类，显示该子分类的技能
-      if (currentSkillSubCategory.value) {
-        if (currentSubCategory.value === '主动技能') {
-          items = (getActiveSkills()[currentSkillSubCategory.value] || []) as Skill[];
-        } else if (currentSubCategory.value === '被动技能') {
-          items = (getPassiveSkills()[currentSkillSubCategory.value] || []) as Skill[];
-        }
-      } else if (currentSubCategory.value === '主动技能') {
-        // 否则显示所有主动技能
-        items = Object.values(getActiveSkills()).flat() as Skill[];
+      if (currentSubCategory.value === '主动技能') {
+        sourceItems = currentSkillSubCategory.value
+          ? activeSkills.value[currentSkillSubCategory.value] || []
+          : Object.values(activeSkills.value).flat();
       } else if (currentSubCategory.value === '被动技能') {
-        // 否则显示所有被动技能
-        items = Object.values(getPassiveSkills()).flat() as Skill[];
+        sourceItems = currentSkillSubCategory.value
+          ? passiveSkills.value[currentSkillSubCategory.value] || []
+          : Object.values(passiveSkills.value).flat();
       }
       break;
   }
 
   // 应用品质筛选
   if (currentRarity.value !== 'all') {
-    items = items.filter(item => item.rarity === currentRarity.value);
+    return sourceItems.filter(item => item.rarity === currentRarity.value);
   }
 
-  return items;
+  return sourceItems;
 });
 
 // 获取当前选中的物品列表

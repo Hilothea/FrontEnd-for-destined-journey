@@ -1,29 +1,49 @@
-import type { Equipment, Item, Skill } from '../types';
+import JSON5 from 'json5';
+import type { Background, DestinedOne, Equipment, Item, Skill } from '../types';
 
 /**
  * 数据基础路径 - CDN 部署环境
  */
 const DATA_BASE_PATH =
-  'https://testingcf.jsdelivr.net/gh/The-poem-of-destiny/FrontEnd-for-destined-journey@latest/public/assets/data';
+  'https://testingcf.jsdelivr.net/gh/The-poem-of-destiny/FrontEnd-for-destined-journey/public/assets/data';
+
+/**
+ * 生成带缓存破坏参数的 URL
+ * 添加时间戳参数来绕过 CDN 缓存
+ */
+function getCacheBustedUrl(path: string): string {
+  const timestamp = Date.now();
+  return `${path}?t=${timestamp}`;
+}
+
+/**
+ * 通用数据加载函数
+ * 使用 JSON5 解析，支持注释和更灵活的格式
+ */
+async function loadJsonData<T>(filename: string, dataName: string): Promise<T> {
+  try {
+    const response = await fetch(getCacheBustedUrl(`${DATA_BASE_PATH}/${filename}`));
+    if (!response.ok) {
+      console.log(`📝 未找到自定义数据文件 (${filename})`);
+      return {} as T;
+    }
+
+    const text = await response.text();
+    const data = JSON5.parse(text);
+    console.log(`✅ 成功加载自定义${dataName}数据`);
+    return data;
+  } catch (error) {
+    console.log(`📝 未找到自定义${dataName}数据或格式错误:`, error);
+    return {} as T;
+  }
+}
 
 /**
  * 加载自定义装备数据
  * 从 public/assets/data 目录加载用户自定义的装备数据
  */
 export async function loadCustomEquipments(): Promise<Record<string, Equipment[]>> {
-  try {
-    const response = await fetch(`${DATA_BASE_PATH}/equipments.json`);
-    if (!response.ok) {
-      console.log('📝 未找到自定义装备数据文件 (equipments.json)');
-      return {};
-    }
-    const data = await response.json();
-    console.log('✅ 成功加载自定义装备数据');
-    return data;
-  } catch (error) {
-    console.log('📝 未找到自定义装备数据或格式错误:', error);
-    return {};
-  }
+  return loadJsonData<Record<string, Equipment[]>>('equipments.json', '装备');
 }
 
 /**
@@ -31,61 +51,55 @@ export async function loadCustomEquipments(): Promise<Record<string, Equipment[]
  * 从 public/assets/data 目录加载用户自定义的道具数据
  */
 export async function loadCustomItems(): Promise<Record<string, Item[]>> {
-  try {
-    const response = await fetch(`${DATA_BASE_PATH}/items.json`);
-    if (!response.ok) {
-      console.log('📝 未找到自定义道具数据文件 (items.json)');
-      return {};
-    }
-    const data = await response.json();
-    console.log('✅ 成功加载自定义道具数据');
-    return data;
-  } catch (error) {
-    console.log('📝 未找到自定义道具数据或格式错误:', error);
-    return {};
-  }
+  return loadJsonData<Record<string, Item[]>>('items.json', '道具');
 }
 
 /**
  * 加载自定义技能数据
  * 从 public/assets/data 目录加载用户自定义的技能数据
+ * 兼容中英文字段名
  */
 export async function loadCustomSkills(): Promise<{
   ActiveSkills?: Record<string, Skill[]>;
   PassiveSkills?: Record<string, Skill[]>;
 }> {
-  try {
-    const response = await fetch(`${DATA_BASE_PATH}/skills.json`);
-    if (!response.ok) {
-      console.log('📝 未找到自定义技能数据文件 (skills.json)');
-      return {};
-    }
-    const data = await response.json();
+  const data = await loadJsonData<any>('skills.json', '技能');
 
-    // 将中文字段名转换为英文（兼容两种格式）
-    const result: {
-      ActiveSkills?: Record<string, Skill[]>;
-      PassiveSkills?: Record<string, Skill[]>;
-    } = {};
+  // 将中文字段名转换为英文（兼容两种格式）
+  const result: {
+    ActiveSkills?: Record<string, Skill[]>;
+    PassiveSkills?: Record<string, Skill[]>;
+  } = {};
 
-    if (data.主动技能) {
-      result.ActiveSkills = data.主动技能;
-    } else if (data.ActiveSkills) {
-      result.ActiveSkills = data.ActiveSkills;
-    }
-
-    if (data.被动技能) {
-      result.PassiveSkills = data.被动技能;
-    } else if (data.PassiveSkills) {
-      result.PassiveSkills = data.PassiveSkills;
-    }
-
-    console.log('✅ 成功加载自定义技能数据');
-    return result;
-  } catch (error) {
-    console.log('📝 未找到自定义技能数据或格式错误:', error);
-    return {};
+  if (data.主动技能) {
+    result.ActiveSkills = data.主动技能;
+  } else if (data.ActiveSkills) {
+    result.ActiveSkills = data.ActiveSkills;
   }
+
+  if (data.被动技能) {
+    result.PassiveSkills = data.被动技能;
+  } else if (data.PassiveSkills) {
+    result.PassiveSkills = data.PassiveSkills;
+  }
+
+  return result;
+}
+
+/**
+ * 加载自定义初始剧情数据
+ * 从 public/assets/data 目录加载用户自定义的初始剧情数据
+ */
+export async function loadCustomBackgrounds(): Promise<Record<string, Background[]>> {
+  return loadJsonData<Record<string, Background[]>>('backgrounds.json', '初始剧情');
+}
+
+/**
+ * 加载自定义命定之人数据
+ * 从 public/assets/data 目录加载用户自定义的初始剧情数据
+ */
+export async function loadCustomDestinedOnes(): Promise<Record<string, DestinedOne[]>> {
+  return loadJsonData<Record<string, DestinedOne[]>>('destinedOnes.json', '命定之人');
 }
 
 /**
