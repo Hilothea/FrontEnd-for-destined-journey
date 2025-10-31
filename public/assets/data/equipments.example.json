@@ -1,0 +1,44 @@
+{
+  "武器": [
+    {
+      "name": "新手长剑",
+      "cost": 5,
+      "type": "武器",
+      "rarity": "common",
+      "tag": "[力量][单手武器]",
+      "effect": "攻击力+5",
+      "description": "一把普通的长剑，适合新手使用"
+    },
+    {
+      "name": "精钢大剑",
+      "cost": 15,
+      "type": "武器",
+      "rarity": "uncommon",
+      "tag": "[力量][双手武器][重型]",
+      "effect": "攻击力+12，攻击速度-10%",
+      "description": "由精钢锻造的大剑，威力强大但沉重"
+    }
+  ],
+  "防具": [
+    {
+      "name": "皮质护甲",
+      "cost": 5,
+      "type": "防具",
+      "rarity": "common",
+      "tag": "[体质][轻甲]",
+      "effect": "防御力+3",
+      "description": "简单的皮质护甲，提供基础防护"
+    }
+  ],
+  "饰品": [
+    {
+      "name": "力量之戒",
+      "cost": 10,
+      "type": "饰品",
+      "rarity": "rare",
+      "tag": "[力量][戒指]",
+      "effect": "力量+2",
+      "description": "蕴含力量之力的魔法戒指"
+    }
+  ]
+}
