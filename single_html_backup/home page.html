@@ -32,6 +32,7 @@
             background-color: var(--item-bg-hover-color);
             border-color: var(--border-strong-color);
         }
+
         .env-check-container {
             border: 1px solid var(--border-color);
             border-radius: 6px;
@@ -566,14 +567,25 @@
             document.getElementById("ejsTemplate-Enabled").innerText = ejsTemplateEnabled || "undefined";
             MVUcheck()
             async function MVUcheck() {
-                let MVUStatus
+                let MVUStatus;
+                const timeoutDuration = 3000;
                 try {
-                    await waitGlobalInitialized('Mvu');
-                    MVUStatus = "MVU框架正常"
+                    const timeoutPromise = new Promise((_, reject) => {
+                        const timeoutId = setTimeout(() => {
+                            reject(new Error("timed out"));
+                        }, timeoutDuration);
+                    });
+                    await Promise.race([
+                        waitGlobalInitialized('Mvu'),
+                        timeoutPromise
+                    ]);
+
+                    MVUStatus = "MVU框架正常";
                 } catch (error) {
-                    MVUStatus = "MVU框架异常或不可用"
+                    MVUStatus = `MVU框架异常或不可用 (超时: ${timeoutDuration}ms)`;
+                } finally {
+                    document.getElementById("MVU-Status").innerText = MVUStatus || "undefined";
                 }
-                document.getElementById("MVU-Status").innerText = MVUStatus || "undefined";
             };
             function compareVersion(v1, v2) {
                 const arr1 = v1.split(".").map(Number);
@@ -590,6 +602,7 @@
         }
     </script>
 </body>
+
 </html>
 
 ```
